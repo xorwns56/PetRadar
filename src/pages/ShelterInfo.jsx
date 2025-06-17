@@ -10,7 +10,7 @@ const ShelterInfo = () => {
         "f6ISl+Wv7yUWp0+IGtly6gkDGU7h8l/m5cxyxgDXZmJnwNileMGkN39UXmBU5EOHGsnukcp2jg2E9VNEkq4CQw==";
       const encodedKey = encodeURIComponent(serviceKey);
 
-      const url = `/api/1543061/abandonmentPublicService_v2/abandonmentPublic_v2?serviceKey=${encodedKey}&_type=json`;
+      const url = `/api/1543061/abandonmentPublicService_v2/abandonmentPublic_v2?serviceKey=${encodedKey}&upr_cd=11&org&_type=json`;
       try {
         const response = await fetch(url);
         console.log(response);
@@ -33,11 +33,14 @@ const ShelterInfo = () => {
       <ul>
         {shelterList.map((shelter, idx) => (
           <li key={idx}>
-            {shelter.careNm} - {shelter.orgNm}
+            {shelter.careNm} - {shelter.orgNm} -{shelter.careRegNo}
           </li>
         ))}
         <li>shelterInfo</li>
       </ul>
+      <p>{shelterList}</p>
+
+      <Map shelters={shelterList} />
     </div>
   );
 };
