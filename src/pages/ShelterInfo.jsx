@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+// import handler from "../../api/shelters";
 
 const ShelterInfo = () => {
   const [shelterList, setShelterList] = useState([]);
