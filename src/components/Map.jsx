@@ -1,2 +1,4 @@
-const Map = () => {};
+const Map = () => {
+  
+};
 export default Map;
