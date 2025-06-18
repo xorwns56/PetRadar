@@ -1,25 +1,28 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import "../style/LoginForm.css";
 
-const LoginForm = ({ onCreate }) => {
+const LoginForm = ({ onLogin }) => {
+  const nav = useNavigate();
   const onSubmit = (event) => {
     event.preventDefault();
     if (!input.id) {
-      setErrorMsg("아이디를 입력해주세요");
+      setErrMsg("아이디를 입력해주세요");
       return;
     }
     if (!input.pw) {
-      setErrorMsg("비밀번호를 입력해주세요");
+      setErrMsg("비밀번호를 입력해주세요");
       return;
     }
-    const result = onCreate(input.id, input.pw);
-    if (!result) {
-      setErrorMsg(
+    const user = onLogin(input.id, input.pw);
+    if (!user) {
+      setErrMsg(
         "아이디 또는 비밀번호가 잘못 되었습니다. 아이디와 비밀번호를 정확히 입력해 주세요."
       );
       return;
     }
-    //생성 성공, 메인 페이지 이동
+    sessionStorage.setItem("user", JSON.stringify(user));
+    nav("/", { replace: true });
   };
   const [focus, setFocus] = useState({
     id: false,
@@ -30,7 +33,7 @@ const LoginForm = ({ onCreate }) => {
     pw: "",
   });
   const [pwHide, setPwHide] = useState(true);
-  const [errorMsg, setErrorMsg] = useState("");
+  const [errMsg, setErrMsg] = useState("");
   const onChangeInput = (event) => {
     setInput({
       ...input,
@@ -57,7 +60,7 @@ const LoginForm = ({ onCreate }) => {
   };
 
   return (
-    <form onSubmit={onSubmit}>
+    <form onSubmit={onSubmit} autoComplete="off">
       <div
         className={`input_item id ${focus.id ? "focus" : ""} ${
           input.id ? "on" : ""
@@ -66,13 +69,13 @@ const LoginForm = ({ onCreate }) => {
         <input
           type="text"
           name="id"
-          id="user_id"
+          id="login_id"
           onChange={onChangeInput}
           onFocus={onFocus}
           onBlur={onBlur}
           value={input.id}
         />
-        <label htmlFor="user_id">아이디</label>
+        <label htmlFor="login_id">아이디</label>
         <button
           type="button"
           className={`btn_delete ${input.id ? "" : "hide"}`}
@@ -111,10 +114,11 @@ const LoginForm = ({ onCreate }) => {
           }}
         ></button>
       </div>
-      <div className={`error_message ${errorMsg ? "" : "hide"}`}>
-        {errorMsg}
-      </div>
-      <button type="submit" className="btn_login">
+      <div className={`error_message ${errMsg ? "" : "hide"}`}>{errMsg}</div>
+      <button
+        type="submit"
+        className={`btn_login ${input.id && input.pw ? "on" : ""}`}
+      >
         로그인
       </button>
     </form>

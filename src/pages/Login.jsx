@@ -1,27 +1,30 @@
 import { useState } from "react";
+import { Link } from "react-router-dom";
 import "../style/Login.css";
 import LoginForm from "../components/LoginForm";
 
 const mockData = [
   {
-    id: "admin",
-    pw: "admin",
+    id: "xorwns56",
+    pw: "xorwns56",
   },
 ];
 
 const Login = () => {
-  const [users, setUsers] = useState(mockData);
-  const onCreate = (id, pw) => {
-    setUsers([...users, { id, pw }]);
+  const [users] = useState(mockData);
+  const onLogin = (id, pw) => {
+    return users.find((user) => user.id === id && user.pw === pw);
   };
 
   return (
     <>
-      <div className="container">
+      <div className="Login">
         <div className="header">로고</div>
         <div className="content">
-          <LoginForm onCreate={onCreate} />
-          <div className="register">회원가입</div>
+          <LoginForm onLogin={onLogin} />
+          <Link className="register" to="/register">
+            회원가입
+          </Link>
         </div>
       </div>
     </>
