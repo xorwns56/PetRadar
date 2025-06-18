@@ -1,4 +1,10 @@
+import "../style/SideBar.css"
+
 const SideBar = () => {
-  <h2>SideBar</h2>;
+  return(
+    <div className="SideBar">
+      
+    </div>
+  )
 };
 export default SideBar;

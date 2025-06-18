@@ -27,6 +27,7 @@ li {
   min-height: 100vh;
   height: 100%;
   margin: 0 auto;
-  padding: 0px 20px;
+  /* padding: 0px 20px; */
   box-shadow: rgba(100, 100, 100, 0.2) 0px 0px 29px 0px;
+  overflow: hidden;
 }
