@@ -1,12 +1,15 @@
 import "./App.css";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Home from "./pages/Home";
+
 import Login from "./pages/Login";
 import Register from "./pages/Register";
-import UserInfo from "./pages/UserInfo";
+import MyPage from "./pages/Mypage";
+
 import MissingReport from "./pages/MissingReport";
-import WitnessList from "./pages/WitnessList";
-import ShelterInfo from "./pages/ShelterInfo";
+import MissingList from "./pages/MissingList";
+
+import ShelterList from "./pages/ShelterList";
 import NotFound from "./pages/NotFound";
 
 function App() {
@@ -15,12 +18,15 @@ function App() {
       <BrowserRouter>
         <Routes>
           <Route path="/" element={<Home />} />
+
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
-          <Route path="/userInfo" element={<UserInfo />} />
+          <Route path="/myPage" element={<MyPage />} />
+
+          <Route path="/missingList" element={<MissingList />} />
           <Route path="/missingReport" element={<MissingReport />} />
-          <Route path="/witnessList" element={<WitnessList />} />
-          <Route path="/shelterInfo" element={<ShelterInfo />} />
+
+          <Route path="/shelterList" element={<ShelterList />} />
           <Route path="/*" element={<NotFound />} />
         </Routes>
       </BrowserRouter>
