@@ -4,20 +4,26 @@ import Map from "../components/Map";
 import MainMenu from "../components/MainMenu";
 import SideBar from "../components/SideBar";
 import { useNavigate } from "react-router-dom";
+import { useState } from "react";
 
 const Home = () => {
   const nav = useNavigate();
 
+  const [isActive, setIsActive] = useState(false);
+
   return (
     <div className="Home">
       {/* leftChild={true} */}
-      <Header rightChild={"로그인/회원가입"} />
+      <Header
+        rightChild={"로그인/회원가입"}
+        toggleSidebar={() => setIsActive((prev) => !prev)}
+      />
       <div className="main-container">
         <div className="menu-title">
           <h2>길 잃은 아이를 바로 신고해주세요.</h2>
           <p>간편한 원터치 기능으로 주변에 있는 보호소로 자동신고가 되요!</p>
         </div>
-        <Map style={{ width: "100%", height: "350px"}} />
+        <Map style={{ width: "100%", height: "350px" }} />
 
         <div className="mainMenu-container">
           <MainMenu
@@ -43,7 +49,7 @@ const Home = () => {
           />
         </div>
       </div>
-      <SideBar />
+      <SideBar isActive={isActive} toggleSidebar={() => setIsActive((prev) => !prev)}/>
     </div>
   );
 };

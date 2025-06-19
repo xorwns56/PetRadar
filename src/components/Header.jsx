@@ -1,7 +1,7 @@
 import { useNavigate } from "react-router-dom";
 import "../style/Header.css";
 
-const Header = ({ leftChild, rightChild }) => {
+const Header = ({ leftChild, toggleSidebar }) => {
   const nav = useNavigate();
   const isLogin = true;
   const goMyPage = () => {
@@ -27,7 +27,7 @@ const Header = ({ leftChild, rightChild }) => {
       </div>
       <div className="header_right">
         <p onClick={goMyPage}>{isLogin ? "마이페이지" : "로그인/회원가입"}</p>
-        <p className="Msg-bell"></p>
+        <p className="Msg-bell" onClick={toggleSidebar}></p>
       </div>
     </header>
   );
