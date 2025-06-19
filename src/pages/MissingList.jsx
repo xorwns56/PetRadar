@@ -1,25 +1,42 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { missingPet } from "../utils/missingPet";
 import Button from "../components/Button";
 import Header from "../components/Header";
-import ListItem from "../components/ListItem";
+import MissingItem from "../components/MissingItem";
 
 const MissingList = () => {
-  const [missigPetList, setMissingPetList] = useState(null);
+  const [selectedMissingPet, setSelectedMissingPet] = useState(null);
   const [sortType, setSortType] = useState("latest");
   const onChangeSortType = (e) => {
     setSortType(e.target.value);
   };
-  const getSortedData = (missingPet) => {
-    return missingPet.toSorted((prev, next) => {
+
+  const getSortedData = () => {
+    return [...missingPet].toSorted((prev, next) => {
+      const prevDate = new Date(prev.petMissingDate);
+      const nextDate = new Date(next.petMissingDate);
       if (sortType === "oldest") {
-        return Number(prev.petMissingDate) - Number(next.petMissingDate);
+        return prevDate - nextDate;
       } else {
-        return Number(next.petMissingDate) - Number(prev.petMissingDate);
+        return nextDate - prevDate;
       }
     });
   };
   const sortedData = getSortedData();
+
+  const [search, setSearch] = useState("");
+  const onChangeSearch = (e) => {
+    setSearch(e.target.value);
+  };
+  const getFilterTitle = () => {
+    if (search === "") {
+      return sortedData;
+    }
+    return sortedData.filter((title) =>
+      title.petTitle.toLowerCase().includes(search.toLowerCase())
+    );
+  };
+  const getFilterTitleData = getFilterTitle();
 
   return (
     <div>
@@ -29,18 +46,24 @@ const MissingList = () => {
           <option value={"latest"}>최신순</option>
           <option value={"oldest"}>오래된 순</option>
         </select>
-        <input placeholder="검색할 제목을 입력하세요." />
+        <input
+          value={search}
+          onChange={onChangeSearch}
+          placeholder="검색할 제목을 입력하세요."
+        />
         <Button text={"조회하기"} />
       </div>
       <div>
-        {sortedData.map((item) => (
-          <ListItem key={item.id} {...item} />
+        {getFilterTitleData.map((item) => (
+          <MissingItem key={item.id} {...item} />
         ))}
       </div>
-
-      {missigPetList && (
-        <Modal onClose={() => setMissingPetList(null)}>{missigPetList}</Modal>
+      {selectedMissingPet && (
+        <Modal onClose={() => setSelectedMissingPet(null)}>
+          {selectedMissingPet}
+        </Modal>
       )}
+      <Button text={"실종 동물 신고"} />
     </div>
   );
 };
