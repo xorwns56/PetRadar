@@ -11,6 +11,8 @@ import MissingList from "./pages/MissingList";
 
 import ShelterList from "./pages/ShelterList";
 import NotFound from "./pages/NotFound";
+import { SidebarProvider } from "./hooks/SidebarContext";
+import SideBar from "./components/SideBar";
 
 import { UsersProvider } from "./contexts/UsersContext";
 import { LoginUserProvider } from "./contexts/LoginUserContext";
@@ -21,6 +23,8 @@ function App() {
       <UsersProvider>
         <LoginUserProvider>
           <BrowserRouter>
+               <SidebarProvider>
+          <SideBar />
             <Routes>
               <Route path="/" element={<Home />} />
 
@@ -34,6 +38,7 @@ function App() {
               <Route path="/shelterList" element={<ShelterList />} />
               <Route path="/*" element={<NotFound />} />
             </Routes>
+  </SidebarProvider>
           </BrowserRouter>
         </LoginUserProvider>
       </UsersProvider>

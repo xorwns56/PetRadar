@@ -7,6 +7,7 @@ body {
   margin: 0;
   width: 100%;
   background-color: rgb(246, 246, 246);
+  overflow: hidden;
 }
 
 * {
@@ -21,13 +22,18 @@ li {
 }
 
 #root {
+  position: relative;
   background-color: #fff;
   width: 60%;
   min-width: 600px;
   min-height: 100vh;
   height: 100%;
   margin: 0 auto;
-  /* padding: 0px 20px; */
   box-shadow: rgba(100, 100, 100, 0.2) 0px 0px 29px 0px;
   overflow: hidden;
+}
+
+.inner {
+  max-width: 800px;
+  margin: 0 auto;
 }
