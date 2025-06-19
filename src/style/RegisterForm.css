@@ -1,0 +1,97 @@
+.Register .input_item {
+  position: relative;
+  height: 60px;
+  padding: 27px 15px 8px;
+  border: 1px solid #c5ccd2;
+  box-sizing: border-box;
+}
+
+.Register button,
+.Register input {
+  border-radius: 0;
+  border: none;
+  outline: 0;
+  cursor: pointer;
+  width: 100%;
+  font-size: 16px;
+}
+
+.Register .input_item.id {
+  border-radius: 8px 8px 0 0;
+}
+
+.Register .input_item.hp {
+  border-radius: 0 0 8px 8px;
+}
+
+.Register .input_item > label {
+  display: inline-block;
+  position: absolute;
+  bottom: 18px;
+  left: 15px;
+  font-size: 16px;
+  font-weight: 400;
+  line-height: 22px;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  color: rgba(0, 0, 0, 0.38);
+  box-sizing: border-box;
+  cursor: pointer;
+}
+
+.Register .input_item.focus {
+  border: 2px solid black;
+}
+
+.Register .input_item.err {
+  border: 1px solid red;
+}
+
+.Register .input_item.on > #register_pw {
+  padding-right: 34px;
+}
+
+.Register .input_item.on > label,
+.Register .input_item.focus > label {
+  bottom: 30px;
+  font-size: 12px;
+}
+
+.Register .btn_view {
+  position: absolute;
+  top: 10px;
+  right: 3px;
+  width: 22px;
+  height: 22px;
+  margin: 9px;
+}
+
+.Register .btn_login {
+  padding: 13px 20px;
+  border-radius: 8px;
+  background-color: #c5ccd2;
+  box-sizing: border-box;
+  cursor: pointer;
+  margin-top: 20px;
+  margin-bottom: 20px;
+  font-size: 17px;
+  font-weight: 700;
+  line-height: 24px;
+  color: #fff;
+}
+
+.Register .hide {
+  display: none;
+}
+
+.Register .btn_login.on {
+  background-color: black;
+}
+
+.Register .error_message {
+  margin-top: 20px;
+  font-size: 12px;
+  line-height: 16px;
+  color: #ff0101;
+  font-weight: bold;
+  text-align: left;
+}
