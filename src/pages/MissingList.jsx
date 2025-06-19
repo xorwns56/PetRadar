@@ -1,56 +1,46 @@
 import { useEffect, useState } from "react";
+import { missingPet } from "../utils/missingPet";
 import Button from "../components/Button";
+import Header from "../components/Header";
 import ListItem from "../components/ListItem";
-import axios from "axios";
 
 const MissingList = () => {
-  const [missingPetList, setMissingPetList] = useState([]);
-  const API_KEY = import.meta.env.VITE_API_KEY;
-
-  const apiMissingPet = async () => {
-    try {
-      const url =
-        "https://openapi.gg.go.kr/AbdmAnimalProtect?Key=60554ebd49694348a45e46de06912bbd&Type=json&pIndex=1&pSize=100";
-      const response = await axios.get(url, {
-        params: {
-          KEY: API_KEY,
-          Type: "json",
-          pIndex: 1,
-          pSize: 20,
-        },
-      });
-      const data = response?.data?.AbdmAnimalProtect;
-      console.log(data);
-      if (data) {
-        setMissingPetList(data);
-      }
-    } catch (error) {
-      console.log("API 호출 실패 : ", error);
-    }
+  const [missigPetList, setMissingPetList] = useState(null);
+  const [sortType, setSortType] = useState("latest");
+  const onChangeSortType = (e) => {
+    setSortType(e.target.value);
   };
-
-  useEffect(() => {
-    apiMissingPet();
-  }, []);
+  const getSortedData = (missingPet) => {
+    return missingPet.toSorted((prev, next) => {
+      if (sortType === "oldest") {
+        return Number(prev.petMissingDate) - Number(next.petMissingDate);
+      } else {
+        return Number(next.petMissingDate) - Number(prev.petMissingDate);
+      }
+    });
+  };
+  const sortedData = getSortedData();
 
   return (
-    <div
-      style={{ border: "1px solid black", width: "500px", height: "1000pxs" }}
-    >
-      <h2>실종 동물 목록</h2>
+    <div>
+      <Header leftChild={true} />
       <div>
-        <select>
+        <select value={sortType} onChange={onChangeSortType}>
           <option value={"latest"}>최신순</option>
           <option value={"oldest"}>오래된 순</option>
         </select>
         <input placeholder="검색할 제목을 입력하세요." />
-        <Button />
+        <Button text={"조회하기"} />
       </div>
       <div>
-        <ListItem />
-        <ListItem />
-        <ListItem />
+        {sortedData.map((item) => (
+          <ListItem key={item.id} {...item} />
+        ))}
       </div>
+
+      {missigPetList && (
+        <Modal onClose={() => setMissingPetList(null)}>{missigPetList}</Modal>
+      )}
     </div>
   );
 };
