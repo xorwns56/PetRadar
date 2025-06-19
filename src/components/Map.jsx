@@ -1,5 +1,5 @@
-
 import { useEffect, useRef } from "react";
+import "../style/Map.css";
 
 const Map = ({ shelters, onSelect }) => {
   const mapRef = useRef(null);
@@ -53,12 +53,7 @@ const Map = ({ shelters, onSelect }) => {
     document.head.appendChild(script);
   }, [shelters, onSelect]);
 
-  return (
-    <div
-      ref={mapRef}
-      style={{ width: "100%", height: "400px", borderRadius: "10px" }}
-    />
-  );
+  return <div className="Map" ref={mapRef}></div>;
 };
 
 export default Map;
