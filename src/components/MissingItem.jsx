@@ -7,6 +7,7 @@ const MissingItem = ({
   petType,
   petSex,
   petAge,
+  petTitle,
   petMissingDate,
 }) => {
   return (
@@ -17,6 +18,7 @@ const MissingItem = ({
       </div>
       {/* missingPet content */}
       <div>
+        <div>{petTitle}</div>
         <div>{petType}</div>
         <div>{petSex}</div>
         <div>{petName}</div>
