@@ -39,3 +39,17 @@
   gap: 20px;
   cursor: pointer;
 }
+
+.Header .header_right .Msg-bell {
+  background-image: url(/public/Msg-Bell.png);
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: cover;
+  width: 30px;
+  height: 30px;
+  transition: .35s;
+}
+
+.Header .header_right .Msg-bell:hover {
+  background-image: url(/public/Msg-Bell-hover.png);
+}

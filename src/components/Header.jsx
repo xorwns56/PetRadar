@@ -25,11 +25,9 @@ const Header = ({ leftChild, rightChild }) => {
       <div className="header_center">
         <img src="/PetRadar-Logo.png" alt="logo" />
       </div>
-      <div className="header_right" onClick={goMyPage}>
-        <p>{isLogin ? "마이페이지" : "로그인/회원가입"}</p>
-        <p className="Msg-bell">
-          <img src="/Msg-Bell.png" alt="msg" />
-        </p>
+      <div className="header_right">
+        <p onClick={goMyPage}>{isLogin ? "마이페이지" : "로그인/회원가입"}</p>
+        <p className="Msg-bell"></p>
       </div>
     </header>
   );
