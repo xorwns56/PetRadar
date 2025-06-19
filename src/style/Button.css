@@ -1,0 +1,26 @@
+.Button {
+  background-color: #F47835;
+  cursor: pointer;
+  border: none;
+  font-size: 18px;
+  white-space: nowrap;
+  color: white;
+}
+
+.Button_Circle{
+  border-radius: 50%;
+  width: 30px;
+  height: 30px;
+}
+
+.Button_Square{
+  padding: 10px 20px;
+  border-radius: 5px;
+}
+
+.Button_Square_lg{
+  width: 100%;
+  padding: 10px 20px;
+  border-radius: 5px;
+}
+

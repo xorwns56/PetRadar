@@ -1,0 +1,25 @@
+.MainMenu {
+  width: 32%;
+  min-width: 200px;
+  height: 230px;
+  border: 2px solid #FFA516;
+  padding: 30px;
+  border-radius: 30px;
+  cursor: pointer;
+  transition: .5s;
+}
+
+.MainMenu:hover {
+  border: 2px solid #FFA516;
+  background-color: #FFA516;
+  color: #fff;
+}
+
+.MainMenu h2 {
+  font-size: 22px;
+}
+
+.MainMenu p {
+  font-size: 16px;
+  padding-top: 15px;
+}
