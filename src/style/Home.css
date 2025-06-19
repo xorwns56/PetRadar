@@ -1,10 +1,10 @@
-.Home{
+.Home {
   position: relative;
   height: 100vh;
   background-color: #FFF9F0;
 }
 
-.Home .main-container{
+.Home .main-container {
   max-width: 800px;
   margin: 0 auto;
   display: flex;
@@ -13,20 +13,20 @@
 }
 
 /* menu-title */
-.Home .menu-title{
+.Home .menu-title {
   text-align: center;
   margin-top: 30px;
   line-height: 1.5;
-  padding: 20px;
+  padding: 10px;
 }
 
-.Home .menu-title h2{
+.Home .menu-title h2 {
   font-size: 28px;
   padding-bottom: 15px;
 }
 
 /* mainMenu-container */
-.Home .mainMenu-container{
+.Home .mainMenu-container {
   display: flex;
   justify-content: space-between;
 }
