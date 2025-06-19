@@ -1,3 +1,14 @@
+.MissingList {
+  height: 100vh;
+}
+
+.MissingList .MissingList-conatiner {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  height: 100%;
+}
+
 /* menu-title */
 .MissingList .menu-title {
   text-align: center;
@@ -14,7 +25,18 @@
   margin: 10px 0;
 }
 
+.MissingList .search-box select {
+  width: 100px;
+}
+
 .MissingList .search-box input {
   flex: 1;
 }
 
+.MissingList .MissingItems {
+  border: 1px solid #f00;
+}
+
+.MissingList .MissingList-btn {
+  align-items: end;
+}

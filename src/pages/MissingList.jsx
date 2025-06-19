@@ -42,7 +42,7 @@ const MissingList = () => {
   return (
     <div className="MissingList">
       <Header leftChild={true} />
-      <div className="inner">
+      <div className="MissingList-conatiner inner">
         <div className="menu-title">
           <h2>실종동물 목록</h2>
         </div>
@@ -65,7 +65,9 @@ const MissingList = () => {
           ))}
         </div>
 
-        <Button text={"실종 동물 신고"} type={"Square_lg"} />
+        <div className="MissingList-btn">
+          <Button text={"실종 동물 신고"} type={"Square_lg"} />
+        </div>
       </div>
 
       {/* selectedMissingPet 아직 미작업 */}

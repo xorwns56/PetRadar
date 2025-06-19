@@ -15,8 +15,6 @@ const Home = () => {
           <h2>길 잃은 아이를 바로 신고해주세요.</h2>
           <p>간편한 원터치 기능으로 주변에 있는 보호소로 자동신고가 되요!</p>
         </div>
-        <Map style={{ width: "100%", height: "350px" }} />
-
         <div className="mainMenu-container">
           <MainMenu
             mainTitle={"신고"}
@@ -40,6 +38,7 @@ const Home = () => {
             }}
           />
         </div>
+        <Map />
       </div>
     </div>
   );
