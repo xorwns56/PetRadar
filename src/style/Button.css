@@ -1,11 +1,10 @@
 .Button {
-  background: linear-gradient(to bottom, #F47835, #FCC430);
+  background-color: #F47835;
   cursor: pointer;
   border: none;
   font-size: 18px;
   white-space: nowrap;
   color: white;
-  margin: 10px;
 }
 
 .Button_Circle{
