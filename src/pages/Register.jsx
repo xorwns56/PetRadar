@@ -7,9 +7,9 @@ const Register = () => {
   const isExist = (id) => {
     return users.some((user) => user.id === id);
   };
-  const onRegister = (id, pw, name) => {
+  const onRegister = (id, pw, hp) => {
     if (isExist(id)) return false;
-    setUsers([...users, { id, pw, name }]);
+    setUsers([...users, { id, pw, hp }]);
     return true;
   };
 

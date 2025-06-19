@@ -20,7 +20,7 @@
   border-radius: 8px 8px 0 0;
 }
 
-.Register .input_item.name {
+.Register .input_item.hp {
   border-radius: 0 0 8px 8px;
 }
 
@@ -47,7 +47,7 @@
 }
 
 .Register .input_item.on > #register_id,
-.Register .input_item.on > #register_name {
+.Register .input_item.on > #register_hp {
   padding-right: 34px;
 }
 

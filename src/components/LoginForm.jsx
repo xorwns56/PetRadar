@@ -7,11 +7,11 @@ const LoginForm = ({ onLogin }) => {
   const onSubmit = (event) => {
     event.preventDefault();
     if (!input.id) {
-      setErrMsg("아이디를 입력해주세요");
+      setErrMsg("아이디를 입력해주세요.");
       return;
     }
     if (!input.pw) {
-      setErrMsg("비밀번호를 입력해주세요");
+      setErrMsg("비밀번호를 입력해주세요.");
       return;
     }
     const user = onLogin(input.id, input.pw);

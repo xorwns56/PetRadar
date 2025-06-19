@@ -3,19 +3,37 @@ import "../style/RegisterForm.css";
 import { useState } from "react";
 const RegisterForm = ({ onRegister, isExist }) => {
   const nav = useNavigate();
+  const formCheck = (name) => {
+    const newErrMsg = {};
+    if (!input.id) {
+      newErrMsg.id = "아이디를 입력해주세요.";
+    } else if (isExist(input.id)) {
+      newErrMsg.id = "사용할 수 없는 아이디입니다. 다른 아이디를 입력해주세요.";
+    }
+    const pwRegex = /^(?=.*[a-zA-Z])(?=.*\d)(?=.*[^\w\s]).{8,}$/;
+    if (!input.pw) {
+      newErrMsg.pw = "비밀번호를 입력해주세요.";
+    } else if (!pwRegex.test(input.pw)) {
+      newErrMsg.pw =
+        "비밀번호는 영문, 숫자, 특수문자를 포함한 8자 이상이어야 합니다.";
+    }
+    const hpRegex = /^01[0-9]{1}-\d{3,4}-\d{4}$/;
+    if (!input.hp) {
+      newErrMsg.hp = "연락처를 입력해주세요.";
+    } else if (!hpRegex.test(input.hp)) {
+      newErrMsg.hp = "올바른 연락처 형식을 입력해 주세요. (예: 010-1234-5678)";
+    }
+    setErrMsg(name ? { ...errMsg, [name]: newErrMsg[name] } : newErrMsg);
+    return JSON.stringify(newErrMsg) === "{}";
+  };
   const onSubmit = (event) => {
     event.preventDefault();
-    if (
-      !input.id ||
-      !input.pw ||
-      !input.name ||
-      errMsg.id ||
-      errMsg.pw ||
-      errMsg.name
-    )
-      //errMsg를 여기서 쓰면 안될거 같고 그냥 form check를 따로 만들어서 한꺼번에 에러 체크 후 포커스 잃을때 실행해야될듯?
+    const check = formCheck();
+    if (!check) {
+      console.log("등록 실패");
       return;
-    const result = onRegister(input.id, input.pw, input.name);
+    }
+    const result = onRegister(input.id, input.pw, input.hp);
     if (!result) {
       console.log("등록 실패");
       return;
@@ -25,17 +43,17 @@ const RegisterForm = ({ onRegister, isExist }) => {
   const [focus, setFocus] = useState({
     id: false,
     pw: false,
-    name: false,
+    hp: false,
   });
   const [input, setInput] = useState({
     id: "",
     pw: "",
-    name: "",
+    hp: "",
   });
   const [errMsg, setErrMsg] = useState({
     id: "",
     pw: "",
-    name: "",
+    hp: "",
   });
   const [pwHide, setPwHide] = useState(true);
   const onChangeInput = (event) => {
@@ -51,8 +69,8 @@ const RegisterForm = ({ onRegister, isExist }) => {
     });
   };
 
-  //onBlur일때 에러 체크를 해야한다.
   const onBlur = (event) => {
+    formCheck(event.target.name);
     setFocus({
       ...focus,
       [event.target.name]: false,
@@ -96,20 +114,20 @@ const RegisterForm = ({ onRegister, isExist }) => {
       </div>
 
       <div
-        className={`input_item name ${focus.name ? "focus" : ""} ${
-          input.name ? "on" : ""
-        } ${errMsg.name ? "err" : ""}`}
+        className={`input_item hp ${focus.hp ? "focus" : ""} ${
+          input.hp ? "on" : ""
+        } ${errMsg.hp ? "err" : ""}`}
       >
         <input
           type="text"
-          name="name"
-          id="register_name"
+          name="hp"
+          id="register_hp"
           onChange={onChangeInput}
           onFocus={onFocus}
           onBlur={onBlur}
-          value={input.name}
+          value={input.hp}
         />
-        <label htmlFor="register_name">닉네임</label>
+        <label htmlFor="register_hp">연락처</label>
       </div>
 
       <div className={`error_message ${errMsg.id ? "" : "hide"}`}>
@@ -118,18 +136,18 @@ const RegisterForm = ({ onRegister, isExist }) => {
       <div className={`error_message ${errMsg.pw ? "" : "hide"}`}>
         {errMsg.pw}
       </div>
-      <div className={`error_message ${errMsg.name ? "" : "hide"}`}>
-        {errMsg.name}
+      <div className={`error_message ${errMsg.hp ? "" : "hide"}`}>
+        {errMsg.hp}
       </div>
       <button
         type="submit"
         className={`btn_login ${
           !input.id ||
           !input.pw ||
-          !input.name ||
+          !input.hp ||
           errMsg.id ||
           errMsg.pw ||
-          errMsg.name
+          errMsg.hp
             ? ""
             : "on"
         }`}
