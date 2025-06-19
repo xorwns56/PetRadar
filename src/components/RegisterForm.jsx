@@ -1,7 +1,13 @@
 import { useNavigate } from "react-router-dom";
 import "../style/RegisterForm.css";
 import { useState } from "react";
-const RegisterForm = ({ onRegister, isExist }) => {
+import { useUsersDispatch, useUsersState } from "../contexts/UsersContext";
+const RegisterForm = () => {
+  const usersState = useUsersState();
+  const usersDispatch = useUsersDispatch();
+  const isExist = (id) => {
+    return usersState.some((user) => user.id === id);
+  };
   const nav = useNavigate();
   const formCheck = (name) => {
     const newErrMsg = {};
@@ -28,16 +34,15 @@ const RegisterForm = ({ onRegister, isExist }) => {
   };
   const onSubmit = (event) => {
     event.preventDefault();
-    const check = formCheck();
-    if (!check) {
-      console.log("등록 실패");
-      return;
-    }
-    const result = onRegister(input.id, input.pw, input.hp);
-    if (!result) {
-      console.log("등록 실패");
-      return;
-    }
+    if (!formCheck()) return;
+    usersDispatch({
+      type: "CREATE",
+      data: {
+        id: input.id,
+        pw: input.pw,
+        hp: input.hp,
+      },
+    });
     nav("/login", { replace: true });
   };
   const [focus, setFocus] = useState({
@@ -76,7 +81,6 @@ const RegisterForm = ({ onRegister, isExist }) => {
       [event.target.name]: false,
     });
   };
-
   return (
     <form onSubmit={onSubmit} autoComplete="off">
       <div
@@ -95,14 +99,13 @@ const RegisterForm = ({ onRegister, isExist }) => {
         />
         <label htmlFor="register_id">아이디</label>
       </div>
-
       <div
         className={`input_item pw ${focus.pw ? "focus" : ""} ${
           input.pw ? "on" : ""
         } ${errMsg.pw ? "err" : ""}`}
       >
         <input
-          type="password"
+          type={pwHide ? "password" : "text"}
           name="pw"
           id="register_pw"
           onChange={onChangeInput}
@@ -111,8 +114,14 @@ const RegisterForm = ({ onRegister, isExist }) => {
           value={input.pw}
         />
         <label htmlFor="register_pw">비밀번호</label>
+        <button
+          type="button"
+          className={`btn_view ${input.pw ? "" : "hide"}`}
+          onClick={() => {
+            setPwHide(!pwHide);
+          }}
+        ></button>
       </div>
-
       <div
         className={`input_item hp ${focus.hp ? "focus" : ""} ${
           input.hp ? "on" : ""
@@ -129,7 +138,6 @@ const RegisterForm = ({ onRegister, isExist }) => {
         />
         <label htmlFor="register_hp">연락처</label>
       </div>
-
       <div className={`error_message ${errMsg.id ? "" : "hide"}`}>
         {errMsg.id}
       </div>

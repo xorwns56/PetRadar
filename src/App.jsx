@@ -12,24 +12,31 @@ import MissingList from "./pages/MissingList";
 import ShelterList from "./pages/ShelterList";
 import NotFound from "./pages/NotFound";
 
+import { UsersProvider } from "./contexts/UsersContext";
+import { LoginUserProvider } from "./contexts/LoginUserContext";
+
 function App() {
   return (
     <>
-      <BrowserRouter>
-        <Routes>
-          <Route path="/" element={<Home />} />
+      <UsersProvider>
+        <LoginUserProvider>
+          <BrowserRouter>
+            <Routes>
+              <Route path="/" element={<Home />} />
 
-          <Route path="/login" element={<Login />} />
-          <Route path="/register" element={<Register />} />
-          <Route path="/myPage" element={<MyPage />} />
+              <Route path="/login" element={<Login />} />
+              <Route path="/register" element={<Register />} />
+              <Route path="/myPage" element={<MyPage />} />
 
-          <Route path="/missingList" element={<MissingList />} />
-          <Route path="/missingReport" element={<MissingReport />} />
+              <Route path="/missingList" element={<MissingList />} />
+              <Route path="/missingReport" element={<MissingReport />} />
 
-          <Route path="/shelterList" element={<ShelterList />} />
-          <Route path="/*" element={<NotFound />} />
-        </Routes>
-      </BrowserRouter>
+              <Route path="/shelterList" element={<ShelterList />} />
+              <Route path="/*" element={<NotFound />} />
+            </Routes>
+          </BrowserRouter>
+        </LoginUserProvider>
+      </UsersProvider>
     </>
   );
 }

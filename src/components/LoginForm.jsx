@@ -1,9 +1,15 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import "../style/LoginForm.css";
-
-const LoginForm = ({ onLogin }) => {
+import { useUsersState } from "../contexts/UsersContext";
+import { useLoginUser } from "../contexts/LoginUserContext";
+const LoginForm = () => {
+  const usersState = useUsersState();
+  const { login } = useLoginUser();
   const nav = useNavigate();
+  const Login = (id, pw) => {
+    return usersState.find((user) => user.id === id && user.pw === pw);
+  };
   const onSubmit = (event) => {
     event.preventDefault();
     if (!input.id) {
@@ -14,14 +20,14 @@ const LoginForm = ({ onLogin }) => {
       setErrMsg("비밀번호를 입력해주세요.");
       return;
     }
-    const user = onLogin(input.id, input.pw);
+    const user = Login(input.id, input.pw);
     if (!user) {
       setErrMsg(
         "아이디 또는 비밀번호가 잘못 되었습니다. 아이디와 비밀번호를 정확히 입력해 주세요."
       );
       return;
     }
-    sessionStorage.setItem("user", JSON.stringify(user));
+    login(input.id);
     nav("/", { replace: true });
   };
   const [focus, setFocus] = useState({
