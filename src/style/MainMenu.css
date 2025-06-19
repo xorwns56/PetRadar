@@ -1,0 +1,19 @@
+.MainMenu{
+  width: 32%;
+  min-width: 200px;
+  height: 230px;
+  background: linear-gradient(to bottom, #F47835, #FCC430);
+  padding: 30px;
+  border-radius: 30px;
+  color: #fff;
+  cursor: pointer;
+}
+
+.MainMenu h2{
+  font-size: 22px;
+}
+
+.MainMenu p{
+  font-size: 16px;
+  padding-top: 15px;
+}
