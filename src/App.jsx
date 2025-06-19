@@ -11,24 +11,29 @@ import MissingList from "./pages/MissingList";
 
 import ShelterList from "./pages/ShelterList";
 import NotFound from "./pages/NotFound";
+import { SidebarProvider } from "./hooks/SidebarContext";
+import SideBar from "./components/SideBar";
 
 function App() {
   return (
     <>
       <BrowserRouter>
-        <Routes>
-          <Route path="/" element={<Home />} />
+        <SidebarProvider>
+          <SideBar />
+          <Routes>
+            <Route path="/" element={<Home />} />
 
-          <Route path="/login" element={<Login />} />
-          <Route path="/register" element={<Register />} />
-          <Route path="/myPage" element={<MyPage />} />
+            <Route path="/login" element={<Login />} />
+            <Route path="/register" element={<Register />} />
+            <Route path="/myPage" element={<MyPage />} />
 
-          <Route path="/missingList" element={<MissingList />} />
-          <Route path="/missingReport" element={<MissingReport />} />
+            <Route path="/missingList" element={<MissingList />} />
+            <Route path="/missingReport" element={<MissingReport />} />
 
-          <Route path="/shelterList" element={<ShelterList />} />
-          <Route path="/*" element={<NotFound />} />
-        </Routes>
+            <Route path="/shelterList" element={<ShelterList />} />
+            <Route path="/*" element={<NotFound />} />
+          </Routes>
+        </SidebarProvider>
       </BrowserRouter>
     </>
   );

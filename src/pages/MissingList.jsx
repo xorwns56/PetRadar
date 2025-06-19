@@ -1,3 +1,4 @@
+import "../style/MissingList.css";
 import { useState } from "react";
 import { missingPet } from "../utils/missingPet";
 import Button from "../components/Button";
@@ -39,31 +40,40 @@ const MissingList = () => {
   const getFilterTitleData = getFilterTitle();
 
   return (
-    <div>
+    <div className="MissingList">
       <Header leftChild={true} />
-      <div>
-        <select value={sortType} onChange={onChangeSortType}>
-          <option value={"latest"}>최신순</option>
-          <option value={"oldest"}>오래된 순</option>
-        </select>
-        <input
-          value={search}
-          onChange={onChangeSearch}
-          placeholder="검색할 제목을 입력하세요."
-        />
-        <Button text={"조회하기"} />
+      <div className="inner">
+        <div className="menu-title">
+          <h2>실종동물 목록</h2>
+        </div>
+        <div className="search-box">
+          <select value={sortType} onChange={onChangeSortType}>
+            <option value={"latest"}>최신순</option>
+            <option value={"oldest"}>오래된 순</option>
+          </select>
+          <input
+            value={search}
+            onChange={onChangeSearch}
+            placeholder="검색할 제목을 입력하세요."
+          />
+          <Button text={"조회"} type={"Square"} />
+        </div>
+
+        <div className="MissingItems">
+          {getFilterTitleData.map((item) => (
+            <MissingItem key={item.id} {...item} />
+          ))}
+        </div>
+
+        <Button text={"실종 동물 신고"} type={"Square_lg"} />
       </div>
-      <div>
-        {getFilterTitleData.map((item) => (
-          <MissingItem key={item.id} {...item} />
-        ))}
-      </div>
+
+      {/* selectedMissingPet 아직 미작업 */}
       {selectedMissingPet && (
         <Modal onClose={() => setSelectedMissingPet(null)}>
           {selectedMissingPet}
         </Modal>
       )}
-      <Button text={"실종 동물 신고"} />
     </div>
   );
 };
