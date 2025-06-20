@@ -1,0 +1,15 @@
+.MyPage {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  height: 100vh;
+  background-color: #fff9f0;
+}
+
+.MyPage .container {
+  width: 100%;
+  padding: 20px 100px 50px 100px;
+  flex-direction: column;
+  display: flex;
+  flex: 1;
+}

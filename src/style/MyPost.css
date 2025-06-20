@@ -1,0 +1,79 @@
+.MyPost {
+  flex: 1;
+  flex-direction: column;
+  display: flex;
+}
+
+.MyPost .title {
+  text-align: center;
+  padding: 20px;
+}
+
+.MyPost .content {
+  flex: 1;
+  border-radius: 20px;
+  border: 1px solid #ccc;
+  display: flex;
+  flex-direction: column;
+}
+
+.MyPost .content .btn {
+  width: 100%;
+  display: flex;
+  gap: 15px;
+  padding: 15px;
+  white-space: nowrap;
+  overflow-x: scroll;
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+  user-select: none;
+  cursor: grab;
+}
+
+.MyPost .content .btn:active {
+  cursor: grabbing;
+}
+
+.MyPost .content .btn::-webkit-scrollbar {
+  display: none;
+}
+
+.MyPost .content button {
+  padding: 0px 20px;
+  font-size: 16px;
+  cursor: pointer;
+  background: #ccc;
+  border-radius: 6px;
+  border: none;
+}
+
+.MyPost .content .report {
+  padding: 20px;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.MyPost .content .report .item {
+  display: flex;
+  background-color: gray;
+  border-radius: 5px;
+}
+
+.MyPost .content .report .item .img {
+  flex: 1;
+  padding: 15px;
+}
+
+.MyPost .content .report .item img {
+  width: 100%;
+  height: 100%;
+}
+
+.MyPost .content .report .item .txt {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  flex: 5;
+}
