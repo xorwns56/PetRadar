@@ -1,8 +1,9 @@
 import { useModal } from "../hooks/ModalContext";
 import "../style/ModalDetail.css";
 import Button from "./Button";
+import { missingPet } from "../utils/missingPet";
 
-const ModalDetail = ({ onClick }) => {
+const ModalDetail = ({ onClick, selectedId }) => {
   const { isActive, toggleModal } = useModal();
 
   return (
@@ -29,7 +30,7 @@ const ModalDetail = ({ onClick }) => {
             </div>
             <div className="contents-t4">
               <h3>특징: </h3>
-              <p>관악구 도림천 근처에 비슷한 애 본 것 같아요.</p>
+              <p>내용</p>
             </div>
           </div>
           <div className="Report-btn">
