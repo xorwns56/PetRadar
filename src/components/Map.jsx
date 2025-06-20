@@ -1,4 +1,3 @@
-
 import { useEffect, useRef } from "react";
 import "../style/Map.css";
 
@@ -44,7 +43,7 @@ const Map = ({ shelters, onSelect, setCenterRef }) => {
 
               window.kakao.maps.event.addListener(marker, "click", () => {
                 infowindow.open(map, marker);
-                map.panTo(marker.getPosition()); // ← 부드럽게 이동
+                map.panTo(marker.getPosition(2)); // ← 부드럽게 이동
                 onSelect?.(shelter);
                 console.log(
                   shelter.SHTER_NM,
@@ -52,8 +51,6 @@ const Map = ({ shelters, onSelect, setCenterRef }) => {
                   result[0].y,
                   result[0].x
                 );
-
-                map.setLevel(5);
               });
             }
           });
@@ -77,8 +74,7 @@ const Map = ({ shelters, onSelect, setCenterRef }) => {
               current.getLat() !== coords.getLat() ||
               current.getLng() !== coords.getLng()
             ) {
-              mapInstance.current.panTo(coords);
-              mapInstance.current.setLevel(9);
+              mapInstance.current.setCenter(coords);
             }
           }
         });
