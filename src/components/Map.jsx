@@ -102,7 +102,11 @@ const Map = ({ shelters, onSelect, setCenterRef }) => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  return <div ref={mapRef} className="Map" />;
+  return (
+    <div className="Map">
+      <div ref={mapRef} className="Map-box" />
+    </div>
+  );
 };
 
 export default Map;

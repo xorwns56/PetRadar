@@ -13,7 +13,6 @@ const MissingList = () => {
   const { toggleModal } = useModal();
   const nav = useNavigate();
 
-  const [selectedMissingPet, setSelectedMissingPet] = useState(null);
   const [sortType, setSortType] = useState("latest");
   const onChangeSortType = (e) => {
     setSortType(e.target.value);
@@ -79,7 +78,7 @@ const MissingList = () => {
             />
           ))}
         </div>
-          
+
         <div className="MissingList-btn">
           <Button
             text={"실종 동물 신고"}
