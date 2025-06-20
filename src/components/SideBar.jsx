@@ -1,13 +1,14 @@
 import "../style/SideBar.css";
 import Button from "./Button";
 import AlertBox from "./AlertBox";
+import { useSidebar } from "../hooks/SidebarContext";
 
 const SideBar = () => {
-  const onClick = () => {};
+  const { isActive, toggleSidebar } = useSidebar();
 
   return (
-    <div className="SideBar">
-      <div className="close-btn">
+    <div className={`SideBar ${isActive ? "active" : ""}`}>
+      <div className="close-btn" onClick={toggleSidebar}>
         <Button text={"X"} type={"Circle"} />
       </div>
       <AlertBox />

@@ -1,19 +1,20 @@
 .SideBar {
   position: absolute;
   top: 0;
-  right: 0;
+  right: -300px;
   width: 300px;
   height: 100%;
-  background-color: #FFF3D6;
+  background-color: #fefbef;
   display: flex;
   flex-direction: column;
   gap: 10px;
   padding: 30px 20px;
-  transition: .5s;
+  transition: 1s;
+  z-index: 99;
 }
 
-.SideBar .on {
-  right: -300px;
+.SideBar.active {
+  right: 0px;
 }
 
 .SideBar .close-btn {

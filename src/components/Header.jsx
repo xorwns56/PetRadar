@@ -1,9 +1,11 @@
-import { useNavigate } from "react-router-dom";
 import "../style/Header.css";
+import { useNavigate } from "react-router-dom";
+import { useSidebar } from "../hooks/SidebarContext";
 
-const Header = ({ leftChild, rightChild }) => {
+const Header = ({ leftChild }) => {
+  const { toggleSidebar } = useSidebar();
   const nav = useNavigate();
-  const isLogin = true;
+  const isLogin = false;
   const goMyPage = () => {
     if (isLogin) {
       nav("/myPage");
@@ -25,11 +27,9 @@ const Header = ({ leftChild, rightChild }) => {
       <div className="header_center">
         <img src="/PetRadar-Logo.png" alt="logo" />
       </div>
-      <div className="header_right" onClick={goMyPage}>
-        <p>{isLogin ? "마이페이지" : "로그인/회원가입"}</p>
-        <p className="Msg-bell">
-          <img src="/Msg-Bell.png" alt="msg" />
-        </p>
+      <div className="header_right">
+        <p onClick={goMyPage}>{isLogin ? "마이페이지" : "로그인/회원가입"}</p>
+        <p className="Msg-bell" onClick={toggleSidebar}></p>
       </div>
     </header>
   );

@@ -14,7 +14,7 @@
   border-radius: 10px;
   min-width: 300px;
   max-width: 90%;
-  animation: popupIn 0.5s ease forwards;
+  animation: popupIn 2s ease forwards;
   transform: scale(0.9);
   opacity: 0;
 }
