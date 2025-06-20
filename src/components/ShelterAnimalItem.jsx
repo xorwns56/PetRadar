@@ -1,23 +1,22 @@
-import "../style/MissingItem.css";
-import { getMissingImage } from "../utils/get-missingPet-image";
-import Button from "./Button";
-
-const MissingItem = ({
+const ShelterAnimalItem = ({
   petId,
-  petName,
   petType,
   petGender,
+  petName,
   petAge,
   petMissingDate,
+  imageUrl,
   onClick,
-  toggleModal,
 }) => {
   return (
-    <div className="MissingItem" onClick={toggleModal}>
+    <div className="MissingItem" onClick={onClick}>
       <div className="MissingItem-img">
-        <img src={getMissingImage(petId)} alt="missingPet img" />
+        <img
+          src={imageUrl || "/noimage.png"}
+          alt="유기동물"
+          onError={(e) => (e.target.src = "/noimage.png")}
+        />
       </div>
-
       <div className="contents">
         <div className="contents-t1">
           <p className="petType">{petType}</p>
@@ -27,10 +26,10 @@ const MissingItem = ({
         <p className="contents-t2">{petAge}(년생)</p>
         <div className="contents-t3">
           <p>실종일자 : {petMissingDate}</p>
-          <Button text={"제보하기"} type={"Square_ls"} onClick={onClick} />
         </div>
       </div>
     </div>
   );
 };
-export default MissingItem;
+
+export default ShelterAnimalItem;

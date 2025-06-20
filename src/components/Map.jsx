@@ -9,7 +9,7 @@ const Map = ({ shelters, onSelect, setCenterRef }) => {
 
   useEffect(() => {
     const script = document.createElement("script");
-    script.src = `//dapi.kakao.com/v2/maps/sdk.js?appkey=5c8a6ed6eae576f83f70e75198543b79&libraries=services&autoload=false`;
+    script.src = `//dapi.kakao.com/v2/maps/sdk.js?appkey=a62ab991b478d4cfb3a3e5b0c93a3148&libraries=services&autoload=false`;
     script.async = true;
 
     script.onload = () => {
@@ -102,7 +102,11 @@ const Map = ({ shelters, onSelect, setCenterRef }) => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  return <div ref={mapRef} className="Map" />;
+  return (
+    <div className="Map">
+      <div ref={mapRef} className="Map-box" />
+    </div>
+  );
 };
 
 export default Map;
