@@ -2,6 +2,7 @@ import "../style/MissingItem.css";
 import { getMissingImage } from "../utils/get-missingPet-image";
 import Button from "./Button";
 
+
 const MissingItem = ({
   petId,
   petName,
@@ -12,7 +13,7 @@ const MissingItem = ({
   onClick,
 }) => {
   return (
-    <div className="MissingItem">
+    <div className="MissingItem" onClick={toggleModal}>
       <div className="MissingItem-img">
         <img src={getMissingImage(petId)} alt="missingPet img" />
       </div>

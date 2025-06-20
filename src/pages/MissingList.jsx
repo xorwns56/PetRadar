@@ -4,9 +4,13 @@ import { missingPet } from "../utils/missingPet";
 import Button from "../components/Button";
 import Header from "../components/Header";
 import MissingItem from "../components/MissingItem";
+
+import ModalDetail from "../components/ModalDetail";
 import { useNavigate } from "react-router-dom";
+import { useModal } from "../hooks/ModalContext";
 
 const MissingList = () => {
+  const { toggleModal } = useModal();
   const nav = useNavigate();
 
   const [selectedMissingPet, setSelectedMissingPet] = useState(null);
@@ -67,6 +71,7 @@ const MissingList = () => {
             <MissingItem
               key={item.petId}
               {...item}
+              toggleModal={toggleModal}
               onClick={() => {
                 nav("/missingReport");
               }}
@@ -84,13 +89,11 @@ const MissingList = () => {
           />
         </div>
       </div>
-
-      {/* selectedMissingPet 아직 미작업 */}
-      {selectedMissingPet && (
-        <Modal onClose={() => setSelectedMissingPet(null)}>
-          {selectedMissingPet}
-        </Modal>
-      )}
+      <ModalDetail
+        onClick={() => {
+          nav("/missingReport");
+        }}
+      />
     </div>
   );
 };
