@@ -1,8 +1,10 @@
 import { useEffect, useRef } from "react";
+import { useNavigate } from "react-router-dom";
 import "../style/ListItem.css";
 
-const ShelterListSection = ({ shelters, onItemClick, selected }) => {
+const ShelterListSection = ({ shelters = [], selected }) => {
   const containerRef = useRef();
+  const navigate = useNavigate();
 
   useEffect(() => {
     if (!selected || !containerRef.current || !selected.SHTER_ID) return;
@@ -14,23 +16,37 @@ const ShelterListSection = ({ shelters, onItemClick, selected }) => {
 
   return (
     <div className="ListContainer" ref={containerRef}>
-      {shelters.map((shelter) => (
-        <div
-          className="ItemListst"
-          key={shelter.SHTER_ID}
-          id={`item-${shelter.SHTER_ID}`}
-          style={{
-            backgroundColor:
-              selected?.SHTER_ID === shelter.SHTER_ID ? "white" : "#fff",
-            cursor: "pointer",
-            padding: "30px",
-          }}
-          onClick={() => onItemClick(shelter)}
-        >
-          <strong>{shelter.SHTER_NM}</strong>
-          <div>{shelter.REFINE_ROADNM_ADDR || "주소 없음"}</div>
-        </div>
-      ))}
+      {Array.isArray(shelters) &&
+        shelters.map((shelter, index) => {
+          const key =
+            shelter.SHTER_ID ??
+            `${shelter.SHTER_NM || "unknown"}-${shelter.careRegNo || index}`;
+
+          return (
+            <div
+              className="ItemListst"
+              key={key}
+              id={`item-${shelter.SHTER_ID || index}`}
+              style={{
+                backgroundColor:
+                  selected?.SHTER_ID === shelter.SHTER_ID ? "#f0f0f0" : "#fff",
+                cursor: "pointer",
+                padding: "30px",
+                borderBottom: "1px solid #ddd",
+              }}
+              onClick={() => {
+                if (shelter.careRegNo) {
+                  navigate(`/shelter/${shelter.careRegNo}`);
+                } else {
+                  alert("careRegNo 없음 - 이동 불가");
+                }
+              }}
+            >
+              <strong>{shelter.SHTER_NM || "이름 없음"}</strong>
+              <div>{shelter.REFINE_ROADNM_ADDR || "주소 없음"}</div>
+            </div>
+          );
+        })}
     </div>
   );
 };

@@ -4,9 +4,12 @@ import Modal from "../components/Modal";
 import ShelterDetail from "../components/ShelterDetail";
 import useShelterData from "../api/ShelterData";
 import ShelterListSection from "../components/ListItem";
+import Header from "../components/Header";
 import "../style/ShelterList.css";
+import { useNavigate } from "react-router-dom";
 
 const ShelterList = () => {
+  const navigate = useNavigate();
   const { animals, error } = useShelterData();
   const [selectedShelter, setSelectedShelter] = useState(null);
   const mapRef = useRef(null);
@@ -32,12 +35,12 @@ const ShelterList = () => {
   }, []);
 
   const handleItemClick = (shelter) => {
-    setSelectedShelter(shelter);
-    if (mapRef.current) {
-      mapRef.current(shelter); // 지도 중심 이동
+    if (shelter.careRegNo) {
+      navigate(`/shelter/${shelter.careRegNo}`);
+    } else {
+      alert("보호소 등록번호(careRegNo)가 없습니다.");
     }
   };
-
   if (error) return <div>에러 발생</div>;
   if (!Array.isArray(animals)) return <div>불러오는 중...</div>;
   if (!animals.length)
@@ -48,7 +51,10 @@ const ShelterList = () => {
     );
 
   return (
-    <>
+    <div className="container">
+      <div>
+        <Header leftChild={true} />
+      </div>
       <Map
         shelters={uniqueShelters}
         onSelect={(shelter) => {
@@ -71,7 +77,7 @@ const ShelterList = () => {
           selected={selectedShelter}
         />
       </div>
-    </>
+    </div>
   );
 };
 

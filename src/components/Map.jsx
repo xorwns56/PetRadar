@@ -22,6 +22,16 @@ const Map = ({ shelters, onSelect, setCenterRef }) => {
         const geocoder = new window.kakao.maps.services.Geocoder();
         geocoderInstance.current = geocoder;
 
+        if (!Array.isArray(shelters)) return;
+
+        shelters.forEach((shelter) => {
+          const address =
+            shelter.REFINE_LOTNO_ADDR || shelter.REFINE_ROADNM_ADDR;
+          if (!address) return;
+
+          // 나머지 처리
+        });
+
         shelters.forEach((shelter) => {
           const address =
             shelter.REFINE_LOTNO_ADDR || shelter.REFINE_ROADNM_ADDR;
@@ -89,6 +99,7 @@ const Map = ({ shelters, onSelect, setCenterRef }) => {
     };
 
     document.head.appendChild(script);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   return <div ref={mapRef} className="Map" />;
