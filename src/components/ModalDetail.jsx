@@ -1,8 +1,21 @@
 import { useModal } from "../hooks/ModalContext";
 import "../style/ModalDetail.css";
+import { getMissingImage } from "../utils/get-missingPet-image";
+import { missingPet } from "../utils/missingPet";
 import Button from "./Button";
+import { missingPet } from "../utils/missingPet";
 
-const ModalDetail = ({ onClick }) => {
+
+const ModalDetail = ({
+  petId,
+  petName,
+  petType,
+  petGender,
+  petAge,
+  petMissingDate,
+  onClick,
+}) => {
+
   const { isActive, toggleModal } = useModal();
 
   return (
@@ -11,25 +24,25 @@ const ModalDetail = ({ onClick }) => {
         <div className="Modal-contents">
           <div className="img-box">
             {/* 이미지  or 위치 */}
-            <img src="/dog.jpg" alt="" />
+            <img src={getMissingImage(petId)} alt="missingPet img" />
           </div>
           <div className="text-contents">
             <div className="contents-t1">
-              <p className="petType">고양이</p>
-              <p>♂</p>
-              <p>코슈</p>
+              <p className="petType">{petType}</p>
+              <p>{petGender}</p>
+              <p>{petName}</p>
             </div>
             <div className="contents-t2">
-              <h3>나이: </h3>
+              <h3>나이: {petAge}</h3>
               <p>2022(년생)</p>
             </div>
             <div className="contents-t3">
               <h3>실종날짜: </h3>
-              <p>2025.06.19 실종</p>
+              <p>{petMissingDate} 실종</p>
             </div>
             <div className="contents-t4">
               <h3>특징: </h3>
-              <p>관악구 도림천 근처에 비슷한 애 본 것 같아요.</p>
+              <p>내용</p>
             </div>
           </div>
           <div className="Report-btn">

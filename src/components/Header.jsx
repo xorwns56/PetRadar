@@ -24,7 +24,12 @@ const Header = ({ leftChild }) => {
       >
         {leftChild ? <img src="/Prev-btn.png" alt="logo" /> : ""}
       </div>
-      <div className="header_center">
+      <div
+        className="header_center"
+        onClick={() => {
+          nav("/");
+        }}
+      >
         <img src="/PetRadar-Logo.png" alt="logo" />
       </div>
       <div className="header_right">

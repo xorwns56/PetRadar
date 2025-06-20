@@ -1,0 +1,14 @@
+.Pagination {
+  display: flex;
+  justify-content: space-evenly;
+  align-items: center;
+}
+
+.Pagination span {
+  padding: 10px;
+  cursor: pointer;
+}
+
+.Pagination .hide {
+  visibility: hidden;
+}

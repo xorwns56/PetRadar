@@ -9,9 +9,10 @@
   padding: 20px 40px;
   background-color: #ffa516;
   color: #fff;
+  cursor: pointer;
 }
 
-.Header > div {
+.Header>div {
   display: flex;
 }
 
@@ -22,7 +23,7 @@
 .Header .header_left {
   width: 25%;
   justify-content: flex-start;
-  cursor: pointer;
+
 }
 
 .Header .header_center {
@@ -41,7 +42,6 @@
   justify-content: flex-end;
   align-items: center;
   gap: 20px;
-  cursor: pointer;
 }
 
 .Header .header_right .Msg-bell {
