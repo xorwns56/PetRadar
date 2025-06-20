@@ -4,6 +4,7 @@ import Modal from "../components/Modal";
 import ShelterDetail from "../components/ShelterDetail";
 import useShelterData from "../api/ShelterData";
 import ShelterListSection from "../components/ListItem";
+import Header from "../components/Header";
 import "../style/ShelterList.css";
 
 const ShelterList = () => {
@@ -48,7 +49,10 @@ const ShelterList = () => {
     );
 
   return (
-    <>
+    <div className="container">
+      <div>
+        <Header leftChild={true} />
+      </div>
       <Map
         shelters={uniqueShelters}
         onSelect={(shelter) => {
@@ -71,7 +75,7 @@ const ShelterList = () => {
           selected={selectedShelter}
         />
       </div>
-    </>
+    </div>
   );
 };
 
