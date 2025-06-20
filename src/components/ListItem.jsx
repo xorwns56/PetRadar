@@ -19,8 +19,12 @@ const ShelterListSection = ({ shelters = [], selected }) => {
       {Array.isArray(shelters) &&
         shelters.map((shelter, index) => {
           const key =
-            shelter.SHTER_ID ??
-            `${shelter.SHTER_NM || "unknown"}-${shelter.careRegNo || index}`;
+            shelter.SHTER_ID ?? `${shelter.SHTER_NM || "unknown"}-${index}`;
+
+          const name = encodeURIComponent(shelter.SHTER_NM || "unknown");
+          const addr = encodeURIComponent(
+            shelter.REFINE_ROADNM_ADDR || shelter.REFINE_LOTNO_ADDR || ""
+          );
 
           return (
             <div
@@ -35,15 +39,23 @@ const ShelterListSection = ({ shelters = [], selected }) => {
                 borderBottom: "1px solid #ddd",
               }}
               onClick={() => {
-                if (shelter.careRegNo) {
-                  navigate(`/shelter/${shelter.careRegNo}`);
-                } else {
-                  alert("careRegNo 없음 - 이동 불가");
+                if (
+                  !shelter.SHTER_NM ||
+                  !(shelter.REFINE_ROADNM_ADDR || shelter.REFINE_LOTNO_ADDR)
+                ) {
+                  alert("보호소 이름이나 주소 정보가 부족합니다.");
+                  return;
                 }
+
+                navigate(`/shelter/${name}/${addr}`);
               }}
             >
               <strong>{shelter.SHTER_NM || "이름 없음"}</strong>
-              <div>{shelter.REFINE_ROADNM_ADDR || "주소 없음"}</div>
+              <div>
+                {shelter.REFINE_ROADNM_ADDR ||
+                  shelter.REFINE_LOTNO_ADDR ||
+                  "주소 없음"}
+              </div>
             </div>
           );
         })}
