@@ -1,28 +1,38 @@
 .Home {
   position: relative;
   height: 100vh;
-  background-color: #FFF9F0;
+  background-color: #FFFCF9;
 }
 
 .Home .main-container {
-  max-width: 800px;
-  margin: 0 auto;
   display: flex;
   flex-direction: column;
   gap: 30px;
 }
 
+.Home .menu-titleBox{
+  display: flex;
+  justify-content: space-between;
+}
+
 /* menu-title */
 .Home .menu-title {
-  text-align: center;
   margin-top: 30px;
   line-height: 1.5;
-  padding: 10px;
+  padding: 20px;
+}
+
+.Home .menu-titleBox img{
+  width: 300px;
 }
 
 .Home .menu-title h2 {
-  font-size: 28px;
+  font-size: 34px;
   padding-bottom: 15px;
+}
+
+.Home .menu-title p{
+  font-size: 18px;
 }
 
 /* mainMenu-container */

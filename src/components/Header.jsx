@@ -1,9 +1,11 @@
-import { useNavigate } from "react-router-dom";
 import "../style/Header.css";
+import { useNavigate } from "react-router-dom";
+import { useSidebar } from "../hooks/SidebarContext";
 
-const Header = ({ leftChild, toggleSidebar }) => {
+const Header = ({ leftChild }) => {
+  const { toggleSidebar } = useSidebar();
   const nav = useNavigate();
-  const isLogin = true;
+  const isLogin = false;
   const goMyPage = () => {
     if (isLogin) {
       nav("/myPage");

@@ -1,4 +1,14 @@
+import "../style/Register.css";
+import RegisterForm from "../components/RegisterForm";
+
 const Register = () => {
-  return <h2>Register</h2>;
+  return (
+    <div className="Register">
+      <div className="header">로고</div>
+      <div className="content">
+        <RegisterForm />
+      </div>
+    </div>
+  );
 };
 export default Register;

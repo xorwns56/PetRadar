@@ -1,0 +1,57 @@
+.MissingList {
+  height: 100vh;
+}
+
+.MissingList .MissingList-conatiner {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  height: 100%;
+}
+
+/* menu-title */
+.MissingList .menu-title {
+  text-align: center;
+  margin-top: 30px;
+  line-height: 1.5;
+  padding: 10px;
+  font-size: 34px;
+}
+
+.MissingList .search-box {
+  display: flex;
+  gap: 5px;
+  height: 50px;
+  margin: 10px 0;
+}
+
+/* select */
+.MissingList .search-box select {
+  width: 100px;
+  border: 1px solid #f0eeeb;
+  font-size: 14px;
+}
+
+/* input */
+.MissingList .search-box input {
+  border: 1px solid #f0eeeb;
+  flex: 1;
+  font-size: 14px;
+  padding: 10px;
+}
+
+/* MissingItems */
+.MissingList .MissingItems {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+/* button */
+.MissingList .MissingList-btn {
+  position: fixed;
+  left: 50%;
+  bottom: 50px;
+  transform: translateX(-50%);
+  width: 45%;
+}

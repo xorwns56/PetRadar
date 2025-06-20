@@ -1,5 +1,5 @@
 .Button {
-  background-color: #F47835;
+  background-color: #ffa516;
   cursor: pointer;
   border: none;
   font-size: 18px;
@@ -7,20 +7,34 @@
   color: white;
 }
 
-.Button_Circle{
+.Button_Circle {
   border-radius: 50%;
   width: 30px;
   height: 30px;
 }
 
-.Button_Square{
+.Button_Square {
   padding: 10px 20px;
   border-radius: 5px;
 }
 
-.Button_Square_lg{
+.Button_Square_ls {
+  font-size: 14px;
+  padding: 5px 10px;
+  border-radius: 3px;
+  background-color: #fff;
+  border: 1px solid #f0eeeb;
+  color: #000;
+  transition: 0.5s;
+}
+
+.Button_Square_ls:hover {
+  border: 1px solid #ffa516;
+}
+
+.Button_Square_lg {
   width: 100%;
   padding: 10px 20px;
   border-radius: 5px;
+  height: 50px;
 }
-
