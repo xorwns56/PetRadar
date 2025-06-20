@@ -1,0 +1,59 @@
+.MissingReport {
+  height: 100vh;
+}
+
+/* menu-title */
+.MissingReport .menu-title {
+  text-align: center;
+  margin-top: 30px;
+  line-height: 1.5;
+  padding: 10px;
+  font-size: 28px;
+}
+
+.MissingReport .MissingReport-container {
+  height: 100%;
+}
+
+.MissingReportForms {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  max-height: calc(100vh - 200px);
+  margin: 30px 20px 0 20px;
+  border-radius: 50px 50px 0 0;
+  border: 2px solid #f0eeeb;
+  height: 100%;
+  padding: 40px;
+  background-color: #fff;
+}
+
+.MissingReportForms .MissingReportForm {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.MissingReportForms .MissingReportForm h4,
+.MissingReportForms .MissingReportForm label {
+  font-size: 18px;
+  font-weight: bold;
+}
+
+.MissingReportForms .MissingReportForm input,
+.MissingReportForms .MissingReportForm select {
+  width: 100%;
+  height: 50px;
+  border: 1px solid #f0eeeb;
+  font-size: 14px;
+  padding: 10px;
+}
+
+.MissingReportForms .MissingReportForm textarea {
+  height: 180px;
+  border: 1px solid #f0eeeb;
+  font-size: 14px;
+  padding: 10px;
+  resize: none;
+  overflow-y: auto;
+}

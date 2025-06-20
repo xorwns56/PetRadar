@@ -37,3 +37,29 @@
   padding-top: 15px;
    line-height: 1.5;
 }
+
+/* 📱 모바일*/
+@media (max-width: 1110px) {
+  .MainMenu {
+    width: 100%;
+    height: auto;
+    padding: 20px;
+    margin-bottom: 16px;
+      border-radius: 10px;
+  }
+
+  .MainMenu img {
+    width: 50px;
+    right: 20px;
+    bottom: 16px;
+  }
+
+  .MainMenu h2 {
+    font-size: 22px;
+  }
+
+  .MainMenu p {
+    font-size: 16px;
+    padding-top: 10px;
+  }
+}
