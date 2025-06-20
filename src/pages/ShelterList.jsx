@@ -35,18 +35,25 @@ const ShelterList = () => {
   }, []);
 
   const handleItemClick = (shelter) => {
-    if (shelter.careRegNo) {
-      navigate(`/shelter/${shelter.careRegNo}`);
+    if (
+      shelter.SHTER_NM &&
+      (shelter.REFINE_ROADNM_ADDR || shelter.REFINE_LOTNO_ADDR)
+    ) {
+      const name = encodeURIComponent(shelter.SHTER_NM);
+      const addr = encodeURIComponent(
+        shelter.REFINE_ROADNM_ADDR || shelter.REFINE_LOTNO_ADDR
+      );
+      navigate(`/shelter/${name}/${addr}`);
     } else {
-      alert("보호소 등록번호(careRegNo)가 없습니다.");
+      alert("보호소 이름이나 주소 정보가 없습니다.");
     }
   };
   if (error) return <div>에러 발생</div>;
   if (!Array.isArray(animals)) return <div>불러오는 중...</div>;
   if (!animals.length)
     return (
-      <div>
-        <span className="load">로딩중{dots}</span>
+      <div className="load-container">
+        <span className="load">LOADING{dots}</span>
       </div>
     );
 
