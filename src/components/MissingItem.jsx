@@ -24,7 +24,6 @@ const MissingItem = ({
 
       <div className="contents">
         <div className="contents-t1">
-          
           <p className="petType">{petType}</p>
           <p>{petGender}</p>
           <p>{petName}</p>
