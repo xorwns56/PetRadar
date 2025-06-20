@@ -7,6 +7,7 @@ const MissingItem = ({
   petName,
   petType,
   petSex,
+  petGender,
   petAge,
   petMissingDate,
   onClick,
@@ -20,7 +21,7 @@ const MissingItem = ({
       <div className="contents">
         <div className="contents-t1">
           <p className="petType">{petType}</p>
-          <p>{petSex}</p>
+          <p>{petGender}</p>
           <p>{petName}</p>
         </div>
         <p className="contents-t2">{petAge}(년생)</p>

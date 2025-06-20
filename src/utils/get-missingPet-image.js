@@ -1,15 +1,15 @@
-import 마루 from "../../public/마루.jpg";
-import 코쇼 from "../../public/코쇼.jpg";
-import 히니 from "../../public/히니.jpg";
+import petId_1 from "../../public/petId_1.jpg";
+import petId_2 from "../../public/petId_2.jpg";
+import petId_3 from "../../public/petId_3.jpg";
 
 export function getMissingImage(missingPetId) {
   switch (missingPetId) {
     case 1:
-      return 코쇼;
+      return petId_1;
     case 2:
-      return 마루;
+      return petId_2;
     case 3:
-      return 히니;
+      return petId_3;
     default:
       return null;
   }
