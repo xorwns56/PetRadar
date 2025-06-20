@@ -1,5 +1,6 @@
 const ShelterDetail = ({ shelter }) => {
   const defaultImg = "/enhanced_image_1.png";
+
   if (!shelter) return null;
 
   return (
@@ -29,9 +30,9 @@ const ShelterDetail = ({ shelter }) => {
         <h3 style={{ margin: "8px 0", fontWeight: "bold" }}>
           {shelter.SHTER_NM}
         </h3>
-        <p style={{ margin: "4px 0" }}>📞 {shelter.SHTER_TELNO}</p>
+        <p style={{ margin: "4px 0" }}> {shelter.SHTER_TELNO}</p>
         <p style={{ margin: "4px 0" }}>
-          📍 {shelter.REFINE_ROADNM_ADDR || shelter.REFINE_LOTNO_ADDR}
+          {shelter.REFINE_ROADNM_ADDR || shelter.REFINE_LOTNO_ADDR}
         </p>
 
         {shelter.HOMEPAGE && (

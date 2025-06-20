@@ -5,14 +5,16 @@
 }
 
 .Home .main-container {
+  height: calc(100% - 80px);
   display: flex;
   flex-direction: column;
-  gap: 30px;
+  gap: 20px;
 }
 
-.Home .menu-titleBox{
+.Home .menu-titleBox {
   display: flex;
   justify-content: space-between;
+  height: 30%;
 }
 
 /* menu-title */
@@ -22,8 +24,8 @@
   padding: 20px;
 }
 
-.Home .menu-titleBox img{
-  width: 300px;
+.Home .menu-titleBox img {
+  height: 100%;
 }
 
 .Home .menu-title h2 {
@@ -31,7 +33,7 @@
   padding-bottom: 15px;
 }
 
-.Home .menu-title p{
+.Home .menu-title p {
   font-size: 18px;
 }
 
@@ -39,4 +41,9 @@
 .Home .mainMenu-container {
   display: flex;
   justify-content: space-between;
+  height: 28%;
+}
+
+.Home .map {
+  height: 35%;
 }

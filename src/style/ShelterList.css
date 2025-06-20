@@ -1,0 +1,18 @@
+@font-face {
+    font-family: 'RixXladywatermelonR';
+    src: url('https://fastly.jsdelivr.net/gh/projectnoonnu/2408-4@1.0/RixXladywatermelonR.woff2') format('woff2');
+    font-weight: normal;
+    font-style: normal;
+}
+.load-container {
+  height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.load {
+  font-size: 40px;
+  font-family: 'RixXladywatermelonR', sans-serif;
+  text-align: center;
+}
