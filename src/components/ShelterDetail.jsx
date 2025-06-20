@@ -42,9 +42,7 @@ const ShelterDetail = ({ shelter }) => {
               href={shelter.HOMEPAGE}
               target="_blank"
               rel="noopener noreferrer"
-            >
-              홈페이지 바로가기
-            </a>
+            ></a>
           </p>
         )}
       </div>

@@ -11,6 +11,7 @@ import MissingDeclaration from "./pages/MissingDeclaration";
 import MissingList from "./pages/MissingList";
 
 import ShelterList from "./pages/ShelterList";
+import ShelterAnimalList from "./pages/ShelterAnimalList";
 import NotFound from "./pages/NotFound";
 import SideBar from "./components/SideBar";
 
@@ -37,6 +38,10 @@ function App() {
                   <Route path="/myPage" element={<MyPage />} />
                   <Route path="/missingList" element={<MissingList />} />
                   <Route path="/shelterList" element={<ShelterList />} />
+                  <Route
+                    path="/shelter/:name/:addr"
+                    element={<ShelterAnimalList />}
+                  />
 
                   <Route
                     path="/missingDeclaration"
