@@ -3,8 +3,6 @@ import "../style/ModalDetail.css";
 import { getMissingImage } from "../utils/get-missingPet-image";
 import { missingPet } from "../utils/missingPet";
 import Button from "./Button";
-import { missingPet } from "../utils/missingPet";
-
 
 const ModalDetail = ({
   petId,
@@ -15,7 +13,6 @@ const ModalDetail = ({
   petMissingDate,
   onClick,
 }) => {
-
   const { isActive, toggleModal } = useModal();
 
   return (
