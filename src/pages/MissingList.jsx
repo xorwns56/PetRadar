@@ -53,6 +53,7 @@ const MissingList = () => {
         <div className="menu-title">
           <h3>실종동물 목록</h3>
         </div>
+        {/* search-box */}
         <div className="search-box">
           <select value={sortType} onChange={onChangeSortType}>
             <option value={"latest"}>최신순</option>
@@ -65,7 +66,7 @@ const MissingList = () => {
           />
           <Button text={"조회"} type={"Square"} />
         </div>
-
+        {/* "MissingItems */}
         <div className="MissingItems">
           {getFilterTitleData.map((item) => (
             <MissingItem
@@ -78,7 +79,7 @@ const MissingList = () => {
             />
           ))}
         </div>
-
+          
         <div className="MissingList-btn">
           <Button
             text={"실종 동물 신고"}
