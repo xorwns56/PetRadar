@@ -1,8 +1,9 @@
 .Map {
   width: 100%;
   height: 100%;
-  border: 2px solid #FFA516;
+  border: 2px solid #ffa516;
   border-radius: 30px;
+  overflow: auto;
 }
 
 .Map .Map-box {
