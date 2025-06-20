@@ -4,6 +4,7 @@ import { missingPet } from "../utils/missingPet";
 import Button from "../components/Button";
 import Header from "../components/Header";
 import MissingItem from "../components/MissingItem";
+
 import ModalDetail from "../components/ModalDetail";
 import { useNavigate } from "react-router-dom";
 import { useModal } from "../hooks/ModalContext";
@@ -68,7 +69,7 @@ const MissingList = () => {
         <div className="MissingItems">
           {getFilterTitleData.map((item) => (
             <MissingItem
-              key={item.id}
+              key={item.petId}
               {...item}
               toggleModal={toggleModal}
               onClick={() => {
