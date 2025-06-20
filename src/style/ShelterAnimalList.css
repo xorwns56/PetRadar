@@ -1,3 +1,70 @@
-.thumb{
-  background: #ddd
-} 
+.ShelterAnimalList {
+  position: relative;
+  height: 100vh;
+}
+
+.ShelterAnimalList .ShelterAnimalList-conatiner {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  height: 100%;
+}
+
+/* menu-title */
+.ShelterAnimalList .menu-title {
+  text-align: center;
+  margin-top: 30px;
+  line-height: 1.5;
+  padding: 10px;
+  font-size: 34px;
+}
+
+.ShelterAnimalList .search-box {
+  display: flex;
+  gap: 5px;
+  height: 50px;
+  margin: 10px 0;
+}
+
+/* select */
+.ShelterAnimalList .search-box select {
+  width: 100px;
+  border: 1px solid #F0EEEB;
+  font-size: 14px;
+}
+
+/* input */
+.ShelterAnimalList .search-box input {
+  border: 1px solid #F0EEEB;
+  flex: 1;
+  font-size: 14px;
+  padding: 10px;
+}
+
+/* MissingItems */
+.ShelterAnimalList .MissingItems {
+  max-height: 510px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  border: 1px solid #F0EEEB;
+  padding: 10px;
+  border-radius: 10px;
+  overflow-y: auto;
+  scrollbar-width: none;
+  /* Firefox */
+  -ms-overflow-style: none;
+  /* IE 10+ */
+}
+
+.scroll-hidden::-webkit-scrollbar {
+  display: none;
+  /* Chrome, Safari */
+}
+
+/* button */
+.ShelterAnimalList .ShelterAnimalList-btn {
+  width: 100%;
+  bottom: 20px;
+}

@@ -4,7 +4,7 @@
     font-weight: normal;
     font-style: normal;
 }
-.load-container {
+.load > .ShelterList {
   height: 100vh;
   display: flex;
   justify-content: center;
