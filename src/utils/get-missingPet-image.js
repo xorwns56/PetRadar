@@ -1,15 +1,11 @@
-import petId_1 from "../../public/petId_1.jpg";
-import petId_2 from "../../public/petId_2.jpg";
-import petId_3 from "../../public/petId_3.jpg";
-
 export function getMissingImage(missingPetId) {
   switch (missingPetId) {
     case 1:
-      return petId_1;
+      return "/petId1.jpg";
     case 2:
-      return petId_2;
+      return "/petId2.jpg";
     case 3:
-      return petId_3;
+      return "/petId3.jpg";
     default:
       return null;
   }

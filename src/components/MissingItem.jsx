@@ -6,7 +6,6 @@ const MissingItem = ({
   petId,
   petName,
   petType,
-  petSex,
   petGender,
   petAge,
   petMissingDate,
