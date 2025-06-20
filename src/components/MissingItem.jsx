@@ -3,6 +3,7 @@ import { getMissingImage } from '../utils/get-missingPet-image';
 import Button from './Button';
 
 const MissingItem = ({ petId, petName, petType, petSex, petAge, petMissingDate ,onClick}) => {
+
   return (
     <div className="MissingItem">
       <div className="MissingItem-img">
@@ -20,6 +21,7 @@ const MissingItem = ({ petId, petName, petType, petSex, petAge, petMissingDate ,
           <p>실종일자 : {petMissingDate}</p>
           <Button text={'제보하기'} type={'Square_ls'} onClick={onClick} />
         </div>
+
       </div>
     </div>
   );
