@@ -19,42 +19,51 @@ import { SidebarProvider } from "./hooks/SidebarContext";
 import { UsersProvider } from "./contexts/UsersContext";
 import { LoginUserProvider } from "./contexts/LoginUserContext";
 import { ModalProvider } from "./hooks/ModalContext";
+import { ReportProvider } from "./contexts/ReportContext";
+import { MissingProvider } from "./contexts/MissingContext";
 
 function App() {
   return (
     <>
       <UsersProvider>
-        <LoginUserProvider>
-          <BrowserRouter>
-            <SidebarProvider>
-              <SideBar />
-              <ModalProvider>
-                <Routes>
-                  <Route path="/" element={<Home />} />
+        <MissingProvider>
+          <ReportProvider>
+            <LoginUserProvider>
+              <BrowserRouter>
+                <SidebarProvider>
+                  <SideBar />
+                  <ModalProvider>
+                    <Routes>
+                      <Route path="/" element={<Home />} />
 
-                  <Route path="/login" element={<Login />} />
-                  <Route path="/register" element={<Register />} />
+                      <Route path="/login" element={<Login />} />
+                      <Route path="/register" element={<Register />} />
 
-                  <Route path="/myPage" element={<MyPage />} />
-                  <Route path="/missingList" element={<MissingList />} />
-                  <Route path="/shelterList" element={<ShelterList />} />
-                  <Route
-                    path="/shelter/:name/:addr"
-                    element={<ShelterAnimalList />}
-                  />
+                      <Route path="/myPage" element={<MyPage />} />
+                      <Route path="/missingList" element={<MissingList />} />
+                      <Route path="/shelterList" element={<ShelterList />} />
+                      <Route
+                        path="/shelter/:name/:addr"
+                        element={<ShelterAnimalList />}
+                      />
 
-                  <Route
-                    path="/missingDeclaration"
-                    element={<MissingDeclaration />}
-                  />
-                  <Route path="/missingReport" element={<MissingReport />} />
+                      <Route
+                        path="/missingDeclaration"
+                        element={<MissingDeclaration />}
+                      />
+                      <Route
+                        path="/missingReport"
+                        element={<MissingReport />}
+                      />
 
-                  <Route path="/*" element={<NotFound />} />
-                </Routes>
-              </ModalProvider>
-            </SidebarProvider>
-          </BrowserRouter>
-        </LoginUserProvider>
+                      <Route path="/*" element={<NotFound />} />
+                    </Routes>
+                  </ModalProvider>
+                </SidebarProvider>
+              </BrowserRouter>
+            </LoginUserProvider>
+          </ReportProvider>
+        </MissingProvider>
       </UsersProvider>
     </>
   );
