@@ -9,13 +9,17 @@ const MissingItem = ({
   petGender,
   petAge,
   petMissingDate,
+  petImage,
   onClick,
   toggleModal,
 }) => {
   return (
     <div className="MissingItem" onClick={toggleModal}>
       <div className="MissingItem-img">
-        <img src={getMissingImage(petId)} alt="missingPet img" />
+        <img
+          src={petImage ? petImage : getMissingImage(petId)}
+          alt="missingPet img"
+        />
       </div>
 
       <div className="contents">

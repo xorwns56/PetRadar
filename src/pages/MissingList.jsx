@@ -10,10 +10,10 @@ import { useNavigate } from "react-router-dom";
 import { useModal } from "../hooks/ModalContext";
 
 const MissingList = () => {
+  const [selectedId, setSelectedId] = useState(null);
   const { toggleModal } = useModal();
   const nav = useNavigate();
 
-  const [selectedMissingPet, setSelectedMissingPet] = useState(null);
   const [sortType, setSortType] = useState("latest");
   const onChangeSortType = (e) => {
     setSortType(e.target.value);
@@ -40,8 +40,8 @@ const MissingList = () => {
     if (search === "") {
       return sortedData;
     }
-    return sortedData.filter((title) =>
-      title.petTitle.toLowerCase().includes(search.toLowerCase())
+    return sortedData.filter((item) =>
+      item.petTitle.toLowerCase().includes(search.toLowerCase())
     );
   };
   const getFilterTitleData = getFilterTitle();
@@ -72,7 +72,10 @@ const MissingList = () => {
             <MissingItem
               key={item.petId}
               {...item}
-              toggleModal={toggleModal}
+              toggleModal={() => {
+                setSelectedId(item.petId);
+                toggleModal();
+              }}
               onClick={() => {
                 nav("/missingReport");
               }}
@@ -91,6 +94,7 @@ const MissingList = () => {
         </div>
       </div>
       <ModalDetail
+        selectedId={selectedId}
         onClick={() => {
           nav("/missingReport");
         }}
