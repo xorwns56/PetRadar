@@ -1,93 +1,73 @@
-import "../style/ShelterList.css";
-import { useState, useEffect, useRef } from "react";
+import { useParams } from "react-router-dom";
 import useShelterData from "../api/ShelterData";
-import ShelterItem from "../components/ShelterItem";
-import Header from "../components/Header";
-import Button from "../components/Button";
-import { useNavigate } from "react-router-dom";
+import { useEffect, useState } from "react";
+import Modal from "../components/Modal";
+import "../style/ShelterList.css";
 
-const ShelterList = () => {
-  const nav = useNavigate();
-  const { animals, error } = useShelterData();
-  const [sortType, setSortType] = useState("name");
-  const [search, setSearch] = useState("");
-  const mapRef = useRef(null);
-  const [dots, setDots] = useState("");
-
-  const onChangeSortType = (e) => setSortType(e.target.value);
-  const onChangeSearch = (e) => setSearch(e.target.value);
-
-  const uniqueShelters = animals.filter((shelter, index, self) => {
-    const key = `${shelter.SHTER_NM}-${shelter.PROTECT_PLC}`;
-    return (
-      index === self.findIndex((s) => `${s.SHTER_NM}-${s.PROTECT_PLC}` === key)
-    );
-  });
-
-  const getSortedData = () => {
-    return [...uniqueShelters].sort((a, b) => {
-      if (sortType === "name") {
-        return a.SHTER_NM.localeCompare(b.SHTER_NM);
-      } else {
-        return a.PROTECT_PLC.localeCompare(b.PROTECT_PLC);
-      }
-    });
-  };
-
-  const getFilteredData = () => {
-    const filtered = getSortedData();
-    if (!search) return filtered;
-    return filtered.filter((item) =>
-      item.SHTER_NM.toLowerCase().includes(search.toLowerCase())
-    );
-  };
+const ShelterDetailPage = () => {
+  const { name, addr } = useParams();
+  const { animals } = useShelterData();
+  const [filtered, setFiltered] = useState([]);
+  const [selectedAnimal, setSelectedAnimal] = useState(null);
 
   useEffect(() => {
-    const interval = setInterval(() => {
-      setDots((prev) => (prev.length >= 3 ? "" : prev + "."));
-    }, 500);
-    return () => clearInterval(interval);
-  }, []);
+    const decodedName = decodeURIComponent(name);
+    const decodedAddr = decodeURIComponent(addr);
 
-  if (error) return <div>에러 발생</div>;
-  if (!Array.isArray(animals)) return <div>불러오는 중...</div>;
-  if (!animals.length) return <div className="load">로딩중{dots}</div>;
+    const result = animals.filter(
+      (a) => a.CARE_NM === decodedName && a.REFINE_ROADNM_ADDR === decodedAddr
+    );
+    setFiltered(result);
+  }, [animals, name, addr]);
 
   return (
-    <div className="ShelterList">
-      <Header leftChild={true} />
-      <div className="ShelterList-container inner">
+    <div className="MissingList">
+      <div className="MissingList-container inner">
         <div className="menu-title">
-          <h3>보호소 목록</h3>
+          <h3>{decodeURIComponent(name)} 동물 목록</h3>
         </div>
 
-        <div className="search-box">
-          <select value={sortType} onChange={onChangeSortType}>
-            <option value="name">이름순</option>
-            <option value="place">주소순</option>
-          </select>
-          <input
-            value={search}
-            onChange={onChangeSearch}
-            placeholder="보호소 이름 검색"
-          />
-          <Button text="조회" type="Square" />
-        </div>
-
-        <div className="ShelterItems">
-          {getFilteredData().map((shelter) => (
-            <ShelterItem
-              key={shelter.SHTER_NM + shelter.PROTECT_PLC}
-              {...shelter}
-              onClick={() => {
-                nav(`/shelter/${shelter.careRegNo}`);
-              }}
-            />
+        <div className="MissingItems">
+          {filtered.map((a) => (
+            <div
+              className="MissingItem"
+              key={a.PBLANC_IDNTFY_NO}
+              onClick={() => setSelectedAnimal(a)}
+            >
+              <div className="thumb" style={{ background: "#ddd" }}>
+                <img src={a.IMAGE_COURS || "/noimage.png"} alt="유기동물" />
+              </div>
+              <div className="content">
+                <span className="type">{a.SPECIES_NM}</span>
+                <span className="name">{a.KIND_NM || "정보 없음"}</span>
+                <p>발견 장소: {a.DISCVRY_PLC_INFO}</p>
+                <p>공고번호: {a.PBLANC_IDNTFY_NO}</p>
+                <p>보호상태: {a.STATE_NM}</p>
+              </div>
+            </div>
           ))}
         </div>
       </div>
+
+      {selectedAnimal && (
+        <Modal onClose={() => setSelectedAnimal(null)}>
+          <div className="animal-popup">
+            <img
+              src={selectedAnimal.IMAGE_COURS || "/noimage.png"}
+              alt="동물 이미지"
+              width="100%"
+            />
+            <h3>{selectedAnimal.SPECIES_NM}</h3>
+            <p>품종: {selectedAnimal.KIND_NM}</p>
+            <p>색상: {selectedAnimal.COLOR_NM}</p>
+            <p>발견 장소: {selectedAnimal.DISCVRY_PLC_INFO}</p>
+            <p>공고번호: {selectedAnimal.PBLANC_IDNTFY_NO}</p>
+            <p>보호 상태: {selectedAnimal.STATE_NM}</p>
+          </div>
+        </Modal>
+      )}
     </div>
   );
 };
 
-export default ShelterList;
+export default ShelterDetailPage;
