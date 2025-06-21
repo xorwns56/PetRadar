@@ -1,38 +1,34 @@
 import { useState } from "react";
-import { useLoginUser } from "../contexts/LoginUserContext";
-import { useUsersDispatch, useUsersState } from "../contexts/UsersContext";
 import "../style/MyInfo.css";
-const MyInfo = () => {
-  const usersState = useUsersState();
-  const usersDispatch = useUsersDispatch();
-  const { loginUserId } = useLoginUser();
-
-  let user = usersState.find((user) => user.id === loginUserId);
-  if (!user) user = {};
+const MyInfo = ({ id, pw, hp, onUpdate, onDelete }) => {
+  const [editMode, setEditMode] = useState(false);
+  const [pwHide, setPwHide] = useState(false);
   const [input, setInput] = useState({
-    pw: user.pw,
-    hp: user.hp,
-    isVisible: false,
+    pw,
+    hp,
   });
-  const UpdateUser = () => {
-    usersDispatch({
-      type: "UPDATE",
-      data: {
-        ...user,
-        hp: input.hp,
-      },
+  const [focus, setFocus] = useState({
+    pw: false,
+    hp: false,
+  });
+  const onChangeInput = (event) => {
+    setInput({
+      ...input,
+      [event.target.name]: event.target.value,
     });
   };
-  const DeleteUser = () => {
-    var result = confirm("정말 회원탈퇴하시겠습니까?");
-    if (result) {
-      usersDispatch({
-        type: "DELETE",
-        data: {
-          id: loginUserId,
-        },
-      });
-    }
+  const onFocus = (event) => {
+    setFocus({
+      ...focus,
+      [event.target.name]: true,
+    });
+  };
+  const onBlur = (event) => {
+    //formCheck(event.target.name);
+    setFocus({
+      ...focus,
+      [event.target.name]: false,
+    });
   };
   return (
     <div className="MyInfo">
@@ -42,36 +38,57 @@ const MyInfo = () => {
           <tbody>
             <tr>
               <th>아이디</th>
-              <td>{user.id}</td>
+              <td>{id}</td>
             </tr>
-            {input.isVisible ? (
+            {editMode ? (
               <>
                 <tr>
                   <th>비밀번호</th>
                   <td>
-                    <input value={user.pw} />
+                    <input
+                      type={pwHide ? "password" : "text"}
+                      name="pw"
+                      onChange={onChangeInput}
+                      onFocus={onFocus}
+                      onBlur={onBlur}
+                      value={input.pw}
+                    />
                   </td>
                 </tr>
                 <tr>
                   <th>연락처</th>
                   <td>
-                    <input value={user.hp} />
+                    <input
+                      type="text"
+                      name="hp"
+                      onChange={onChangeInput}
+                      onFocus={onFocus}
+                      onBlur={onBlur}
+                      value={input.hp}
+                    />
                   </td>
                 </tr>
               </>
             ) : (
               <tr>
                 <th>연락처</th>
-                <td>{user.hp}</td>
+                <td>{hp}</td>
               </tr>
             )}
           </tbody>
         </table>
         <div className="btn">
-          <button onClick={() => setInput({ ...input, isVisible: true })}>
-            정보 수정
-          </button>
-          <button onClick={DeleteUser}>회원 탈퇴</button>
+          {editMode ? (
+            <>
+              <button onClick={() => onUpdate(input.pw, input.hp)}>확인</button>
+              <button onClick={() => setEditMode(false)}>취소</button>
+            </>
+          ) : (
+            <>
+              <button onClick={() => setEditMode(true)}>정보 수정</button>
+              <button onClick={onDelete}>회원 탈퇴</button>
+            </>
+          )}
         </div>
       </div>
     </div>

@@ -1,14 +1,6 @@
-import { useNavigate } from "react-router-dom";
 import "../style/RegisterForm.css";
 import { useState } from "react";
-import { useUsersDispatch, useUsersState } from "../contexts/UsersContext";
-const RegisterForm = () => {
-  const usersState = useUsersState();
-  const usersDispatch = useUsersDispatch();
-  const isExist = (id) => {
-    return usersState.some((user) => user.id === id);
-  };
-  const nav = useNavigate();
+const RegisterForm = ({ isExist, onCreate, onRegister }) => {
   const formCheck = (name) => {
     const newErrMsg = {};
     if (!input.id) {
@@ -35,15 +27,8 @@ const RegisterForm = () => {
   const onSubmit = (event) => {
     event.preventDefault();
     if (!formCheck()) return;
-    usersDispatch({
-      type: "CREATE",
-      data: {
-        id: input.id,
-        pw: input.pw,
-        hp: input.hp,
-      },
-    });
-    nav("/login", { replace: true });
+    onCreate(input.id, input.pw, input.hp);
+    onRegister();
   };
   const [focus, setFocus] = useState({
     id: false,
@@ -120,7 +105,9 @@ const RegisterForm = () => {
           onClick={() => {
             setPwHide(!pwHide);
           }}
-        ></button>
+        >
+          <img src={`/${pwHide ? "close" : "open"}EyeIcon.png`} />
+        </button>
       </div>
       <div
         className={`input_item hp ${focus.hp ? "focus" : ""} ${
@@ -136,7 +123,7 @@ const RegisterForm = () => {
           onBlur={onBlur}
           value={input.hp}
         />
-        <label htmlFor="register_hp">연락처</label>
+        <label htmlFor="register_hp">연락처{" (예 : 010-1234-5678)"}</label>
       </div>
       <div className={`error_message ${errMsg.id ? "" : "hide"}`}>
         {errMsg.id}
