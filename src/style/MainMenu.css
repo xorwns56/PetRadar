@@ -3,49 +3,57 @@
   width: 32%;
   min-width: 200px;
   height: 100%;
-  border: 1px solid #F0EEEB;
-  background-color: #FFFFFF;
+  border: 1px solid var(--border-color);
+  background-color: var(--bg-white-color);
   padding: 30px;
   border-radius: 30px;
   cursor: pointer;
-  transition: .5s;
+  transition: 0.5s;
 }
 
 .MainMenu:hover {
-  background-color: #FFA516;
-  color: #fff;
+  background-color: var(--main-color);
 }
 
-.MainMenu img{
+.MainMenu:hover h2 {
+  color: var(--text-white);
+}
+
+.MainMenu:hover p {
+  color: var(--text-white);
+}
+
+.MainMenu img {
   width: 60px;
   position: absolute;
   right: 30px;
   bottom: 20px;
-  
 }
 
-.MainMenu:hover img{
+.MainMenu:hover img {
   filter: invert(100%);
 }
 
 .MainMenu h2 {
-  font-size: 28px;
+  font-size: var(--font-title-lg-d);
+  color: var(--title-color);
 }
 
 .MainMenu p {
-  font-size: 18px;
+  font-size: var(--font-subtitle-lg-d);
   padding-top: 15px;
-   line-height: 1.5;
+  line-height: 1.5;
+  color: var(--subtitle-color);
 }
 
-/* 📱 모바일*/
+/* 모바일*/
 @media (max-width: 1110px) {
   .MainMenu {
     width: 100%;
     height: auto;
     padding: 20px;
     margin-bottom: 16px;
-      border-radius: 10px;
+    border-radius: 10px;
   }
 
   .MainMenu img {
@@ -55,11 +63,11 @@
   }
 
   .MainMenu h2 {
-    font-size: 22px;
+    font-size: var(--font-title-lg-m);
   }
 
   .MainMenu p {
-    font-size: 16px;
+    font-size: var(--font-subtitle-lg-m);
     padding-top: 10px;
   }
 }

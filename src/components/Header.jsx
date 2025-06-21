@@ -29,7 +29,7 @@ const Header = ({ leftChild }) => {
           nav("/");
         }}
       >
-        <img src="/PetRadar-Logo.png" alt="logo" />
+        <img src="/PetRadar-Logo-w.png" alt="logo" />
       </div>
       <div className="header_right">
         <p

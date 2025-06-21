@@ -17,7 +17,7 @@
   margin-top: 30px;
   line-height: 1.5;
   padding: 10px;
-  font-size: 28px;
+  font-size: var(--font-title-lg-d);
 }
 
 .MissingList .search-box {
@@ -30,15 +30,15 @@
 /* select */
 .MissingList .search-box select {
   width: 100px;
-  border: 2px solid #F0EEEB;
-  font-size: 14px;
+  border: 2px solid var(--border-color);
+  font-size: var(--font-small);
 }
 
 /* input */
 .MissingList .search-box input {
-  border: 2px solid #F0EEEB;
+  border: 2px solid var(--border-color);
   flex: 1;
-  font-size: 14px;
+  font-size: var(--font-small);
   padding: 10px;
 }
 
@@ -48,7 +48,7 @@
   display: flex;
   flex-direction: column;
   gap: 20px;
-  border: 2px solid #F0EEEB;
+  border: 2px solid var(--border-color);
   padding: 10px;
   border-radius: 10px;
   overflow-y: auto;
@@ -58,11 +58,9 @@
 
 .scroll-hidden::-webkit-scrollbar {
   display: none;
-  /* Chrome, Safari */
 }
 
 /* button */
 .MissingList .MissingList-btn {
   width: 100%;
 }
-
