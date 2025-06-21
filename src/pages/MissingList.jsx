@@ -1,6 +1,6 @@
 import "../style/MissingList.css";
 import { useState } from "react";
-import { missingPet } from "../utils/missingPet";
+import { useUsersState } from "../contexts/UsersContext";
 import Button from "../components/Button";
 import Header from "../components/Header";
 import MissingItem from "../components/MissingItem";
@@ -18,9 +18,9 @@ const MissingList = () => {
   const onChangeSortType = (e) => {
     setSortType(e.target.value);
   };
-
+  const users = useUsersState();
   const getSortedData = () => {
-    return [...missingPet].toSorted((prev, next) => {
+    return [...users].toSorted((prev, next) => {
       const prevDate = new Date(prev.petMissingDate);
       const nextDate = new Date(next.petMissingDate);
       if (sortType === "oldest") {
@@ -41,7 +41,7 @@ const MissingList = () => {
       return sortedData;
     }
     return sortedData.filter((item) =>
-      item.petTitle.toLowerCase().includes(search.toLowerCase())
+      item.petTitle?.toLowerCase().includes(search.toLowerCase())
     );
   };
   const getFilterTitleData = getFilterTitle();
