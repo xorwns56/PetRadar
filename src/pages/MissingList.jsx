@@ -1,11 +1,9 @@
-
 import "../style/MissingList.css";
 import { useState } from "react";
-import { useUsersState } from "../contexts/UsersContext";
+import { useUserState } from "../contexts/UserContext";
 import Button from "../components/Button";
 import Header from "../components/Header";
 import MissingItem from "../components/MissingItem";
-
 
 import ModalDetail from '../components/ModalDetail';
 import { useNavigate } from 'react-router-dom';
@@ -20,18 +18,24 @@ const MissingList = () => {
   const onChangeSortType = (e) => {
     setSortType(e.target.value);
   };
-  const users = useUsersState();
+  // const users = useUserState();
+  const { users = [] } = useUserState(); // 안전하게 구조 분해
+
+  // const getSortedData = () => {
+  //   return [...users].toSorted((prev, next) => {
+  //     const prevDate = new Date(prev.petMissingDate);
+  //     const nextDate = new Date(next.petMissingDate);
+  //     if (sortType === 'oldest') {
+  //       return prevDate - nextDate;
+  //     } else {
+  //       return nextDate - prevDate;
+  //     }
+  //   });
+  // };
   const getSortedData = () => {
-    return [...users].toSorted((prev, next) => {
-      const prevDate = new Date(prev.petMissingDate);
-      const nextDate = new Date(next.petMissingDate);
-      if (sortType === 'oldest') {
-        return prevDate - nextDate;
-      } else {
-        return nextDate - prevDate;
-      }
-    });
+    return users.slice().sort((a, b) => b.petId - a.petId); // 혹은 다른 정렬 기준
   };
+
   const sortedData = getSortedData();
 
   const [search, setSearch] = useState('');

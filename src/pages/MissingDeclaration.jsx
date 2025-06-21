@@ -1,6 +1,6 @@
-
+import "../style/MissingDeclaration.css";
 import { useState } from "react";
-import { useUsersDispatch, useUsersState } from "../contexts/UsersContext";
+import { useUserDispatch, useUserState } from "../contexts/UserContext";
 import { getStringDate } from "../utils/get-stringed-date";
 import { dogBreed, catBreed, etcBreed } from "../utils/get-pet-breed";
 import Header from "../components/Header";
@@ -10,7 +10,7 @@ import { useNavigate } from "react-router-dom";
 
 
 const MissingDeclaration = () => {
-  const dispatch = useUsersDispatch();
+  const dispatch = useUserDispatch();
   // const data = useUsersState();
 
   const nav = useNavigate();
