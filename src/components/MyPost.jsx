@@ -52,8 +52,10 @@ const MyPost = () => {
   };
   return (
     <div className="MyPost">
-      <h2 className="title">제보글</h2>
-      <div className="content">
+       <div className="menu-title">
+          <h3>제보글 목록</h3>
+        </div>
+      <div className="MyPost-contents">
         <div className="tabs">
           {mockData.map((item) => {
             return (
@@ -82,12 +84,11 @@ const MyPost = () => {
                   <img src="https://search.pstatic.net/common?type=f&size=174x174&quality=95&direct=true&src=http%3A%2F%2Fsstatic.naver.net%2Fkeypage%2Fimage%2Fdss%2F605%2F84%2F69%2F19%2F605_11846919_kind_imgurl_1_1579514278263.png" />
                 </div>
                 <div className="post-info">
-                  <p className="post-title">aasd</p>
+                  <p className="post-title">고양이를 발견했어요!!</p>
                   <p className="post-description">
-                    당곡역 근처에서 하얀색 고양이가 포착되었습니다. 정확한
-                    장소는
+                    당곡역 근처에서 하얀색 고양이가 포착되었습니다.정확한 장소는
                   </p>
-                  <p className="post-location">위치보기</p>
+                  <p className="post-location">위치보기 →</p>
                 </div>
               </div>
             );
