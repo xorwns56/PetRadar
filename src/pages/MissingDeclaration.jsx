@@ -1,52 +1,30 @@
-import '../style/MissingDeclaration.css';
-import { useReducer, useRef, useState } from 'react';
-import { missingPet } from '../utils/missingPet';
-import { getStringDate } from '../utils/get-stringed-date';
-import { dogBreed, catBreed, etcBreed } from '../utils/get-pet-breed';
-import Header from '../components/Header';
-import Button from '../components/Button';
-import { useNavigate } from 'react-router-dom';
 
-function reducer(state, action) {
-  switch (action.type) {
-    case 'Create':
-      return [action.data, ...state];
-    case 'Update':
-      return state.map((data) => (String(data.petId) === String(action.data.petId) ? action.data : data));
-    case 'Delete':
-      return state.filter((data) => String(data.petId) !== String(action.petId));
-    default:
-      return state;
-  }
-}
+import { useState } from "react";
+import { useUsersDispatch, useUsersState } from "../contexts/UsersContext";
+import { getStringDate } from "../utils/get-stringed-date";
+import { dogBreed, catBreed, etcBreed } from "../utils/get-pet-breed";
+import Header from "../components/Header";
+import Button from "../components/Button";
+import { useNavigate } from "react-router-dom";
+
+
 
 const MissingDeclaration = () => {
+  const dispatch = useUsersDispatch();
+  // const data = useUsersState();
+
   const nav = useNavigate();
-  const idRef = useRef(4);
-  const [data, dispatch] = useReducer(reducer, missingPet);
 
   const onCreate = () => {
     dispatch({
-      type: 'Create',
+
+      type: "CREATE",
+
       data: {
-        petId: idRef.current++,
+        petId: Date.now(),
         ...form,
       },
     });
-  };
-
-  const onUpdate = (petId) => {
-    dispatch({
-      type: 'Update',
-      data: {
-        petId,
-        ...form,
-      },
-    });
-  };
-
-  const onDelete = (petId) => {
-    dispatch({ type: 'Delete', petId: petId });
   };
 
   const [form, setForm] = useState({
@@ -62,8 +40,10 @@ const MissingDeclaration = () => {
     petImage: '',
   });
   const onSubmitButtonClick = () => {
-    onCreate(data);
-    nav('/missingList');
+
+    onCreate(form);
+    nav("/missingList");
+
   };
 
   const handleChange = (e) => {
@@ -72,15 +52,29 @@ const MissingDeclaration = () => {
 
     if (name === 'petMissingDate') {
       newValue = new Date(value);
-    } else if (name === 'petImage' && files?.[0]) {
+
+    } else if (name === "petImage" && files?.[0]) {
+      const file = files[0]
+
       newValue = URL.createObjectURL(files[0]);
+      
+      const reader = new FileReader()
+      reader.onloadend = () => {
+        setForm((prev)=> ({
+          ...prev,
+          [name]: reader.result,
+        }))
+      }
+      reader.readAsDataURL(file);
     } else {
       newValue = value;
     }
-    setForm((prev) => ({
+    if(name !== "petImage"){
+      setForm((prev) => ({
       ...prev,
       [name]: newValue,
     }));
+    }
   };
 
   const onSelectBreed = (breed, value, onChange) => {
