@@ -5,6 +5,8 @@ const ReportMap = ({onLocationSelect}) => {
     const markerRef = useRef(null)
 
     useEffect(() =>{
+        if (!window.kakao || !window.kakao.maps) return;
+
         const reportMapContainer = document.getElementById("reportMap");
         const options = {
             center: new window.kakao.maps.LatLng(37.5665, 126.9780),
