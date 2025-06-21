@@ -47,10 +47,6 @@ const ShelterModalDetail = ({ animal, onClick, onClose }) => {
               <p>{animal.SHTER_TELNO}</p>
             </div>
           </div>
-
-          <div className="Report-btn">
-            <Button text={"제보하기"} type={"Square_D"} onClick={onClick} />
-          </div>
         </div>
 
         <div className="Modal-btn" onClick={onClose}>
