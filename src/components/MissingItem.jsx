@@ -13,19 +13,18 @@ const MissingItem = ({
   onClick,
   toggleModal,
 }) => {
-  const imageSrc = petImage || getMissingImage(petId) || "/defaultPet.png";
+  const imageSrc = petImage || getMissingImage(petId) || '/defaultPet.png';
   return (
-
-    <div className="MissingItem" onClick={toggleModal}>
-      <div className="MissingItem-img">
+    <div className="MissingItem">
+      <div className="MissingItem-img" onClick={toggleModal}>
         <img
           src={imageSrc}
           alt="missingPet img"
-          onError={(e)=> {
+          onError={(e) => {
             e.target.onerror = null;
-            e.target.src = getMissingImage(petId)}}
+            e.target.src = getMissingImage(petId);
+          }}
         />
-
       </div>
       <div className="contents" onClick={toggleModal}>
         <div className="contents-t1">
@@ -36,7 +35,7 @@ const MissingItem = ({
         <p className="contents-t2">{petAge}(년생)</p>
         <p className="contents-t3">실종일자 : {petMissingDate}</p>
       </div>
-      <div className='ReportMove-btn'>
+      <div className="ReportMove-btn">
         <Button text={'제보하기'} type={'Square_ls'} onClick={onClick} />
       </div>
     </div>
