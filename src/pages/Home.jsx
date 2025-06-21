@@ -4,6 +4,7 @@ import Map from '../components/Map';
 import MainMenu from '../components/MainMenu';
 import { useNavigate } from 'react-router-dom';
 
+
 const Home = () => {
   const nav = useNavigate();
 
@@ -11,7 +12,7 @@ const Home = () => {
     <div className="Home ">
       <Header rightChild={'로그인/회원가입'} />
       <div className="main-container inner">
-        <div className="menu-titleBox">
+        <div className="menu-titleBox"> 
           <div className="menu-title">
             <h2>
               길 잃은 아이를 <br /> 바로 신고해주세요.
@@ -62,7 +63,9 @@ const Home = () => {
             }}
           />
         </div>
-        <Map />
+        <div className="map">
+          <Map />
+        </div>
       </div>
     </div>
   );

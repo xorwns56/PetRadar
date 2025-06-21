@@ -1,6 +1,6 @@
-import "../style/MissingItem.css";
-import { getMissingImage } from "../utils/get-missingPet-image";
-import Button from "./Button";
+import '../style/MissingItem.css';
+import { getMissingImage } from '../utils/get-missingPet-image';
+import Button from './Button';
 
 const MissingItem = ({
   petId,
@@ -15,6 +15,7 @@ const MissingItem = ({
 }) => {
   const imageSrc = petImage || getMissingImage(petId) || "/defaultPet.png";
   return (
+
     <div className="MissingItem" onClick={toggleModal}>
       <div className="MissingItem-img">
         <img
@@ -24,19 +25,19 @@ const MissingItem = ({
             e.target.onerror = null;
             e.target.src = getMissingImage(petId)}}
         />
-      </div>
 
-      <div className="contents">
+      </div>
+      <div className="contents" onClick={toggleModal}>
         <div className="contents-t1">
           <p className="petType">{petType}</p>
           <p>{petGender}</p>
           <p>{petName}</p>
         </div>
         <p className="contents-t2">{petAge}(년생)</p>
-        <div className="contents-t3">
-          <p>실종일자 : {petMissingDate}</p>
-          <Button text={"제보하기"} type={"Square_ls"} onClick={onClick} />
-        </div>
+        <p className="contents-t3">실종일자 : {petMissingDate}</p>
+      </div>
+      <div className='ReportMove-btn'>
+        <Button text={'제보하기'} type={'Square_ls'} onClick={onClick} />
       </div>
     </div>
   );

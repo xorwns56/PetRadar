@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { useUsersDispatch, useUsersState } from "../contexts/UsersContext";
 import { getStringDate } from "../utils/get-stringed-date";
@@ -5,6 +6,7 @@ import { dogBreed, catBreed, etcBreed } from "../utils/get-pet-breed";
 import Header from "../components/Header";
 import Button from "../components/Button";
 import { useNavigate } from "react-router-dom";
+
 
 
 const MissingDeclaration = () => {
@@ -15,7 +17,9 @@ const MissingDeclaration = () => {
 
   const onCreate = () => {
     dispatch({
+
       type: "CREATE",
+
       data: {
         petId: Date.now(),
         ...form,
@@ -24,30 +28,34 @@ const MissingDeclaration = () => {
   };
 
   const [form, setForm] = useState({
-    petName: "",
-    petType: "",
-    petGender: "",
-    petBreed: "",
-    petAge: "",
+    petName: '',
+    petType: '',
+    petGender: '',
+    petBreed: '',
+    petAge: '',
     petMissingDate: new Date(),
-    petTitle: "",
-    petContent: "",
-    missingPoint: "",
-    petImage: "",
+    petTitle: '',
+    petContent: '',
+    missingPoint: '',
+    petImage: '',
   });
   const onSubmitButtonClick = () => {
+
     onCreate(form);
     nav("/missingList");
+
   };
 
   const handleChange = (e) => {
     const { name, value, files } = e.target;
     let newValue;
 
-    if (name === "petMissingDate") {
+    if (name === 'petMissingDate') {
       newValue = new Date(value);
+
     } else if (name === "petImage" && files?.[0]) {
       const file = files[0]
+
       newValue = URL.createObjectURL(files[0]);
       
       const reader = new FileReader()
@@ -70,16 +78,18 @@ const MissingDeclaration = () => {
   };
 
   const onSelectBreed = (breed, value, onChange) => {
-    if (breed === "") {
+    if (breed === '') {
       return (
         <div>
           <select name="petBreed">
-            <option value="">|||선택해주세요|||</option>
+            <option value="" placeholder="">
+              아래에서 선택해주세요
+            </option>
           </select>
         </div>
       );
     }
-    if (breed === "dog") {
+    if (breed === 'dog') {
       return (
         <div>
           <select name="petBreed" value={value} onChange={onChange}>
@@ -92,7 +102,7 @@ const MissingDeclaration = () => {
         </div>
       );
     }
-    if (breed === "cat") {
+    if (breed === 'cat') {
       return (
         <div>
           <select name="petBreed" value={value} onChange={onChange}>
@@ -105,7 +115,7 @@ const MissingDeclaration = () => {
         </div>
       );
     }
-    if (breed === "etc") {
+    if (breed === 'etc') {
       return (
         <div>
           <select name="petBreed" value={value} onChange={onChange}>
@@ -122,90 +132,80 @@ const MissingDeclaration = () => {
   };
 
   return (
-    <div>
-      <Header leftChild={true} />
-      <h2>실종 동물 신고</h2>
-      <div>
-        <h3>반려동물 이름</h3>
-        <input
-          name="petName"
-          value={form.petName}
-          onChange={handleChange}
-          placeholder="이름"
-        />
-      </div>
-      <div>
-        <h3>종류</h3>
-        <select name="petType" value={form.petType} onChange={handleChange}>
-          <option value="">|||선택해주세요|||</option>
-          <option value={"dog"}>강아지</option>
-          <option value={"cat"}>고양이</option>
-          <option value={"etc"}>기타</option>
-        </select>
-      </div>
-      <div>
-        <h3>성별</h3>
-        <select name="petGender" value={form.petGender} onChange={handleChange}>
-          <option value="F">암컷</option>
-          <option value="M">수컷</option>
-        </select>
-      </div>
-      <div>
-        <h3>품종</h3>
-        {onSelectBreed(form.petType, form.petBreed, handleChange)}
-      </div>
-      <div>
-        <h3>나이</h3>
-        <input
-          name="petAge"
-          value={form.petAge}
-          onChange={handleChange}
-          placeholder="나이"
-        />
-      </div>
-      <div>
-        <h3>실종일자</h3>
-        <input
-          name="petMissingDate"
-          value={getStringDate(form.petMissingDate)}
-          onChange={handleChange}
-          type="date"
-        />
-      </div>
-      <div>
-        <h3>실종장소</h3>
-        <input
-          name="missingPoint"
-          value={form.missingPoint}
-          onChange={handleChange}
-          placeholder="실종된 장소를 적어주세요."
-        />
-      </div>
-      <div>
-        <label htmlFor="imageUpload">사진첨부</label>
-        <input
-          id="imageUpload"
-          type="file"
-          name="petImage"
-          accept="image/*"
-          onChange={handleChange}
-        />
-      </div>
-      <div>
-        <h3>제목</h3>
-        <input name="petTitle" value={form.petTitle} onChange={handleChange} />
-      </div>
-      <div>
-        <h3>내용</h3>
-        <textarea
-          name="petContent"
-          value={form.petContent}
-          onChange={handleChange}
-          placeholder="상세한 설명을 적어주세요."
-        />
-      </div>
-      <div>
-        <Button onClick={onSubmitButtonClick} text={"신고하기"}></Button>
+    <div className="MissingDeclaration">
+      <Header leftChild={true} />{' '}
+      <div className="MissingDeclaration-container inner">
+        <div className="menu-title">
+          <h3>실종 동물 신고</h3>
+        </div>
+        <div className="MissingDeclarationForms">
+          <div className="MissingDeclarationForm">
+            <h4>반려동물 이름</h4>
+            <input name="petName" value={form.petName} onChange={handleChange} placeholder="이름" />
+          </div>
+          <div className="MissingDeclarationForm">
+            <h4>종류</h4>
+            <select name="petType" value={form.petType} onChange={handleChange}>
+              <option value="">아래에서 선택해주세요</option>
+              <option value={'dog'}>강아지</option>
+              <option value={'cat'}>고양이</option>
+              <option value={'etc'}>기타</option>
+            </select>
+          </div>
+          <div className="MissingDeclarationForm">
+            <h4>성별</h4>
+            <select name="petGender" value={form.petGender} onChange={handleChange}>
+              <option value="F">암컷</option>
+              <option value="M">수컷</option>
+            </select>
+          </div>
+          <div className="MissingDeclarationForm">
+            <h4>품종</h4>
+            {onSelectBreed(form.petType, form.petBreed, handleChange)}
+          </div>
+          <div className="MissingDeclarationForm">
+            <h4>나이</h4>
+            <input name="petAge" value={form.petAge} onChange={handleChange} placeholder="나이" />
+          </div>
+          <div className="MissingDeclarationForm">
+            <h4>실종일자</h4>
+            <input
+              name="petMissingDate"
+              value={getStringDate(form.petMissingDate)}
+              onChange={handleChange}
+              type="date"
+            />
+          </div>
+          <div className="MissingDeclarationForm">
+            <h4>실종장소</h4>
+            <input
+              name="missingPoint"
+              value={form.missingPoint}
+              onChange={handleChange}
+              placeholder="실종된 장소를 적어주세요."
+            />
+          </div>
+          <div className="MissingDeclarationForm">
+            <label htmlFor="imageUpload">사진첨부</label>
+            <input id="imageUpload" type="file" name="petImage" accept="image/*" onChange={handleChange} />
+          </div>
+          <div className="MissingDeclarationForm">
+            <h4>제목</h4>
+            <input name="petTitle" value={form.petTitle} onChange={handleChange} />
+          </div>
+          <div className="MissingDeclarationForm">
+            <h4>내용</h4>
+            <textarea
+              name="petContent"
+              value={form.petContent}
+              onChange={handleChange}
+              placeholder="상세한 설명을 적어주세요."
+            />
+          </div>
+          <div className="MissingDeclaration-btn">
+            <Button onClick={onSubmitButtonClick} text={'신고하기'} type={'Square_lg'}></Button>
+          </div>
+        </div>
       </div>
     </div>
   );

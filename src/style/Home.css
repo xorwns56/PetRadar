@@ -1,18 +1,19 @@
 .Home {
   position: relative;
   height: 100vh;
-  background-color: #FFFCF9;
 }
 
 .Home .main-container {
+  height: calc(100% - 80px);
   display: flex;
   flex-direction: column;
-  gap: 30px;
+  gap: 20px;
 }
 
-.Home .menu-titleBox{
+.Home .menu-titleBox {
   display: flex;
   justify-content: space-between;
+  height: 30%;
 }
 
 /* menu-title */
@@ -22,21 +23,77 @@
   padding: 20px;
 }
 
-.Home .menu-titleBox img{
-  width: 300px;
+.Home .menu-titleBox img {
+  height: 100%;
 }
 
 .Home .menu-title h2 {
-  font-size: 34px;
+  font-size: var(--font-title-xl-d);
   padding-bottom: 15px;
+  color: var(--title-color);
 }
 
-.Home .menu-title p{
-  font-size: 18px;
+.Home .menu-title p {
+  font-size: var(--font-subtitle-xl-d);
+  color: var(--subtitle-color);
 }
 
 /* mainMenu-container */
 .Home .mainMenu-container {
   display: flex;
   justify-content: space-between;
+  height: 28%;
+}
+
+.Home .map {
+  height: 35%;
+}
+
+/* 모바일 */
+@media (max-width: 1110px) {
+  .Home {
+    height: auto;
+  }
+
+  .Home .main-container {
+    height: auto;
+    gap: 16px;
+  }
+
+  .Home .menu-titleBox {
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    height: auto;
+  }
+
+  .Home .menu-titleBox img {
+    width: 50%;
+    height: auto;
+    margin-top: 12px;
+  }
+
+  .Home .menu-title {
+    margin-top: 16px;
+    padding: 12px;
+  }
+
+  .Home .menu-title h2 {
+    font-size: var(--font-title-lg-m);
+    padding-bottom: 10px;
+  }
+
+  .Home .menu-title p {
+    font-size: var(--font-subtitle-xl-m);
+  }
+
+  .Home .mainMenu-container {
+    flex-direction: column;
+    height: auto;
+    gap: 12px;
+  }
+
+  .Home .map {
+    height: 200px;
+  }
 }

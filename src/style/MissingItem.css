@@ -1,6 +1,7 @@
 .MissingItem {
+  position: relative;
   display: flex;
-  border-bottom: 1px solid #f0eeeb;
+  border-bottom: 1px solid var(--border-color);
   padding-bottom: 10px;
   cursor: pointer;
 }
@@ -11,7 +12,7 @@
   overflow: hidden;
   object-fit: cover;
   border-radius: 10px;
-  border: 1px solid #f0eeeb;
+  border: 1px solid var(--border-color);
 }
 
 .MissingItem .contents {
@@ -21,11 +22,10 @@
   flex-direction: column;
   padding: 20px;
   gap: 20px;
-  font-size: 14px;
+  font-size: var(--font-small);
 }
 
-.MissingItem .contents .contents-t1,
-.MissingItem .contents .contents-t3 {
+.MissingItem .contents .contents-t1 {
   display: flex;
   align-items: center;
   gap: 10px;
@@ -33,17 +33,18 @@
 
 .MissingItem .contents .contents-t1 {
   font-weight: bold;
-  font-size: 18px;
+  font-size: var(--font-size-base);
 }
 
 .MissingItem .contents .contents-t1 .petType {
   padding: 5px 10px;
-  background-color: #ffa516;
+  background-color: var(--main-color);
   border-radius: 5px;
-  color: #fff;
+  color: var(--text-white);
 }
 
-.MissingItem .contents .contents-t3 {
-  font-size: 14px;
-  justify-content: space-between;
+.MissingItem .ReportMove-btn {
+  position: absolute;
+  right: 20px;
+  bottom: 20px;
 }

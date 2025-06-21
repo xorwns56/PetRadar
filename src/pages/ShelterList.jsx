@@ -6,10 +6,8 @@ import useShelterData from "../api/ShelterData";
 import ShelterListSection from "../components/ListItem";
 import Header from "../components/Header";
 import "../style/ShelterList.css";
-import { useNavigate } from "react-router-dom";
 
 const ShelterList = () => {
-  const navigate = useNavigate();
   const { animals, error } = useShelterData();
   const [selectedShelter, setSelectedShelter] = useState(null);
   const mapRef = useRef(null);
@@ -35,12 +33,13 @@ const ShelterList = () => {
   }, []);
 
   const handleItemClick = (shelter) => {
-    if (shelter.careRegNo) {
-      navigate(`/shelter/${shelter.careRegNo}`);
-    } else {
-      alert("보호소 등록번호(careRegNo)가 없습니다.");
+    setSelectedShelter(shelter);
+    if (mapRef.current) {
+      mapRef.current(shelter); // 지도 중심 이동
     }
+    navigator();
   };
+
   if (error) return <div>에러 발생</div>;
   if (!Array.isArray(animals)) return <div>불러오는 중...</div>;
   if (!animals.length)
@@ -51,31 +50,33 @@ const ShelterList = () => {
     );
 
   return (
-    <div className="container">
+    <div className="ShelterList">
       <div>
         <Header leftChild={true} />
       </div>
-      <Map
-        shelters={uniqueShelters}
-        onSelect={(shelter) => {
-          setSelectedShelter(shelter);
-          if (mapRef.current) mapRef.current(shelter);
-        }}
-        setCenterRef={mapRef}
-      />
-
-      {selectedShelter && (
-        <Modal onClose={() => setSelectedShelter(null)}>
-          <ShelterDetail shelter={selectedShelter} />
-        </Modal>
-      )}
-
-      <div>
-        <ShelterListSection
+      <div className="inner">
+        <Map
           shelters={uniqueShelters}
-          onItemClick={handleItemClick}
-          selected={selectedShelter}
+          onSelect={(shelter) => {
+            setSelectedShelter(shelter);
+            if (mapRef.current) mapRef.current(shelter);
+          }}
+          setCenterRef={mapRef}
         />
+
+        {selectedShelter && (
+          <Modal onClose={() => setSelectedShelter(null)}>
+            <ShelterDetail shelter={selectedShelter} />
+          </Modal>
+        )}
+
+        <div>
+          <ShelterListSection
+            shelters={uniqueShelters}
+            onItemClick={handleItemClick}
+            selected={selectedShelter}
+          />
+        </div>
       </div>
     </div>
   );

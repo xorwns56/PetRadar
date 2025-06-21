@@ -1,15 +1,18 @@
 @font-face {
-    font-family: 'Galmuri11-Condensed';
-    src: url('https://fastly.jsdelivr.net/gh/projectnoonnu/2506-1@1.0/Galmuri11-Condensed.woff2') format('woff2');
+    font-family: 'RixXladywatermelonR';
+    src: url('https://fastly.jsdelivr.net/gh/projectnoonnu/2408-4@1.0/RixXladywatermelonR.woff2') format('woff2');
     font-weight: normal;
     font-style: normal;
 }
-.load{
-  border : 1px solid blue;  
-  height : 200px; 
-  display : flex;  
-  justify-content : center;
+.load > .ShelterList {
+  height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.load {
   font-size: 40px;
-  font-family: 'Galmuri11-Condensed';
+  font-family: 'RixXladywatermelonR', sans-serif;
   text-align: center;
 }

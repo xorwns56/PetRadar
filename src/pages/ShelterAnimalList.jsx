@@ -1,93 +1,59 @@
-import "../style/ShelterList.css";
-import { useState, useEffect, useRef } from "react";
+import { useEffect, useState } from "react";
 import useShelterData from "../api/ShelterData";
-import ShelterItem from "../components/ShelterItem";
+import ShelterAnimalItem from "../components/ShelterAnimalItem";
+import ShelterModalDetail from "../components/ShelterModalDetail";
+import { useParams } from "react-router-dom";
 import Header from "../components/Header";
-import Button from "../components/Button";
-import { useNavigate } from "react-router-dom";
 
-const ShelterList = () => {
-  const nav = useNavigate();
-  const { animals, error } = useShelterData();
-  const [sortType, setSortType] = useState("name");
-  const [search, setSearch] = useState("");
-  const mapRef = useRef(null);
-  const [dots, setDots] = useState("");
+const ShelterAnimalList = () => {
+  const { animals } = useShelterData();
+  const { name, addr } = useParams();
+  const [selectedAnimal, setSelectedAnimal] = useState(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
-  const onChangeSortType = (e) => setSortType(e.target.value);
-  const onChangeSearch = (e) => setSearch(e.target.value);
+  const decodedName = decodeURIComponent(name);
+  const decodedAddr = decodeURIComponent(addr);
 
-  const uniqueShelters = animals.filter((shelter, index, self) => {
-    const key = `${shelter.SHTER_NM}-${shelter.PROTECT_PLC}`;
-    return (
-      index === self.findIndex((s) => `${s.SHTER_NM}-${s.PROTECT_PLC}` === key)
-    );
-  });
-
-  const getSortedData = () => {
-    return [...uniqueShelters].sort((a, b) => {
-      if (sortType === "name") {
-        return a.SHTER_NM.localeCompare(b.SHTER_NM);
-      } else {
-        return a.PROTECT_PLC.localeCompare(b.PROTECT_PLC);
-      }
+  const getFilteredData = () => {
+    return animals.filter((a) => {
+      const sName = a.SHTER_NM?.trim();
+      const sAddr = a.REFINE_ROADNM_ADDR?.trim() || a.REFINE_LOTNO_ADDR?.trim();
+      return sName === decodedName && sAddr === decodedAddr;
     });
   };
 
-  const getFilteredData = () => {
-    const filtered = getSortedData();
-    if (!search) return filtered;
-    return filtered.filter((item) =>
-      item.SHTER_NM.toLowerCase().includes(search.toLowerCase())
-    );
-  };
-
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setDots((prev) => (prev.length >= 3 ? "" : prev + "."));
-    }, 500);
-    return () => clearInterval(interval);
-  }, []);
-
-  if (error) return <div>에러 발생</div>;
-  if (!Array.isArray(animals)) return <div>불러오는 중...</div>;
-  if (!animals.length) return <div className="load">로딩중{dots}</div>;
-
   return (
-    <div className="ShelterList">
+    <div className="ShelterAnimalList">
       <Header leftChild={true} />
-      <div className="ShelterList-container inner">
-        <div className="menu-title">
-          <h3>보호소 목록</h3>
-        </div>
-
-        <div className="search-box">
-          <select value={sortType} onChange={onChangeSortType}>
-            <option value="name">이름순</option>
-            <option value="place">주소순</option>
-          </select>
-          <input
-            value={search}
-            onChange={onChangeSearch}
-            placeholder="보호소 이름 검색"
-          />
-          <Button text="조회" type="Square" />
-        </div>
-
-        <div className="ShelterItems">
-          {getFilteredData().map((shelter) => (
-            <ShelterItem
-              key={shelter.SHTER_NM + shelter.PROTECT_PLC}
-              {...shelter}
+      <div className="ShelterAnimalList-container inner">
+        <h3>해당 보호소 유기동물</h3>
+        <div className="MissingItems">
+          {getFilteredData().map((item) => (
+            <ShelterAnimalItem
+              key={item.ABDM_IDNTFY_NO}
+              petId={item.ABDM_IDNTFY_NO}
+              petType={item.SPECIES_NM}
+              petGender={item.SEX_NM}
+              petName={item.SHTER_NM}
+              petAge={item.AGE_INFO}
+              petMissingDate={item.RECEPT_DE}
               onClick={() => {
-                nav(`/shelter/${shelter.careRegNo}`);
+                setSelectedAnimal(item);
+                setIsModalOpen(true);
               }}
             />
           ))}
         </div>
       </div>
+      {isModalOpen && (
+        <ShelterModalDetail
+          animal={selectedAnimal}
+          onClick={() => {}}
+          onClose={() => setIsModalOpen(false)}
+        />
+      )}
     </div>
   );
 };
 
-export default ShelterList;
+export default ShelterAnimalList;
