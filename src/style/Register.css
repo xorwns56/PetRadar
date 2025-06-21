@@ -9,6 +9,10 @@
   padding-bottom: 48px;
 }
 
+.Register .header .logo {
+  height: 30px;
+}
+
 .Register .content {
   padding: 24px;
   border: 1px solid #e1e3e5;
