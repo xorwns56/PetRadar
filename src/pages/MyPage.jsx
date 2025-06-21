@@ -12,7 +12,7 @@ const MyPage = () => {
 
   useEffect(() => {
     if (!userState.currentUser) {
-      nav("/login", { replace: true });
+      nav("/", { replace: true });
     }
   }, [userState.currentUser, nav]);
 
@@ -31,16 +31,17 @@ const MyPage = () => {
   };
 
   const onDelete = () => {
-    //컨펌 받자
-    userDispatch({
-      type: "DELETE",
-      data: {
-        id: info.id,
-      },
-    });
-    userDispatch({
-      type: "LOGOUT",
-    });
+    if (confirm("탈퇴 시 모든 정보가 삭제됩니다. 정말 탈퇴하시겠습니까?")) {
+      userDispatch({
+        type: "DELETE",
+        data: {
+          id: info.id,
+        },
+      });
+      userDispatch({
+        type: "LOGOUT",
+      });
+    }
   };
 
   return (

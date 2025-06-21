@@ -80,7 +80,14 @@ const MyInfo = ({ id, pw, hp, onUpdate, onDelete }) => {
         <div className="btn">
           {editMode ? (
             <>
-              <button onClick={() => onUpdate(input.pw, input.hp)}>확인</button>
+              <button
+                onClick={() => {
+                  onUpdate(input.pw, input.hp);
+                  setEditMode(false);
+                }}
+              >
+                확인
+              </button>
               <button onClick={() => setEditMode(false)}>취소</button>
             </>
           ) : (
