@@ -21,6 +21,7 @@
 }
 
 .MissingList .search-box {
+  width: 100%;
   display: flex;
   gap: 5px;
   height: 50px;
@@ -44,6 +45,7 @@
 
 /* MissingItems */
 .MissingList .MissingItems {
+  width: 100%;
   height: calc(100vh - 400px);
   display: flex;
   flex-direction: column;

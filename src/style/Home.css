@@ -4,6 +4,7 @@
 }
 
 .Home .main-container {
+  width: 100%;
   height: calc(100% - 80px);
   display: flex;
   flex-direction: column;
@@ -42,10 +43,12 @@
 .Home .mainMenu-container {
   display: flex;
   justify-content: space-between;
+  width: 100%;
   height: 28%;
 }
 
 .Home .map {
+  width: 100%;
   height: 35%;
 }
 
