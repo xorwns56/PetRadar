@@ -1,17 +1,16 @@
 import { useEffect, useRef, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import Map from "../components/Map";
-import Modal from "../components/Modal";
-import ShelterDetail from "../components/ShelterDetail";
 import useShelterData from "../api/ShelterData";
-import ShelterListSection from "../components/ListItem";
 import Header from "../components/Header";
 import "../style/ShelterList.css";
 
 const ShelterList = () => {
   const { animals, error } = useShelterData();
-  const [selectedShelter, setSelectedShelter] = useState(null);
-  const mapRef = useRef(null);
   const [dots, setDots] = useState("");
+  const mapRef = useRef(null);
+  const navigate = useNavigate();
+
   const uniqueShelters = animals.filter((shelter, index, self) => {
     const key = `${shelter.SHTER_NM}-${
       shelter.REFINE_ROADNM_ADDR || shelter.REFINE_LOTNO_ADDR
@@ -33,49 +32,60 @@ const ShelterList = () => {
   }, []);
 
   const handleItemClick = (shelter) => {
-    setSelectedShelter(shelter);
-    if (mapRef.current) {
-      mapRef.current(shelter); // 지도 중심 이동
-    }
-    navigator();
+    const name = encodeURIComponent(shelter.SHTER_NM);
+    const addr = encodeURIComponent(
+      shelter.REFINE_ROADNM_ADDR || shelter.REFINE_LOTNO_ADDR
+    );
+    navigate(`/shelter/${name}/${addr}`);
   };
 
   if (error) return <div>에러 발생</div>;
   if (!Array.isArray(animals)) return <div>불러오는 중...</div>;
   if (!animals.length)
     return (
-      <div>
+      <div className="load-wrapper">
         <span className="load">로딩중{dots}</span>
       </div>
     );
 
   return (
     <div className="ShelterList">
-      <div>
-        <Header leftChild={true} />
-      </div>
+      <Header leftChild={true} />
+      <h2 className="PageTitle">보호소 정보</h2>
+
       <div className="inner">
-        <Map
-          shelters={uniqueShelters}
-          onSelect={(shelter) => {
-            setSelectedShelter(shelter);
-            if (mapRef.current) mapRef.current(shelter);
-          }}
-          setCenterRef={mapRef}
-        />
-
-        {selectedShelter && (
-          <Modal onClose={() => setSelectedShelter(null)}>
-            <ShelterDetail shelter={selectedShelter} />
-          </Modal>
-        )}
-
-        <div>
-          <ShelterListSection
+        <div className="map-wrapper">
+          <Map
             shelters={uniqueShelters}
-            onItemClick={handleItemClick}
-            selected={selectedShelter}
+            onSelect={(shelter) => {
+              if (mapRef.current) mapRef.current(shelter); // 지도 클릭시 아무 동작 X
+            }}
+            setCenterRef={mapRef}
           />
+        </div>
+
+        <div className="ShelterList-container">
+          {uniqueShelters.map((shelter, index) => (
+            <div
+              key={index}
+              className="shelter-card"
+              onClick={() => handleItemClick(shelter)}
+            >
+              <img
+                src={shelter.THUMB_IMAGE_COURS || "/NoIMG.png"}
+                alt="썸네일"
+                className="shelter-thumb"
+                onError={(e) => {
+                  e.target.onerror = null;
+                  e.target.src = "/NoIMG.png";
+                }}
+              />
+              <div className="shelter-info">
+                <strong>{shelter.SHTER_NM}</strong>
+                <p>{shelter.REFINE_ROADNM_ADDR || shelter.REFINE_LOTNO_ADDR}</p>
+              </div>
+            </div>
+          ))}
         </div>
       </div>
     </div>

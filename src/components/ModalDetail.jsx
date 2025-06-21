@@ -5,6 +5,7 @@ import { missingPet } from '../utils/missingPet';
 import Button from './Button';
 
 const ModalDetail = ({ petId, petName, petType, petGender, petAge, petMissingDate, onClick }) => {
+
   const { isActive, toggleModal } = useModal();
 
   return (
