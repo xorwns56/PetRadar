@@ -16,6 +16,7 @@
   flex: 1;
   display: flex;
   flex-direction: column;
+  padding: 0px 15px;
 }
 
 .MyPost .content .tabs {
@@ -56,10 +57,10 @@
 }
 
 .MyPost .content .report {
-  padding: 20px;
   flex: 1;
   display: flex;
   flex-direction: column;
+  justify-content: center;
   gap: 10px;
 }
 
