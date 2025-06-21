@@ -1,39 +1,81 @@
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import "../style/MyPost.css";
 import Pagination from "./Pagination";
 import Modal from "./Modal";
+import MypageModalDetail from "./MypageModalDetail";
+import { useModal } from "../hooks/ModalContext";
 const MyPost = () => {
-  const mockData = [{}, {}, {}, {}, {}, {}, {}, {}, {}, {}];
+  const { toggleModal } = useModal();
+  const mockData = [
+    { petMissingId: 0, petName: "코카스패니얼" },
+    { petMissingId: 1, petName: "코슈" },
+    { petMissingId: 2, petName: "코슈" },
+    { petMissingId: 3, petName: "코슈" },
+  ];
+  const mockData2 = [
+    { petReportId: 0 },
+    { petReportId: 1 },
+    { petReportId: 2 },
+  ];
 
-  const mockData2 = [{}, {}];
+  const reportDiv = useRef(null);
+  const itemDiv = useRef(null);
 
-  const currPage = 1;
-  const pageItemSize = 4;
+  const [itemCount, setItemCount] = useState(5);
 
-  const [showModal, setShowModal] = useState(false);
+  useEffect(() => {
+    const calcItemSize = () => {
+      if (reportDiv.current && itemDiv.current) {
+        const reportHeight = reportDiv.current.clientHeight;
+        const itemHeight = itemDiv.current.clientHeight;
+        const size = Math.floor(reportHeight / itemHeight);
+        setItemCount(size > 0 ? size : 1); // 최소 1
+      }
+    };
 
-  const rangeStart = (currPage - 1) * pageItemSize;
-  const pagingData = mockData2.slice(rangeStart, pageItemSize);
+    calcItemSize();
+    window.addEventListener("resize", calcItemSize);
+    return () => window.removeEventListener("resize", calcItemSize);
+  }, []);
 
+  console.log(itemCount);
+
+  const [petMissingId, setPetMissingId] = useState(
+    mockData.length > 0 ? mockData[0].petMissingId : null
+  );
+  const itemSize = 1;
+  const [sliceItems, setSliceItems] = useState(mockData2.slice(0, itemSize));
+  const onClick = (page) => {
+    const end = page * itemSize;
+    const start = end - itemSize;
+    setSliceItems(mockData2.slice(start, end));
+  };
   return (
     <div className="MyPost">
-      <h2 className="title">제보 현황</h2>
+      <h2 className="title">제보글</h2>
       <div className="content">
         <div className="tabs">
-          {mockData.map((item, index) => {
+          {mockData.map((item) => {
             return (
-              <button className="tab" key={index}>
-                동물
+              <button
+                className={`tab ${
+                  item.petMissingId === petMissingId ? "active" : ""
+                }`}
+                key={`petMissing${item.petMissingId}`}
+                onClick={() => setPetMissingId(item.petMissingId)}
+              >
+                #{item.petName}
               </button>
             );
           })}
         </div>
-        <div className="report">
-          {pagingData.map((item, index) => {
+        <div className="report" ref={reportDiv}>
+          {sliceItems.map((item, index) => {
             return (
               <div
-                onClick={() => setShowModal(true)}
-                key={index}
+                ref={index === 0 ? itemDiv : null}
+                onClick={toggleModal}
+                key={`petReport${item.petReportId}`}
                 className="item"
               >
                 <div className="post-thumbnail">
@@ -51,13 +93,13 @@ const MyPost = () => {
             );
           })}
         </div>
-        <Pagination totalItems={0} currentPage={1} itemSize={5} pageSize={5} />
+        <Pagination
+          totalItems={mockData2.length}
+          onClick={onClick}
+          itemSize={itemSize}
+        />
       </div>
-      {showModal && (
-        <Modal onClose={() => setShowModal(false)}>
-          <div>Modal</div>
-        </Modal>
-      )}
+      <MypageModalDetail />
     </div>
   );
 };
