@@ -7,14 +7,14 @@ import ReportMap from '../components/ReportMap';
 import {useReportDispatch, useReportState} from "../contexts/ReportContext";
 
 import { useState } from 'react';
-import { data, useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 
 const MissingReport = () => {
   const dispatch = useReportDispatch();
   const nav = useNavigate();
   const [form, setForm] = useState({
     reportTitle: "",
-    reportContetnt: "",
+    reportContent: "",
     lat: null,
     lng: null,
   });
@@ -62,8 +62,8 @@ const MissingReport = () => {
             <h3>내용</h3>
             {/* <textarea type="text" placeholder="상세한 설명을 적어주세요." /> */}
             <textarea
-            name="reportContetnt"
-            value={form.reportContetnt}
+            name="reportContent"
+            value={form.reportContent}
             onChange={handleChange}
             placeholder="상세한 설명을 적어주세요."
           />

@@ -3,6 +3,7 @@ import Header from '../components/Header';
 import Map from '../components/Map';
 import MainMenu from '../components/MainMenu';
 import { useNavigate } from 'react-router-dom';
+import MissingMap from '../components/MissingMap';
 
 
 const Home = () => {
@@ -64,7 +65,7 @@ const Home = () => {
           />
         </div>
         <div className="map">
-          <Map />
+          <MissingMap />
         </div>
       </div>
     </div>
