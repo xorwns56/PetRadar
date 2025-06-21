@@ -1,8 +1,9 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import useShelterData from "../api/ShelterData";
 import ShelterAnimalItem from "../components/ShelterAnimalItem";
 import ShelterModalDetail from "../components/ShelterModalDetail";
 import { useParams } from "react-router-dom";
+import "../style/ShelterAnimalList.css";
 import Header from "../components/Header";
 
 const ShelterAnimalList = () => {
@@ -10,33 +11,67 @@ const ShelterAnimalList = () => {
   const { name, addr } = useParams();
   const [selectedAnimal, setSelectedAnimal] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [sortOrder, setSortOrder] = useState("newest"); // 최신순 기본
 
   const decodedName = decodeURIComponent(name);
   const decodedAddr = decodeURIComponent(addr);
 
+  // 날짜 문자열 파싱 함수
+  const parseDate = (str) => {
+    if (!str || str.length !== 8) return new Date(0);
+    const year = parseInt(str.slice(0, 4));
+    const month = parseInt(str.slice(4, 6)) - 1;
+    const day = parseInt(str.slice(6, 8));
+    return new Date(year, month, day);
+  };
+
+  // 필터 + 정렬
   const getFilteredData = () => {
-    return animals.filter((a) => {
+    const filtered = animals.filter((a) => {
       const sName = a.SHTER_NM?.trim();
       const sAddr = a.REFINE_ROADNM_ADDR?.trim() || a.REFINE_LOTNO_ADDR?.trim();
       return sName === decodedName && sAddr === decodedAddr;
+    });
+
+    return filtered.sort((a, b) => {
+      const dateA = parseDate(a.RECEPT_DE); // ✅ 실종일자 기준
+      const dateB = parseDate(b.RECEPT_DE);
+      return sortOrder === "newest" ? dateB - dateA : dateA - dateB;
     });
   };
 
   return (
     <div className="ShelterAnimalList">
-      <Header leftChild={true} />
-      <div className="ShelterAnimalList-container inner">
-        <h3>해당 보호소 유기동물</h3>
-        <div className="MissingItems">
+      <Header leftChild />
+      <h2 className="PageTitle">해당 보호소 유기동물</h2>
+
+      <div className="SearchBar">
+        <select
+          value={sortOrder}
+          onChange={(e) => setSortOrder(e.target.value)}
+        >
+          <option value="newest">오래된순</option>
+          <option value="oldest">최신순</option>
+        </select>
+      </div>
+
+      <div className="ShelterAnimalList-container">
+        <div className="MissingItems scroll-hidden">
+          <style>
+            {`
+              .scroll-hidden::-webkit-scrollbar {
+                display: none;
+              }
+            `}
+          </style>
+
           {getFilteredData().map((item) => (
             <ShelterAnimalItem
               key={item.ABDM_IDNTFY_NO}
               petId={item.ABDM_IDNTFY_NO}
               petType={item.SPECIES_NM}
-              petGender={item.SEX_NM}
-              petName={item.SHTER_NM}
-              petAge={item.AGE_INFO}
               petMissingDate={item.RECEPT_DE}
+              imageUrl={item.IMAGE_COURS}
               onClick={() => {
                 setSelectedAnimal(item);
                 setIsModalOpen(true);
@@ -45,11 +80,12 @@ const ShelterAnimalList = () => {
           ))}
         </div>
       </div>
+
       {isModalOpen && (
         <ShelterModalDetail
           animal={selectedAnimal}
-          onClick={() => {}}
           onClose={() => setIsModalOpen(false)}
+          onClick={() => {}}
         />
       )}
     </div>

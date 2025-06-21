@@ -1,10 +1,8 @@
 import { useModal } from "../hooks/ModalContext";
 import "../style/ModalDetail.css";
 import { getMissingImage } from "../utils/get-missingPet-image";
-import { missingPet } from "../utils/missingPet";
 import Button from "./Button";
 import { missingPet } from "../utils/missingPet";
-
 
 const ModalDetail = ({
   petId,
@@ -15,7 +13,6 @@ const ModalDetail = ({
   petMissingDate,
   onClick,
 }) => {
-
   const { isActive, toggleModal } = useModal();
 
   return (
@@ -24,7 +21,7 @@ const ModalDetail = ({
         <div className="Modal-contents">
           <div className="img-box">
             {/* 이미지  or 위치 */}
-            <img src={getMissingImage(petId)} alt="missingPet img" />
+            <img src={getMissingImage(petId)} alt="/NoIMG.png" />
           </div>
           <div className="text-contents">
             <div className="contents-t1">
