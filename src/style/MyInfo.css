@@ -1,28 +1,50 @@
-.MyInfo .title {
-  text-align: center;
-  padding: 20px;
+.MyInfo {
+  margin-top: 15px;
 }
 
 .MyInfo .content {
   padding: 20px;
   border-radius: 10px;
-  border: 1px solid #ccc;
+  background-color: white;
+  box-shadow: 0 4px 8px #ccc;
 }
 
 .MyInfo .info {
   width: 100%;
 }
 
-.MyInfo .btn {
+.MyInfo .info span {
+  padding: 8px 14px;
+}
+
+.MyInfo .v_btn {
   display: flex;
-  gap: 20px;
-  margin-top: 20px;
+  flex-direction: column;
 }
 
 .MyInfo button {
-  flex: 1;
+  margin-top: 15px;
   height: 30px;
   border: none;
+  border-radius: 5px;
   background-color: #ffa516;
   color: white;
+}
+
+.MyInfo .h_btn {
+  display: flex;
+  gap: 15px;
+}
+
+.MyInfo .h_btn > button {
+  flex: 1;
+}
+
+.MyInfo input {
+  width: 100%;
+  padding: 8px 12px;
+  font-size: 15px;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  outline: none;
 }

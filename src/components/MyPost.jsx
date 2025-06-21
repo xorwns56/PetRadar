@@ -1,9 +1,9 @@
-import { useRef, useState } from "react";
+import { useState } from "react";
 import "../style/MyPost.css";
 import Pagination from "./Pagination";
 import Modal from "./Modal";
 const MyPost = () => {
-  const mockData = [{}, {}, {}, {}];
+  const mockData = [{}, {}, {}, {}, {}, {}, {}, {}, {}, {}];
 
   const mockData2 = [{}, {}];
 
@@ -19,9 +19,13 @@ const MyPost = () => {
     <div className="MyPost">
       <h2 className="title">제보 현황</h2>
       <div className="content">
-        <div className="btn">
+        <div className="tabs">
           {mockData.map((item, index) => {
-            return <button key={index}>동물</button>;
+            return (
+              <button className="tab" key={index}>
+                동물
+              </button>
+            );
           })}
         </div>
         <div className="report">
@@ -32,19 +36,22 @@ const MyPost = () => {
                 key={index}
                 className="item"
               >
-                <div className="img">
+                <div className="post-thumbnail">
                   <img src="https://search.pstatic.net/common?type=f&size=174x174&quality=95&direct=true&src=http%3A%2F%2Fsstatic.naver.net%2Fkeypage%2Fimage%2Fdss%2F605%2F84%2F69%2F19%2F605_11846919_kind_imgurl_1_1579514278263.png" />
                 </div>
-                <div className="txt">
-                  <h4>고양이를 발견했어요!!</h4>
-                  <p>ㅇㅇㅇㅇ</p>
-                  <p>ㅇㅇㅇㅇ</p>
+                <div className="post-info">
+                  <p className="post-title">aasd</p>
+                  <p className="post-description">
+                    당곡역 근처에서 하얀색 고양이가 포착되었습니다. 정확한
+                    장소는
+                  </p>
+                  <p className="post-location">위치보기</p>
                 </div>
               </div>
             );
           })}
         </div>
-        <Pagination />
+        <Pagination totalItems={0} currentPage={1} itemSize={5} pageSize={5} />
       </div>
       {showModal && (
         <Modal onClose={() => setShowModal(false)}>

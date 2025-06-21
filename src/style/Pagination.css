@@ -1,14 +1,36 @@
 .Pagination {
   display: flex;
-  justify-content: space-evenly;
+  gap: 4px;
+  justify-content: center;
   align-items: center;
-}
-
-.Pagination span {
-  padding: 10px;
-  cursor: pointer;
+  padding: 20px;
 }
 
 .Pagination .hide {
   visibility: hidden;
+  pointer-events: none;
+}
+
+.Pagination .page,
+.Pagination .nav {
+  padding: 4px 8px;
+  border: 1px solid #ccc;
+  cursor: pointer;
+  border-radius: 4px;
+}
+
+.Pagination .page.active {
+  background: #ffa516;
+  color: white;
+  font-weight: bold;
+}
+
+.Pagination .nav:hover,
+.Pagination .page:hover {
+  background: #ccc;
+}
+
+.Pagination .nav {
+  font-size: 12px;
+  color: #ccc;
 }
