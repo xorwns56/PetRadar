@@ -10,41 +10,49 @@
 }
 
 .MyPost .content {
+  border-radius: 10px;
+  background-color: white;
+  box-shadow: 0 4px 8px #ccc;
   flex: 1;
-  border-radius: 20px;
-  border: 1px solid #ccc;
   display: flex;
   flex-direction: column;
 }
 
-.MyPost .content .btn {
-  width: 100%;
+.MyPost .content .tabs {
   display: flex;
-  gap: 15px;
-  padding: 15px;
-  white-space: nowrap;
-  overflow-x: scroll;
-  -ms-overflow-style: none;
-  scrollbar-width: none;
-  user-select: none;
-  cursor: grab;
+  overflow-x: auto;
+  border-bottom: 2px solid #ddd;
+  padding: 0 8px;
+  scrollbar-width: thin;
 }
 
-.MyPost .content .btn:active {
-  cursor: grabbing;
+.tab-container::-webkit-scrollbar {
+  height: 6px;
+}
+.tab-container::-webkit-scrollbar-thumb {
+  background-color: #ccc;
+  border-radius: 3px;
 }
 
-.MyPost .content .btn::-webkit-scrollbar {
-  display: none;
-}
-
-.MyPost .content button {
-  padding: 0px 20px;
-  font-size: 16px;
-  cursor: pointer;
-  background: #ccc;
-  border-radius: 6px;
+.MyPost .content .tab {
+  flex: 0 0 auto;
+  padding: 16px;
   border: none;
+  background: none;
+  cursor: pointer;
+  font-weight: 500;
+  color: gray;
+  border-bottom: 4px solid transparent;
+  transition: color 0.3s, border-color 0.3s;
+  white-space: nowrap;
+}
+.MyPost .content .tab:hover {
+  color: #000;
+}
+.MyPost .content .tab.active {
+  color: #ffa516;
+  border-bottom-color: #ffa516;
+  font-weight: 700;
 }
 
 .MyPost .content .report {
@@ -57,23 +65,46 @@
 
 .MyPost .content .report .item {
   display: flex;
-  background-color: gray;
-  border-radius: 5px;
+  border-radius: 10px;
+  background-color: white;
+  box-shadow: 0 4px 8px gray;
 }
 
-.MyPost .content .report .item .img {
+.MyPost .content .report .item .post-thumbnail {
   flex: 1;
-  padding: 15px;
+  aspect-ratio: 1/1;
+  padding: 5px;
 }
 
-.MyPost .content .report .item img {
+.MyPost .content .report .item .post-thumbnail > img {
   width: 100%;
   height: 100%;
+  border-radius: 10px;
 }
 
-.MyPost .content .report .item .txt {
+.MyPost .content .report .item .post-info {
   display: flex;
   flex-direction: column;
   justify-content: center;
-  flex: 5;
+  overflow: hidden;
+  padding: 10px;
+  font-size: 14px;
+  flex: 3;
+}
+
+.MyPost .content .report .item .post-info > p {
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  padding: 3px;
+}
+
+.MyPost .content .report .item .post-title {
+  font-weight: bold;
+  font-size: 20px;
+}
+
+.MyPost .content .report .item .post-location {
+  font-weight: bold;
+  font-size: 12px;
 }

@@ -1,15 +1,6 @@
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
 import "../style/LoginForm.css";
-import { useUsersState } from "../contexts/UsersContext";
-import { useLoginUser } from "../contexts/LoginUserContext";
-const LoginForm = () => {
-  const usersState = useUsersState();
-  const { login } = useLoginUser();
-  const nav = useNavigate();
-  const Login = (id, pw) => {
-    return usersState.find((user) => user.id === id && user.pw === pw);
-  };
+const LoginForm = ({ onLoginCheck, onLoginSuccess }) => {
   const onSubmit = (event) => {
     event.preventDefault();
     if (!input.id) {
@@ -20,15 +11,13 @@ const LoginForm = () => {
       setErrMsg("비밀번호를 입력해주세요.");
       return;
     }
-    const user = Login(input.id, input.pw);
-    if (!user) {
+    if (!onLoginCheck(input.id, input.pw)) {
       setErrMsg(
         "아이디 또는 비밀번호가 잘못 되었습니다. 아이디와 비밀번호를 정확히 입력해 주세요."
       );
       return;
     }
-    login(input.id);
-    nav("/", { replace: true });
+    onLoginSuccess(input.id);
   };
   const [focus, setFocus] = useState({
     id: false,
@@ -88,7 +77,9 @@ const LoginForm = () => {
           onClick={() => {
             onDeleteInput("id");
           }}
-        ></button>
+        >
+          <img src="/deleteIcon.png" />
+        </button>
       </div>
       <div
         className={`input_item pw ${focus.pw ? "focus" : ""} ${
@@ -111,14 +102,18 @@ const LoginForm = () => {
           onClick={() => {
             setPwHide(!pwHide);
           }}
-        ></button>
+        >
+          <img src={`/${pwHide ? "close" : "open"}EyeIcon.png`} />
+        </button>
         <button
           type="button"
           className={`btn_delete ${input.pw ? "" : "hide"}`}
           onClick={() => {
             onDeleteInput("pw");
           }}
-        ></button>
+        >
+          <img src="/deleteIcon.png" />
+        </button>
       </div>
       <div className={`error_message ${errMsg ? "" : "hide"}`}>{errMsg}</div>
       <button

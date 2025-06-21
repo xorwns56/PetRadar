@@ -1,6 +1,5 @@
 import "../style/MissingList.css";
 import { useState } from "react";
-import { missingPet } from "../utils/missingPet";
 import Button from "../components/Button";
 import Header from "../components/Header";
 import MissingItem from "../components/MissingItem";
@@ -8,25 +7,23 @@ import MissingItem from "../components/MissingItem";
 import ModalDetail from "../components/ModalDetail";
 import { useNavigate } from "react-router-dom";
 import { useModal } from "../hooks/ModalContext";
+import { useMissingState } from "../contexts/MissingContext";
 
 const MissingList = () => {
   const [selectedId, setSelectedId] = useState(null);
   const { toggleModal } = useModal();
   const nav = useNavigate();
-
   const [sortType, setSortType] = useState("latest");
   const onChangeSortType = (e) => {
     setSortType(e.target.value);
   };
-
+  const missingState = useMissingState();
   const getSortedData = () => {
-    return [...missingPet].toSorted((prev, next) => {
-      const prevDate = new Date(prev.petMissingDate);
-      const nextDate = new Date(next.petMissingDate);
+    return missingState.toSorted((prev, next) => {
       if (sortType === "oldest") {
-        return prevDate - nextDate;
+        return prev.createDate - next.createDate;
       } else {
-        return nextDate - prevDate;
+        return next.createDate - prev.createDate;
       }
     });
   };
@@ -40,8 +37,9 @@ const MissingList = () => {
     if (search === "") {
       return sortedData;
     }
+
     return sortedData.filter((item) =>
-      item.petTitle.toLowerCase().includes(search.toLowerCase())
+      item.title?.toLowerCase().includes(search.toLowerCase())
     );
   };
   const getFilterTitleData = getFilterTitle();
@@ -70,10 +68,10 @@ const MissingList = () => {
         <div className="MissingItems">
           {getFilterTitleData.map((item) => (
             <MissingItem
-              key={item.petId}
+              key={item.petMissingId}
               {...item}
               toggleModal={() => {
-                setSelectedId(item.petId);
+                setSelectedId(item.petMissingId);
                 toggleModal();
               }}
               onClick={() => {

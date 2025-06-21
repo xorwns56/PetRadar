@@ -1,18 +1,17 @@
 .Header {
-  width: 60%;
-  min-width: 600px;
   width: 100%;
-  height: 80px;
+  height: 70px;
   display: flex;
   align-items: center;
-  font-size: 18px;
-  padding: 20px 40px;
-  background-color: #ffa516;
-  color: #fff;
+  padding: 15px 24px;
+  font-size: 16px;
+  background-color: var(--main-color);
+  color: var(--text-white);
   cursor: pointer;
 }
 
-.Header>div {
+/* 내부 정렬 */
+.Header > div {
   display: flex;
 }
 
@@ -21,27 +20,26 @@
 }
 
 .Header .header_left {
-  width: 25%;
+  width: 35%;
   justify-content: flex-start;
-
 }
 
 .Header .header_center {
-  width: 50%;
+  width: 30%;
   justify-content: center;
-  font-size: 25px;
+  font-size: var(--font-body);
   font-weight: bold;
 }
 
 .Header .header_center img {
-  filter: invert(100%);
+  height: 22px;
 }
 
 .Header .header_right {
-  width: 25%;
+  width: 35%;
   justify-content: flex-end;
   align-items: center;
-  gap: 20px;
+  gap: 10px;
 }
 
 .Header .header_right .Msg-bell {
@@ -49,7 +47,14 @@
   background-repeat: no-repeat;
   background-position: center;
   background-size: cover;
-  width: 30px;
-  height: 30px;
+  width: 22px;
+  height: 22px;
   transition: 0.35s;
+}
+
+/* 모바일 */
+@media (max-width: 660px) {
+  .Header {
+    font-size: var(--font-small);
+  }
 }
