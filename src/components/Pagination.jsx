@@ -7,9 +7,9 @@ const Pagination = ({
   pageSize = 5,
 }) => {
   const totalPages = Math.ceil(totalItems / itemSize);
-  currentPage = Math.min(totalPages, Math.max(1, currentPage));
+  const safeCurrentPage = Math.min(totalPages, Math.max(1, currentPage));
   //const totalPageBlocks = Math.ceil(totalPages / pageSize);
-  const currPageBlock = Math.floor((currentPage - 1) / pageSize) + 1;
+  const currPageBlock = Math.floor((safeCurrentPage - 1) / pageSize) + 1;
   const blockEnd = currPageBlock * pageSize;
   const blockStart = blockEnd - pageSize + 1;
   const pageArr = [];
@@ -19,28 +19,28 @@ const Pagination = ({
   return (
     totalPages > 0 && (
       <div className="Pagination">
-        <span
-          className={blockStart > 1 ? "" : "hide"}
-          onClick={() => onClick(blockStart - 1)}
-        >
-          ◀
-        </span>
+        {blockStart > 1 && (
+          <span className="nav" onClick={() => onClick(blockStart - 1)}>
+            ◀
+          </span>
+        )}
         {pageArr.map((item) => {
           return (
             <span
-              className={item > totalPages ? "hide" : ""}
-              onClick={() => onClick(item)}
+              className={`page ${item <= totalPages ? "" : "hide"} ${
+                item === safeCurrentPage ? "active" : ""
+              }`}
+              onClick={() => item <= totalPages && onClick(item)}
             >
               {item}
             </span>
           );
         })}
-        <span
-          className={blockEnd < totalPages ? "" : "hide"}
-          onClick={() => onClick(blockEnd + 1)}
-        >
-          ▶
-        </span>
+        {blockEnd < totalPages && (
+          <span className="nav" onClick={() => onClick(blockEnd + 1)}>
+            ▶
+          </span>
+        )}
       </div>
     )
   );

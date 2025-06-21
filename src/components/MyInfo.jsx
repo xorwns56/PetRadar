@@ -1,6 +1,6 @@
 import { useState } from "react";
 import "../style/MyInfo.css";
-const MyInfo = ({ id, pw, hp, onUpdate, onDelete }) => {
+const MyInfo = ({ id, pw, hp, onUpdate, onDelete, onLogOut }) => {
   const [editMode, setEditMode] = useState(false);
   const [pwHide, setPwHide] = useState(false);
   const [input, setInput] = useState({
@@ -32,13 +32,14 @@ const MyInfo = ({ id, pw, hp, onUpdate, onDelete }) => {
   };
   return (
     <div className="MyInfo">
-      <h2 className="title">회원 정보</h2>
       <div className="content">
         <table className="info">
           <tbody>
             <tr>
               <th>아이디</th>
-              <td>{id}</td>
+              <td>
+                <span>{id}</span>
+              </td>
             </tr>
             {editMode ? (
               <>
@@ -72,28 +73,33 @@ const MyInfo = ({ id, pw, hp, onUpdate, onDelete }) => {
             ) : (
               <tr>
                 <th>연락처</th>
-                <td>{hp}</td>
+                <td>
+                  <span>{hp}</span>
+                </td>
               </tr>
             )}
           </tbody>
         </table>
-        <div className="btn">
+        <div className="v_btn">
           {editMode ? (
             <>
-              <button
-                onClick={() => {
-                  onUpdate(input.pw, input.hp);
-                  setEditMode(false);
-                }}
-              >
-                확인
-              </button>
-              <button onClick={() => setEditMode(false)}>취소</button>
+              <button onClick={onDelete}>회원 탈퇴</button>
+              <div className="h_btn">
+                <button
+                  onClick={() => {
+                    onUpdate(input.pw, input.hp);
+                    setEditMode(false);
+                  }}
+                >
+                  확인
+                </button>
+                <button onClick={() => setEditMode(false)}>취소</button>
+              </div>
             </>
           ) : (
             <>
-              <button onClick={() => setEditMode(true)}>정보 수정</button>
-              <button onClick={onDelete}>회원 탈퇴</button>
+              <button onClick={onLogOut}>로그아웃</button>
+              <button onClick={() => setEditMode(true)}>정보수정</button>
             </>
           )}
         </div>

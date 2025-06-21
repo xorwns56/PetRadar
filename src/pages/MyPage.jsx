@@ -38,17 +38,26 @@ const MyPage = () => {
           id: info.id,
         },
       });
-      userDispatch({
-        type: "LOGOUT",
-      });
+      onLogOut();
     }
+  };
+
+  const onLogOut = () => {
+    userDispatch({
+      type: "LOGOUT",
+    });
   };
 
   return (
     <div className="MyPage">
       <Header rightChild={"child"} />
       <div className="container">
-        <MyInfo {...info} onUpdate={onUpdate} onDelete={onDelete} />
+        <MyInfo
+          {...info}
+          onUpdate={onUpdate}
+          onDelete={onDelete}
+          onLogOut={onLogOut}
+        />
         <MyPost />
       </div>
     </div>
