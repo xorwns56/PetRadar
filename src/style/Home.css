@@ -1,7 +1,6 @@
 .Home {
   position: relative;
   height: 100vh;
-  background-color: #fffcf9;
 }
 
 .Home .main-container {
@@ -29,12 +28,14 @@
 }
 
 .Home .menu-title h2 {
-  font-size: 34px;
+  font-size: var(--font-title-xl-d);
   padding-bottom: 15px;
+  color: var(--title-color);
 }
 
 .Home .menu-title p {
-  font-size: 18px;
+  font-size: var(--font-subtitle-xl-d);
+  color: var(--subtitle-color);
 }
 
 /* mainMenu-container */
@@ -67,7 +68,7 @@
   }
 
   .Home .menu-titleBox img {
-    width: 60%;
+    width: 50%;
     height: auto;
     margin-top: 12px;
   }
@@ -78,12 +79,12 @@
   }
 
   .Home .menu-title h2 {
-    font-size: 24px;
+    font-size: var(--font-title-lg-m);
     padding-bottom: 10px;
   }
 
   .Home .menu-title p {
-    font-size: 16px;
+    font-size: var(--font-subtitle-xl-m);
   }
 
   .Home .mainMenu-container {

@@ -4,9 +4,9 @@
   display: flex;
   align-items: center;
   padding: 15px 24px;
-  font-size: 14px;
-  background-color: #ffa516;
-  color: #fff;
+  font-size: 16px;
+  background-color: var(--main-color);
+  color: var(--text-white);
   cursor: pointer;
 }
 
@@ -20,27 +20,26 @@
 }
 
 .Header .header_left {
-  width: 25%;
+  width: 35%;
   justify-content: flex-start;
 }
 
 .Header .header_center {
-  width: 50%;
+  width: 30%;
   justify-content: center;
-  font-size: 18px;
+  font-size: var(--font-body);
   font-weight: bold;
 }
 
 .Header .header_center img {
   height: 22px;
-  filter: invert(100%);
 }
 
 .Header .header_right {
-  width: 30%;
+  width: 35%;
   justify-content: flex-end;
   align-items: center;
-  gap: 20px;
+  gap: 10px;
 }
 
 .Header .header_right .Msg-bell {
@@ -55,26 +54,7 @@
 
 /* 모바일 */
 @media (max-width: 660px) {
-  .Header > div {
-    width: 100%;
-    justify-content: center;
-    margin-bottom: 8px;
+  .Header {
+    font-size: var(--font-small);
   }
-
-  .Header .header_left {
-    order: 1;
-    justify-content: flex-start;
-  }
-
-  .Header .header_center {
-    order: 2;
-  }
-
-  .Header .header_right {
-    width: 35%;
-    order: 3;
-    justify-content: flex-end;
-    gap: 12px;
-  }
-
 }
