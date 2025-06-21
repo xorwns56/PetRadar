@@ -32,7 +32,10 @@ const MyInfo = ({ id, pw, hp, onUpdate, onDelete, onLogOut }) => {
   };
   return (
     <div className="MyInfo">
-      <div className="content">
+        <div className="menu-title">
+          <h3>회원 정보</h3>
+        </div>
+      <div className="MyInfo-contents">
         <table className="info">
           <tbody>
             <tr>
@@ -82,8 +85,8 @@ const MyInfo = ({ id, pw, hp, onUpdate, onDelete, onLogOut }) => {
         </table>
         <div className="v_btn">
           {editMode ? (
-            <>
-              <button onClick={onDelete}>회원 탈퇴</button>
+            <div className="DeleteAccount-btn">
+              <button  onClick={onDelete}>회원 탈퇴</button>
               <div className="h_btn">
                 <button
                   onClick={() => {
@@ -95,12 +98,12 @@ const MyInfo = ({ id, pw, hp, onUpdate, onDelete, onLogOut }) => {
                 </button>
                 <button onClick={() => setEditMode(false)}>취소</button>
               </div>
-            </>
+            </div>
           ) : (
-            <>
+            <div className="UserMenu-btn">
               <button onClick={onLogOut}>로그아웃</button>
               <button onClick={() => setEditMode(true)}>정보수정</button>
-            </>
+            </div>
           )}
         </div>
       </div>
