@@ -64,16 +64,19 @@ li {
   /* color */
   --main-color: #ffa516;
   --sub-color: #fff9e9;
-  --border-color: #f0eeeb;
+  --border-color: #DDDDDD;
+  --err-color: #ff0101;
+  /* --border-color: #c5ccd2; */ /* 색상 검토 */
 
   --text-white: #ffffff;
-  --title-color: #222;
-  --subtitle-color: #666666;
+  --title-color: #222222;
+  --subtitle-color: #6c6c6c;
+  --subtitleL-color:#EDEAE6;
 
   --bg-color: #fffcf9;
   --bg-white-color: #ffffff;
   --bg-rgb-color: rgba(0, 0, 0, 0.5);
-  --bg-notfound: #fffef5;
+  --bg-new: #fffef5;
   /* font-size */
   --font-title-xl-d: 32px;
   --font-title-lg-d: 24px;

@@ -1,114 +1,109 @@
-.Login .input_item {
+.LoginForm .input_item {
   position: relative;
   height: 60px;
-  padding: 27px 15px 8px;
-  border: 1px solid #c5ccd2;
-  box-sizing: border-box;
+  padding: 20px;
+  border: 1px solid var(--border-color);
+  margin-top: -1px;
+  display: flex;
+  align-items: center;
 }
 
-.Login button,
-.Login input {
+.LoginForm button,
+.LoginForm input {
   border-radius: 0;
   border: none;
   outline: 0;
   cursor: pointer;
   width: 100%;
-  font-size: 16px;
+  font-size: var(--font-size-base);
 }
 
-.Login .input_item.id {
-  border-radius: 8px 8px 0 0;
+/* id, pw  border style */
+.LoginForm .input_item.id {
+  border-radius: 10px 10px 0 0;
 }
 
-.Login .input_item.pw {
-  border-radius: 0 0 8px 8px;
+.LoginForm .input_item.pw {
+  border-radius: 0 0 10px 10px;
 }
 
-.Login .input_item > label {
-  display: inline-block;
+.LoginForm .input_item > label {
   position: absolute;
-  bottom: 18px;
-  left: 15px;
-  font-size: 16px;
+  left: auto;
+  top: auto;
+  flex: 1;
+  font-size: var(--font-size-base);
   font-weight: 400;
   line-height: 22px;
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  color: rgba(0, 0, 0, 0.38);
-  box-sizing: border-box;
+  color: var(--subtitleL-color);
   cursor: pointer;
 }
 
-.Login .input_item.focus {
-  border: 2px solid #ffa516;
+.LoginForm .input_item.focus {
+  border: 2px solid var(--main-color);
+  z-index: 99;
 }
 
-.Login .input_item.on > #user_id {
+/* .LoginForm .input_item.on > #user_id {
   padding-right: 34px;
 }
 
-.Login .input_item.on > #user_pw {
+.LoginForm .input_item.on > #user_pw {
   padding-right: 76px;
+}  */
+
+/* login id, pw caption */
+.LoginForm .input_item.on > label,
+.LoginForm .input_item.focus > label {
+  top: 3px;
+  font-size: var(--font-caption);
 }
 
-.Login .input_item.on > label,
-.Login .input_item.focus > label {
-  bottom: 30px;
-  font-size: 12px;
+.LoginForm .loginIcon-box {
+  display: flex;
+  width: 82px;
+  justify-content: end;
 }
 
-.Login .btn_delete {
-  position: absolute;
-  top: 10px;
-  right: 3px;
+.LoginForm .btn_delete,
+.LoginForm .btn_view {
   width: 22px;
   height: 22px;
   margin: 9px;
   background: none;
 }
 
-.Login .btn_view {
-  position: absolute;
-  top: 10px;
-  right: 40px;
-  width: 22px;
-  height: 22px;
-  margin: 9px;
-  background: none;
-}
-
-.Login .btn_delete > img,
-.Login .btn_view > img {
+.LoginForm .btn_delete > img,
+.LoginForm .btn_view > img {
   width: 100%;
-  height: 100%;
+  object-fit: cover;
 }
 
-.Login .btn_login {
-  padding: 13px 20px;
-  border-radius: 8px;
-  background-color: #c5ccd2;
-  box-sizing: border-box;
+.LoginForm .btn_login {
+  padding: 15px;
+  border-radius: 5px;
+  background-color: var(--border-color);
   cursor: pointer;
-  margin-top: 20px;
-  margin-bottom: 20px;
-  font-size: 17px;
-  font-weight: 700;
-  line-height: 24px;
-  color: #fff;
+  margin: 20px 0 50px 0;
+  font-size: var(--font-size-base);
+  font-weight: 500;
+  color: var(--subtitle-color);
 }
 
-.Login .hide {
+.LoginForm .hide {
   display: none;
 }
 
-.Login .btn_login.on {
-  background-color: #ffa516;
+.LoginForm .btn_login.on {
+  background-color: var(--main-color);
+  color: var(--text-white);
 }
 
-.Login .error_message {
-  margin-top: 20px;
-  font-size: 12px;
-  line-height: 16px;
-  color: #ff0101;
-  font-weight: bold;
+.LoginForm .error_message {
+  font-size: var(--font-caption);
+  color: var(--err-color);
+  font-weight: 600;
   text-align: left;
+  padding: 10px 5px;
 }

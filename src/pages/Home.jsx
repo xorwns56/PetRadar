@@ -4,7 +4,6 @@ import Map from '../components/Map';
 import MainMenu from '../components/MainMenu';
 import { useNavigate } from 'react-router-dom';
 
-
 const Home = () => {
   const nav = useNavigate();
 
@@ -12,14 +11,14 @@ const Home = () => {
     <div className="Home ">
       <Header rightChild={'로그인/회원가입'} />
       <div className="main-container inner">
-        <div className="menu-titleBox"> 
+        <div className="menu-titleBox">
           <div className="menu-title">
             <h2>
               길 잃은 아이를 <br /> 바로 신고해주세요.
             </h2>
             <p>
-              간편한 원터치 기능으로 <br />
-              주변에 있는 보호소로 자동신고가 돼요!
+              실종 신고 알림 기능으로, <br />
+              함께 더 빠르게 실종 아이를 찾아낼 수 있어요.
             </p>
           </div>
           <img src="/Menu-icon1.png" alt="dogIcon" />

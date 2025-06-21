@@ -1,7 +1,7 @@
 .NotFound {
   position: relative;
   height: 100vh;
-  background-color: var(--bg-notfound);
+  background-color: var(--bg-new);
 }
 
 .NotFound .NotFound-container {
