@@ -1,6 +1,30 @@
+/* Pretendard Regular (400) */
+@font-face {
+  font-family: 'Pretendard';
+  src: url('https://fastly.jsdelivr.net/gh/projectnoonnu/noonfonts_2107@1.1/Pretendard-Regular.woff') format('woff');
+  font-weight: 400;
+  font-style: normal;
+}
+
+/* Pretendard Medium (500) */
+@font-face {
+  font-family: 'Pretendard';
+  src: url('https://fastly.jsdelivr.net/gh/projectnoonnu/noonfonts_2107@1.1/Pretendard-Medium.woff') format('woff');
+  font-weight: 500;
+  font-style: normal;
+}
+
+/* Pretendard Bold (700) */
+@font-face {
+  font-family: 'Pretendard';
+  src: url('https://fastly.jsdelivr.net/gh/projectnoonnu/noonfonts_2107@1.1/Pretendard-Bold.woff') format('woff');
+  font-weight: 700;
+  font-style: normal;
+}
+
 /* 기본 글꼴 지정 */
 body * {
-  font-family: Arial, Helvetica, sans-serif;
+   font-family: 'Pretendard-Regular';
 }
 
 /* 기본 구조 초기화 */
@@ -48,7 +72,7 @@ li {
 
   --bg-color: #fffcf9;
   --bg-white-color: #ffffff;
-
+  --bg-rgb-color:  rgba(0, 0, 0, .5);
   /* font-size */
   --font-title-xl-d: 32px;
   --font-title-lg-d: 24px;

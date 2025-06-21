@@ -8,4 +8,5 @@
 
 .Map .Map-box {
   height: 350px;
+  z-index: 0;
 }
