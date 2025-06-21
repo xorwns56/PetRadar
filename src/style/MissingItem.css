@@ -43,8 +43,8 @@
   color: var(--text-white);
 }
 
-.MissingItem .ReportMove-btn{
- position: absolute;
- right: 20px;
- bottom: 20px;
+.MissingItem .ReportMove-btn {
+  position: absolute;
+  right: 20px;
+  bottom: 20px;
 }
