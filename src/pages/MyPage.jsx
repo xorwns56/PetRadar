@@ -1,25 +1,25 @@
-import '../style/MyPage.css';
-import Header from '../components/Header';
-import MyInfo from '../components/MyInfo';
-import MyPost from '../components/MyPost';
-import { useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { useUserDispatch, useUserState } from '../contexts/UserContext';
+import "../style/MyPage.css";
+import Header from "../components/Header";
+import MyInfo from "../components/MyInfo";
+import MyPost from "../components/MyPost";
+import { useEffect } from "react";
+import { useNavigate } from "react-router-dom";
+import { useUserDispatch, useUserState } from "../contexts/UserContext";
 const MyPage = () => {
   const nav = useNavigate();
   const userState = useUserState();
   const userDispatch = useUserDispatch();
-
   useEffect(() => {
     if (!userState.currentUser) {
-      nav('/', { replace: true });
+      nav("/", { replace: true });
     }
   }, [userState.currentUser, nav]);
-
-  const info = userState.users.find((user) => user.id === userState.currentUser);
+  const info = userState.users.find(
+    (user) => user.id === userState.currentUser
+  );
   const onUpdate = (pw, hp) => {
     userDispatch({
-      type: 'UPDATE',
+      type: "UPDATE",
       data: {
         id: info.id,
         pw,
@@ -27,11 +27,10 @@ const MyPage = () => {
       },
     });
   };
-
   const onDelete = () => {
-    if (confirm('탈퇴 시 모든 정보가 삭제됩니다. 정말 탈퇴하시겠습니까?')) {
+    if (confirm("탈퇴 시 모든 정보가 삭제됩니다. 정말 탈퇴하시겠습니까?")) {
       userDispatch({
-        type: 'DELETE',
+        type: "DELETE",
         data: {
           id: info.id,
         },
@@ -42,18 +41,23 @@ const MyPage = () => {
 
   const onLogOut = () => {
     userDispatch({
-      type: 'LOGOUT',
+      type: "LOGOUT",
     });
   };
 
   return (
     <div className="MyPage">
-      <Header rightChild={'child'} />
+      <Header rightChild={"child"} />
       <div className="MyPage-container inner">
-        <div className='MyInfo-container'>
-          <MyInfo {...info} onUpdate={onUpdate} onDelete={onDelete} onLogOut={onLogOut} />
+        <div className="MyInfo-container">
+          <MyInfo
+            {...info}
+            onUpdate={onUpdate}
+            onDelete={onDelete}
+            onLogOut={onLogOut}
+          />
         </div>
-        <MyPost />
+        <MyPost id={userState.currentUser} />
       </div>
     </div>
   );

@@ -75,7 +75,7 @@ const MissingList = () => {
                 toggleModal();
               }}
               onClick={() => {
-                nav("/missingReport");
+                nav(`/missingReport/${item.petMissingId}`);
               }}
             />
           ))}
@@ -94,7 +94,7 @@ const MissingList = () => {
       <ModalDetail
         selectedId={selectedId}
         onClick={() => {
-          nav("/missingReport");
+          nav(`/missingReport/${selectedId}}`);
         }}
       />
     </div>

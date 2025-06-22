@@ -1,106 +1,91 @@
 import { useEffect, useRef, useState } from "react";
 import "../style/MyPost.css";
 import Pagination from "./Pagination";
-import Modal from "./Modal";
 import MypageModalDetail from "./MypageModalDetail";
 import { useModal } from "../hooks/ModalContext";
-const MyPost = () => {
+import MyPostReportItem from "./MyPostReportItem";
+import MyPostMissingItem from "./MyPostMissingItem";
+import { useMissingState } from "../contexts/MissingContext";
+import { useReportState } from "../contexts/ReportContext";
+
+const slice = (items, page, itemSize) => {
+  const end = page * itemSize;
+  const start = end - itemSize;
+  return items.slice(start, end);
+};
+
+const MyPost = ({ id }) => {
   const { toggleModal } = useModal();
-  const mockData = [
-    { petMissingId: 0, petName: "코카스패니얼" },
-    { petMissingId: 1, petName: "코슈" },
-    { petMissingId: 2, petName: "코슈" },
-    { petMissingId: 3, petName: "코슈" },
-  ];
-  const mockData2 = [
-    { petReportId: 0 },
-    { petReportId: 1 },
-    { petReportId: 2 },
-  ];
-
-  const reportDiv = useRef(null);
-  const itemDiv = useRef(null);
-
-  const [itemCount, setItemCount] = useState(5);
-
-  useEffect(() => {
-    const calcItemSize = () => {
-      if (reportDiv.current && itemDiv.current) {
-        const reportHeight = reportDiv.current.clientHeight;
-        const itemHeight = itemDiv.current.clientHeight;
-        const size = Math.floor(reportHeight / itemHeight);
-        setItemCount(size > 0 ? size : 1); // 최소 1
-      }
-    };
-
-    calcItemSize();
-    window.addEventListener("resize", calcItemSize);
-    return () => window.removeEventListener("resize", calcItemSize);
-  }, []);
-
-  console.log(itemCount);
-
+  const missingState = useMissingState();
+  const reportState = useReportState();
+  const myMissing = missingState
+    .filter((item) => {
+      return item.id === id;
+    })
+    .toSorted((prev, next) => {
+      return next.createDate - prev.createDate;
+    });
   const [petMissingId, setPetMissingId] = useState(
-    mockData.length > 0 ? mockData[0].petMissingId : null
+    myMissing.length > 0 ? myMissing[0].petMissingId : null
   );
-  const itemSize = 1;
-  const [sliceItems, setSliceItems] = useState(mockData2.slice(0, itemSize));
-  const onClick = (page) => {
-    const end = page * itemSize;
-    const start = end - itemSize;
-    setSliceItems(mockData2.slice(start, end));
-  };
+  useEffect(() => {
+    setPage(1);
+  }, [petMissingId]);
+  const missingReport = reportState
+    .filter((item) => {
+      return String(item.petMissingId) === String(petMissingId);
+    })
+    .toSorted((prev, next) => {
+      return next.createDate - prev.createDate;
+    });
+  const [page, setPage] = useState(1);
+  const itemSize = 2;
+  const sliceItems = slice(missingReport, page, itemSize);
+  const onPageClick = (page) => setPage(page);
+  const [modalData, setModalData] = useState({});
   return (
     <div className="MyPost">
-       <div className="menu-title">
-          <h3>제보글 목록</h3>
-        </div>
-      <div className="MyPost-contents">
-        <div className="tabs">
-          {mockData.map((item) => {
+      <div className="post-title">
+        <h3>제보글 목록</h3>
+      </div>
+      <div className="post-content">
+        <div className="missing">
+          {myMissing.map((item) => {
             return (
-              <button
-                className={`tab ${
-                  item.petMissingId === petMissingId ? "active" : ""
-                }`}
+              <MyPostMissingItem
                 key={`petMissing${item.petMissingId}`}
+                petName={item.petName}
+                isActive={item.petMissingId === petMissingId}
                 onClick={() => setPetMissingId(item.petMissingId)}
-              >
-                #{item.petName}
-              </button>
+              />
             );
           })}
         </div>
-        <div className="report" ref={reportDiv}>
-          {sliceItems.map((item, index) => {
+        <div className="report">
+          {sliceItems.map((item) => {
             return (
-              <div
-                ref={index === 0 ? itemDiv : null}
-                onClick={toggleModal}
+              <MyPostReportItem
                 key={`petReport${item.petReportId}`}
-                className="item"
-              >
-                <div className="post-thumbnail">
-                  <img src="https://search.pstatic.net/common?type=f&size=174x174&quality=95&direct=true&src=http%3A%2F%2Fsstatic.naver.net%2Fkeypage%2Fimage%2Fdss%2F605%2F84%2F69%2F19%2F605_11846919_kind_imgurl_1_1579514278263.png" />
-                </div>
-                <div className="post-info">
-                  <p className="post-title">고양이를 발견했어요!!</p>
-                  <p className="post-description">
-                    당곡역 근처에서 하얀색 고양이가 포착되었습니다.정확한 장소는
-                  </p>
-                  <p className="post-location">위치보기 →</p>
-                </div>
-              </div>
+                title={item.title}
+                content={item.content}
+                petImage={item.petImage}
+                onClick={() => {
+                  setModalData(item);
+                  console.log(item);
+                  toggleModal();
+                }}
+              />
             );
           })}
         </div>
         <Pagination
-          totalItems={mockData2.length}
-          onClick={onClick}
+          totalItems={missingReport.length}
+          page={page}
+          onClick={onPageClick}
           itemSize={itemSize}
         />
       </div>
-      <MypageModalDetail />
+      <MypageModalDetail {...modalData} />
     </div>
   );
 };

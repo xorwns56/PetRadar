@@ -9,7 +9,7 @@ import {
   useMissingState,
 } from "../contexts/MissingContext";
 import { useUserState } from "../contexts/UserContext";
-import ReportMap from '../components/ReportMap';
+import ReportMap from "../components/ReportMap";
 
 const MissingDeclaration = () => {
   const dispatch = useMissingDispatch();
@@ -32,9 +32,8 @@ const MissingDeclaration = () => {
     petAge: "",
     petMissingDate: "",
     petMissingPlace: "",
-    petMissingPoint: { lat: null, lng: null },
+    petMissingPoint: null,
     petImage: "",
-    id: useUserState.currentUser,
     title: "",
     content: "",
   });
@@ -43,6 +42,7 @@ const MissingDeclaration = () => {
       type: "CREATE",
       data: {
         ...form,
+        id: userState.currentUser,
       },
     });
   };
@@ -53,40 +53,34 @@ const MissingDeclaration = () => {
 
   const handleChange = (e) => {
     const { name, value, files } = e.target;
-    let newValue;
-
-    if (name === "petImage" && files?.[0]) {
-      const file = files[0];
-
-      newValue = URL.createObjectURL(files[0]);
-
+    if (name === "petImage") {
+      if (!files[0]) return;
       const reader = new FileReader();
       reader.onloadend = () => {
+        console.log(reader.result);
         setForm((prev) => ({
           ...prev,
           [name]: reader.result,
         }));
       };
-      reader.readAsDataURL(file);
+      reader.readAsDataURL(files[0]);
     } else {
-      newValue = value;
-    }
-    console.log(newValue);
-    if (name !== "petImage") {
       setForm((prev) => ({
         ...prev,
-        [name]: newValue,
+        [name]: value,
       }));
     }
   };
 
-  const onLocationSelect = (latlng) =>{
+  const onLocationSelect = (latlng) => {
     setForm((prev) => ({
       ...prev,
-      lat: latlng.lat,
-      lng: latlng.lng,
-    }))
-  }
+      petMissingPoint: {
+        lat: latlng.lat,
+        lng: latlng.lng,
+      },
+    }));
+  };
 
   const onSelectBreed = (breed, value, onChange) => {
     if (breed === "") {
@@ -210,7 +204,7 @@ const MissingDeclaration = () => {
               onChange={handleChange}
               placeholder="실종된 장소를 적어주세요."
             /> */}
-            <ReportMap onSelect={onLocationSelect}/>
+            <ReportMap onSelect={onLocationSelect} />
           </div>
           <div className="MissingDeclarationForm">
             <label htmlFor="imageUpload">사진첨부</label>
