@@ -1,6 +1,10 @@
 import '../style/ShelterList.css';
 import { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+
+import { useModal } from '../hooks/ModalContext';
+import ShelterModalDetail from '../components/ShelterModalDetail';
+
 import Map from '../components/Map';
 import useShelterData from '../api/ShelterData';
 import Header from '../components/Header';
@@ -9,7 +13,16 @@ const ShelterList = () => {
   const { animals, error } = useShelterData();
   const [dots, setDots] = useState('');
   const mapRef = useRef(null);
+
   const navigate = useNavigate();
+
+  const { isActive, toggleModal } = useModal();
+  const [selectedAnimal, setSelectedAnimal] = useState(null);
+
+  const ShelterInfoClick = (shelter) => {
+    setSelectedAnimal(shelter);
+    toggleModal();
+  };
 
   const uniqueShelters = animals.filter((shelter, index, self) => {
     const key = `${shelter.SHTER_NM}-${shelter.REFINE_ROADNM_ADDR || shelter.REFINE_LOTNO_ADDR}`;
@@ -61,8 +74,7 @@ const ShelterList = () => {
 
         <div className="ShelterList-contents">
           {uniqueShelters.map((shelter, index) => (
-            <div key={index} className="shelter-card">
-              {/* 이미지 클릭 -> 보호소 상세정보 */}
+            <div key={index} className="shelter-card" onClick={() => ShelterInfoClick(shelter)}>
               <img
                 src={shelter.THUMB_IMAGE_COURS || '/image-default.png'}
                 alt="썸네일"
@@ -72,18 +84,32 @@ const ShelterList = () => {
                   e.target.src = '/image-default.png';
                 }}
               />
-              {/* 이미지 클릭 -> 보호소 상세정보 */}
               <div className="shelter-info">
                 <strong>{shelter.SHTER_NM}</strong>
                 <p>{shelter.REFINE_ROADNM_ADDR || shelter.REFINE_LOTNO_ADDR}</p>
               </div>
-              <div className="ShelterAnimalList-btn" onClick={() => handleItemClick(shelter)}>
+              <div
+                className="ShelterAnimalList-btn"
+                onClick={(e) => {
+                  e.stopPropagation(); //버튼 클릭 시 모달도 같이 열리는 걸 방지
+                  handleItemClick(shelter);
+                }}
+              >
                 <p>보호동물 보기 →</p>
               </div>
             </div>
           ))}
         </div>
       </div>
+      {isActive && (
+        <ShelterModalDetail
+          animal={selectedAnimal}
+          onClose={() => {
+            toggleModal(); // 모달 닫기
+            setSelectedAnimal(null); // 상태 초기화
+          }}
+        />
+      )}
     </div>
   );
 };
