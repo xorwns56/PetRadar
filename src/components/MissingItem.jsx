@@ -1,19 +1,22 @@
-import '../style/MissingItem.css';
-import { getMissingImage } from '../utils/get-missingPet-image';
-import Button from './Button';
+import "../style/MissingItem.css";
+import { getMissingImage } from "../utils/get-missingPet-image";
+import { useMissingState } from "../contexts/MissingContext";
+import Button from "./Button";
 
-const MissingItem = ({
-  petId,
-  petName,
-  petType,
-  petGender,
-  petAge,
-  petMissingDate,
-  petImage,
-  onClick,
-  toggleModal,
-}) => {
-  const imageSrc = petImage || getMissingImage(petId) || '/image-default.png';
+const MissingItem = ({ petMissingId, onClick, toggleModal }) => {
+  const missingList = useMissingState();
+
+  const missingPet = missingList.find(
+    (item) => String(item.petMissingId) === String(petMissingId)
+  );
+
+  const imageSrc = missingPet.petImage || "/image-default.png";
+
+  const genderSymbol = {
+    M: "♂",
+    F: "♀",
+  };
+
   return (
     <div className="MissingItem">
       <div className="MissingItem-img" onClick={toggleModal}>
@@ -22,21 +25,20 @@ const MissingItem = ({
           alt="missingPet img"
           onError={(e) => {
             e.target.onerror = null;
-            e.target.src = getMissingImage(petId);
           }}
         />
       </div>
       <div className="contents" onClick={toggleModal}>
         <div className="contents-t1">
-          <p className="petType">{petType}</p>
-          <p>{petGender}</p>
-          <p>{petName}</p>
+          <p className="petType">{missingPet.petType}</p>
+          <p>{genderSymbol[missingPet.petGender] || "-"}</p>
+          <p>{missingPet.petName}</p>
         </div>
-        <p className="contents-t2">{petAge}(년생)</p>
-        <p className="contents-t3">실종일자 : {petMissingDate}</p>
+        <p className="contents-t2">{missingPet.petAge}(년생)</p>
+        <p className="contents-t3">실종일자 : {missingPet.petMissingDate}</p>
       </div>
       <div className="ReportMove-btn">
-        <Button text={'제보하기'} type={'Square_ls'} onClick={onClick} />
+        <Button text={"제보하기"} type={"Square_ls"} onClick={onClick} />
       </div>
     </div>
   );

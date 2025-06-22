@@ -1,12 +1,14 @@
 import { useEffect, useRef, useState } from "react";
-import { useModal } from '../hooks/ModalContext';
-import { useMissingState } from "../contexts/MissingContext"; 
-import PetModalDetail from "../components/PetModalDetail"
+import { useModal } from "../hooks/ModalContext";
+import { useMissingState } from "../contexts/MissingContext";
+import PetModalDetail from "../components/PetModalDetail";
+import { useNavigate } from "react-router-dom";
 
 const MissingMap = () => {
   const missingMapRef = useRef(null);
   const missingList = useMissingState();
   const missingMarkerMap = useRef(new Map()); // 마커 추적용 map 객체 생성(실종 신고 id 기준)
+  const nav = useNavigate();
 
   const { isActive, toggleModal } = useModal();
   const [selectMissingPet, setSelectMissingPet] = useState(null);
@@ -71,11 +73,23 @@ const MissingMap = () => {
           // missingPoint 위도 경도 저장
           const position = new window.kakao.maps.LatLng(petLat, petLng);
 
+          // 마커에 실종 동물 이미지 넣기 (이상해서 일단 제외. 나중에 방법 다시 찾기;;)
+          // const missingPetImage = pet.petImage || "/image-default.png";
+          // const markerImage = new window.kakao.maps.MarkerImage(
+          //   missingPetImage,
+          //   new window.kakao.maps.Size(40, 40),
+          //   { offset: new window.kakao.maps.Point(20, 20) }
+          // );
+
           // map에 마커 찍기
           const marker = new window.kakao.maps.Marker({
             position: position,
             map: map,
+            // image: markerImage,
           });
+
+          // id 기준 마커 저장 (삭제시 필요)
+          missingMarkerMap.current.set(id, marker);
 
           // map 내에 click 이벤트 (선택된 pet 정보 -> 모달열림)
           window.kakao.maps.event.addListener(marker, "click", () => {
@@ -92,12 +106,11 @@ const MissingMap = () => {
       <div id="missingMap" style={{ width: "100%", height: "350px" }}></div>
       {isActive && selectMissingPet && (
         <PetModalDetail
-          petId={selectMissingPet.petid}
-          petName={selectMissingPet.petName}
-          petType={selectMissingPet.petType}
-          petGender={selectMissingPet.petGender}
-          petAge={selectMissingPet.petAge}
-          petMissingDate={selectMissingPet.petMissingDate}
+
+          selectedId={selectMissingPet.petMissingId}
+          onClick={() => {
+            nav("/missingReport");
+          }}
         />
       )}
     </>
