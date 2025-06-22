@@ -7,6 +7,6 @@ export function getMissingImage(missingPetId) {
     case 3:
       return "/petId3.jpg";
     default:
-      return "/defaultPet.png";
+      return "/image-default.png";
   }
 }

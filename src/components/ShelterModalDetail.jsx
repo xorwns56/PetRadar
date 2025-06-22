@@ -10,10 +10,10 @@ const ShelterModalDetail = ({ animal, onClick, onClose }) => {
         <div className="Modal-contents">
           <div className="img-box" style={{ height: "200px" }}>
             <img
-              src={animal.IMAGE_COURS || "/NoIMG.png"}
+              src={animal.IMAGE_COURS || "/image-default.png"}
               alt="동물 이미지"
               onError={(e) => {
-                e.target.src = "/NoIMG.png";
+                e.target.src = "/image-default.png";
               }}
               style={{
                 objectFit: "cover",
@@ -28,21 +28,23 @@ const ShelterModalDetail = ({ animal, onClick, onClose }) => {
             <div className="contents-t1">
               <p className="petType">{animal.SPECIES_NM}</p>
             </div>
-            <div className="contents-t2">
+            <div>
               <h3>색상:</h3>
               <p>{animal.COLOR_NM}</p>
             </div>
-            <div className="contents-t2">
+            <div>
               <h3>나이:</h3>
               <p>{animal.AGE_INFO}(년생)</p>
             </div>
-            <div className="contents-t3">
+            <div>
               <h3>특이사항:</h3>
               <p>{animal.SFETR_INFO || "없음"}</p>
             </div>
-            <div className="contents-t4">
+            <div>
               <h3>보호소 위치:</h3>
               <p>{animal.PROTECT_PLC}</p>
+            </div>
+            <div>
               <h3>보호소 전화번호:</h3>
               <p>{animal.SHTER_TELNO}</p>
             </div>

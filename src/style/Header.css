@@ -53,8 +53,10 @@
 }
 
 /* 모바일 */
-@media (max-width: 660px) {
+@media (max-width: 600px) {
   .Header {
     font-size: var(--font-small);
   }
 }
+
+

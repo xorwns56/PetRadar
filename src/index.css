@@ -103,7 +103,7 @@ li {
 }
 
 /* 모바일 대응 */
-@media (max-width: 500px) {
+@media (max-width: 600px) {
   #root {
     width: 100%;
     min-width: unset;

@@ -50,6 +50,14 @@
 .Home .map {
   width: 100%;
   height: 35%;
+  border: 2px solid var(--border-color);
+  border-radius: 10px;
+  overflow: hidden;
+  transition: .35s;
+}
+
+.Home .map:hover{
+  border: 2px solid var(--main-color);
 }
 
 /* 모바일 */
