@@ -9,7 +9,7 @@ import {
   useMissingState,
 } from "../contexts/MissingContext";
 import { useUserState } from "../contexts/UserContext";
-import ReportMap from "../components/ReportMap";
+import LocationMap from "../components/LocationMap";
 
 const MissingDeclaration = () => {
   const dispatch = useMissingDispatch();
@@ -57,9 +57,7 @@ const MissingDeclaration = () => {
 
     if (name === "petImage" && files?.[0]) {
       const file = files[0];
-
-      newValue = URL.createObjectURL(files[0]);
-
+      // newValue = URL.createObjectURL(files[0]);
       const reader = new FileReader();
       reader.onloadend = () => {
         setForm((prev) => ({
@@ -71,7 +69,7 @@ const MissingDeclaration = () => {
     } else {
       newValue = value;
     }
-    console.log(newValue);
+
     if (name !== "petImage") {
       setForm((prev) => ({
         ...prev,
@@ -212,7 +210,7 @@ const MissingDeclaration = () => {
               onChange={handleChange}
               placeholder="실종된 장소를 적어주세요."
             /> */}
-            <ReportMap onSelect={onLocationSelect} />
+            <LocationMap onSelect={onLocationSelect} />
           </div>
           <div className="MissingDeclarationForm">
             <label htmlFor="imageUpload">사진첨부</label>

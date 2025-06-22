@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 
-const ReportMap = ({ onSelect }) => {
-  const [reportLocation, setReportLocation] = useState(null);
+const LocationMap = ({ onSelect }) => {
+  const [location, setLocation] = useState(null);
   const markerRef = useRef(null);
 
   useEffect(() => {
@@ -11,15 +11,15 @@ const ReportMap = ({ onSelect }) => {
 
     script.onload = () => {
       window.kakao.maps.load(() => {
-        const reportMapContainer = document.getElementById("reportMap");
+        const locationMapContainer = document.getElementById("locationMap");
 
         const options = {
           center: new window.kakao.maps.LatLng(37.5665, 126.978),
           level: 3,
         };
 
-        const map = new window.kakao.maps.Map(reportMapContainer, options);
-        setReportLocation(map);
+        const map = new window.kakao.maps.Map(locationMapContainer, options);
+        setLocation(map);
 
         window.kakao.maps.event.addListener(
           map,
@@ -49,6 +49,8 @@ const ReportMap = ({ onSelect }) => {
     };
     document.head.appendChild(script);
   }, []);
-  return <div id="reportMap" style={{ width: "100%", height: "350px" }}></div>;
+  return (
+    <div id="locationMap" style={{ width: "100%", height: "350px" }}></div>
+  );
 };
-export default ReportMap;
+export default LocationMap;
