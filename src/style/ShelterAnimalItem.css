@@ -1,4 +1,4 @@
-.MissingItem {
+.ShelterAnimalItem {
   position: relative;
   display: flex;
   border-bottom: 1px solid var(--border-color);
@@ -6,11 +6,11 @@
   cursor: pointer;
 }
 
-.MissingItem:last-child {
+.ShelterAnimalItem:last-child{
   border: none;
 }
 
-.MissingItem .MissingItem-img img {
+.ShelterAnimalItem .ShelterAnimalItem-img img {
   width: 150px;
   height: 150px;
   overflow: hidden;
@@ -19,7 +19,7 @@
   border: 1px solid var(--border-color);
 }
 
-.MissingItem .contents {
+.ShelterAnimalItem .contents {
   height: 100%;
   flex: 1;
   display: flex;
@@ -29,25 +29,25 @@
   font-size: var(--font-small);
 }
 
-.MissingItem .contents .contents-t1 {
+.ShelterAnimalItem .contents .contents-t1 {
   display: flex;
   align-items: center;
   gap: 10px;
 }
 
-.MissingItem .contents .contents-t1 {
+.ShelterAnimalItem .contents .contents-t1 {
   font-weight: bold;
   font-size: var(--font-size-base);
 }
 
-.MissingItem .contents .contents-t1 .petType {
+.ShelterAnimalItem .contents .contents-t1 .petType {
   padding: 5px 10px;
   background-color: var(--main-color);
   border-radius: 5px;
   color: var(--text-white);
 }
 
-.MissingItem .ReportMove-btn {
+.ShelterAnimalItem .ReportMove-btn {
   position: absolute;
   right: 20px;
   bottom: 20px;

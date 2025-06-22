@@ -1,42 +1,54 @@
 import { useEffect, useRef, useState } from "react";
 
-const ReportMap = ({onLocationSelect}) => {
-    const [reportLocation, setReportLocation] = useState(null);
-    const markerRef = useRef(null)
+const ReportMap = ({ onSelect }) => {
+  const [reportLocation, setReportLocation] = useState(null);
+  const markerRef = useRef(null);
 
-    useEffect(() =>{
-        if (!window.kakao || !window.kakao.maps) return;
+  useEffect(() => {
+    const script = document.createElement("script");
+    script.src = `//dapi.kakao.com/v2/maps/sdk.js?appkey=e26cd2b9a98785f9299bd0fe37542aab&libraries=services&autoload=false`;
+    script.async = true;
 
+    script.onload = () => {
+      window.kakao.maps.load(() => {
         const reportMapContainer = document.getElementById("reportMap");
+
         const options = {
-            center: new window.kakao.maps.LatLng(37.5665, 126.9780),
-            level : 3,
-        }
+          center: new window.kakao.maps.LatLng(37.5665, 126.978),
+          level: 3,
+        };
 
         const map = new window.kakao.maps.Map(reportMapContainer, options);
-        setReportLocation(map)
+        setReportLocation(map);
 
-        window.kakao.maps.event.addListener(map, "click", function(mouseEvent) {
+        window.kakao.maps.event.addListener(
+          map,
+          "click",
+          function (mouseEvent) {
             const location = mouseEvent.latLng;
 
-            if(markerRef.current) {
-                markerRef.current.setMap(null)
+            if (markerRef.current) {
+              markerRef.current.setMap(null);
             }
 
             const newMarker = new window.kakao.maps.Marker({
-                position: location
-            })
-            newMarker.setMap(map)
-            markerRef.current = newMarker
+              position: location,
+            });
+            newMarker.setMap(map);
+            markerRef.current = newMarker;
 
-            if(onLocationSelect) {
-                onLocationSelect({
-                    lat: location.getLat(),
-                    lng: location.getLng(),
-                })
+            if (onSelect) {
+              onSelect({
+                lat: location.getLat(),
+                lng: location.getLng(),
+              });
             }
-        })
-    },[])
-  return <div id="reportMap" style={{ width: "100%", height: "350px" }}></div>
+          }
+        );
+      });
+    };
+    document.head.appendChild(script);
+  }, []);
+  return <div id="reportMap" style={{ width: "100%", height: "350px" }}></div>;
 };
 export default ReportMap;

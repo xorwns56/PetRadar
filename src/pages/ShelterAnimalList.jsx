@@ -1,17 +1,17 @@
-import { useState } from "react";
-import useShelterData from "../api/ShelterData";
-import ShelterAnimalItem from "../components/ShelterAnimalItem";
-import ShelterModalDetail from "../components/ShelterModalDetail";
-import { useParams } from "react-router-dom";
-import "../style/ShelterAnimalList.css";
-import Header from "../components/Header";
+import '../style/ShelterAnimalList.css';
+import { useState } from 'react';
+import { useParams } from 'react-router-dom';
+import useShelterData from '../api/ShelterData';
+import ShelterAnimalItem from '../components/ShelterAnimalItem';
+import ShelterModalDetail from '../components/ShelterModalDetail';
+import Header from '../components/Header';
 
 const ShelterAnimalList = () => {
   const { animals } = useShelterData();
   const { name, addr } = useParams();
   const [selectedAnimal, setSelectedAnimal] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [sortOrder, setSortOrder] = useState("newest"); // 최신순 기본
+  const [sortOrder, setSortOrder] = useState('newest'); // 최신순 기본
 
   const decodedName = decodeURIComponent(name);
   const decodedAddr = decodeURIComponent(addr);
@@ -36,58 +36,42 @@ const ShelterAnimalList = () => {
     return filtered.sort((a, b) => {
       const dateA = parseDate(a.RECEPT_DE); // ✅ 실종일자 기준
       const dateB = parseDate(b.RECEPT_DE);
-      return sortOrder === "newest" ? dateB - dateA : dateA - dateB;
+      return sortOrder === 'newest' ? dateB - dateA : dateA - dateB;
     });
   };
 
   return (
     <div className="ShelterAnimalList">
       <Header leftChild />
-      <h2 className="PageTitle">해당 보호소 유기동물</h2>
-
-      <div className="SearchBar">
-        <select
-          value={sortOrder}
-          onChange={(e) => setSortOrder(e.target.value)}
-        >
-          <option value="newest">오래된순</option>
-          <option value="oldest">최신순</option>
-        </select>
-      </div>
-
-      <div className="ShelterAnimalList-container">
-        <div className="MissingItems scroll-hidden">
-          <style>
-            {`
-              .scroll-hidden::-webkit-scrollbar {
-                display: none;
-              }
-            `}
-          </style>
-
-          {getFilteredData().map((item) => (
-            <ShelterAnimalItem
-              key={item.ABDM_IDNTFY_NO}
-              petId={item.ABDM_IDNTFY_NO}
-              petType={item.SPECIES_NM}
-              petMissingDate={item.RECEPT_DE}
-              imageUrl={item.IMAGE_COURS}
-              onClick={() => {
-                setSelectedAnimal(item);
-                setIsModalOpen(true);
-              }}
-            />
-          ))}
+      <div className="ShelterAnimalList-container inner">
+        <div className="PageTitle">
+          <h3>해당 보호소 유기동물</h3>
         </div>
+        <div className="SearchBar">
+          <select value={sortOrder} onChange={(e) => setSortOrder(e.target.value)}>
+            <option value="newest">오래된순</option>
+            <option value="oldest">최신순</option>
+          </select>
+        </div>
+            <div className="ShelterAnimalItems">
+              {getFilteredData().map((item) => (
+                <ShelterAnimalItem
+                  key={item.ABDM_IDNTFY_NO}
+                  petId={item.ABDM_IDNTFY_NO}
+                  petType={item.SPECIES_NM}
+                  petMissingDate={item.RECEPT_DE}
+                  imageUrl={item.IMAGE_COURS}
+                  onClick={() => {
+                    setSelectedAnimal(item);
+                    setIsModalOpen(true);
+                  }}
+                />
+              ))}
+            </div>
+        {isModalOpen && (
+          <ShelterModalDetail animal={selectedAnimal} onClose={() => setIsModalOpen(false)} onClick={() => {}} />
+        )}
       </div>
-
-      {isModalOpen && (
-        <ShelterModalDetail
-          animal={selectedAnimal}
-          onClose={() => setIsModalOpen(false)}
-          onClick={() => {}}
-        />
-      )}
     </div>
   );
 };
