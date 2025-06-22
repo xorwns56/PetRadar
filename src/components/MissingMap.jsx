@@ -91,7 +91,7 @@ const MissingMap = () => {
     <>
       <div id="missingMap" style={{ width: "100%", height: "350px" }}></div>
       {isActive && selectMissingPet && (
-        <ModalDetail
+        <PetModalDetail
           petId={selectMissingPet.petid}
           petName={selectMissingPet.petName}
           petType={selectMissingPet.petType}
