@@ -26,8 +26,7 @@ const ShelterModalDetail = ({ animal, onClose }) => {
 
           <div className="text-contents">
             <div className="contents-t1">
-              {/* 임의 이름  */}
-              <h3>시흥동물누리보호센터</h3>
+              <h3>{animal.SHTER_NM}</h3>
             </div>
             <div>
               <h3>보호소 위치</h3>

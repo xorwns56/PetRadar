@@ -61,6 +61,8 @@ const ShelterAnimalList = () => {
             <ShelterAnimalItem
               key={item.ABDM_IDNTFY_NO}
               petId={item.ABDM_IDNTFY_NO}
+              petAge={item.AGE_INFO}
+              petColor={item.COLOR_NM}
               petType={item.SPECIES_NM}
               petMissingDate={item.RECEPT_DE}
               imageUrl={item.IMAGE_COURS}
