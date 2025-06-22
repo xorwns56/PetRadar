@@ -34,7 +34,7 @@ const ShelterModalDetail = ({ animal, onClose }) => {
             </div>
             <div>
               <h3>나이</h3>
-              <p>{animal.AGE_INFO}(년생)</p>
+              <p>{animal.AGE_INFO}</p>
             </div>
             <div>
               <h3>특이사항</h3>
