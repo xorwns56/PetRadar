@@ -3,7 +3,7 @@ import Header from "../components/Header";
 import Button from "../components/Button";
 import Map from "../components/Map";
 
-import ReportMap from "../components/ReportMap";
+import LocationMap from "../components/LocationMap";
 import { useReportDispatch, useReportState } from "../contexts/ReportContext";
 
 import { useEffect, useState } from "react";
@@ -52,7 +52,6 @@ const MissingReport = () => {
   };
 
   const handleChange = (e) => {
-
     const { name, value, files } = e.target;
     if (name === "petImage") {
       if (!files[0]) return;
@@ -71,7 +70,6 @@ const MissingReport = () => {
         [name]: value,
       }));
     }
-
   };
   const onLocationSelect = (latlng) => {
     setForm((prev) => ({
@@ -81,7 +79,6 @@ const MissingReport = () => {
         lat: latlng.lat,
         lng: latlng.lng,
       },
-
     }));
   };
 
@@ -108,16 +105,13 @@ const MissingReport = () => {
             {/* <input type="text" /> */}
 
             <input name="title" value={form.title} onChange={handleChange} />
-
           </div>
           <div className="MissingReportForm">
             <h3>내용</h3>
             {/* <textarea type="text" placeholder="상세한 설명을 적어주세요." /> */}
             <textarea
-
               name="content"
               value={form.content}
-
               onChange={handleChange}
               placeholder="상세한 설명을 적어주세요."
             />
@@ -125,9 +119,7 @@ const MissingReport = () => {
           {/* 발견 장소 위치 Map 사용 : css 수정 필요 */}
           <div className="MissingReportForm">
             <h3>발견 장소</h3>
-
-            <ReportMap onSelect={onLocationSelect} />
-
+            <LocationMap onSelect={onLocationSelect} />
           </div>
           <div className="MissingReport-btn">
             <Button
