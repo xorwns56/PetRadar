@@ -11,8 +11,8 @@
   height: 100%;
 }
 
-/* menu-title */
-.MissingList .menu-title {
+/* PageTitle */
+.MissingList .PageTitle {
   text-align: center;
   margin-top: 30px;
   line-height: 1.5;

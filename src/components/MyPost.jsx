@@ -1,7 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import "../style/MyPost.css";
 import Pagination from "./Pagination";
-import Modal from "./Modal";
 import MypageModalDetail from "./MypageModalDetail";
 import { useModal } from "../hooks/ModalContext";
 const MyPost = () => {

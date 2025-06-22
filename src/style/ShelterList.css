@@ -1,92 +1,105 @@
-@font-face {
-  font-family: 'RixInooAriDuriR';
-  src: url('https://fastly.jsdelivr.net/gh/projectnoonnu/noonfonts_2207-01@1.0/RixInooAriDuriR.woff2') format('woff2');
-  font-weight: normal;
-  font-style: normal;
-}
-
 .ShelterList {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
+  height: 100vh;
 }
 
-.PageTitle {
-  font-size: 24px;
-  margin: 1rem 0 0.5rem;
+.ShelterList .ShelterList-container {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  height: 100%;
+}
+
+/* PageTitle */
+.ShelterList .ShelterList-container .PageTitle {
   text-align: center;
+  margin: 30px;
+  line-height: 1.5;
+  padding: 10px;
+  font-size: var(--font-title-lg-d);
 }
 
-.inner {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  width: 100%;
-}
-
-.map-wrapper {
-  width: 90%;
-  max-width: 700px;
-  height: 350px;
-  margin-bottom: 1rem;
-  border: 2px solid orange;
-  border-radius: 8px;
+/* Map */
+.ShelterList .ShelterList-container .Map-wrapper {
+  height: 30%;
+  min-height: 200px;
+  border: 2px solid var(--border-color);
+  border-radius: 10px;
+  transition: 0.35s;
   overflow: hidden;
 }
 
-.ShelterList-container {
-  width: 90%;
-  max-width: 700px;
-  max-height: 500px;
+.ShelterList .ShelterList-container .Map-wrapper:hover {
+  border: 2px solid var(--main-color);
+}
+
+/* ShelterList-contents */
+.ShelterList .ShelterList-container .ShelterList-contents {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  width: 100%;
+  height: 51%;
+  padding-bottom: 30px;
+  overflow: hidden;
   overflow-y: auto;
-  padding: 0.5rem;
-  box-sizing: border-box;
-  display: flex;
-  flex-direction: column;
-  gap: 1rem;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
 }
 
-.shelter-card {
+/* shelter-card */
+.ShelterList .ShelterList-container .ShelterList-contents .shelter-card {
+  position: relative;
   display: flex;
-  align-items: center;
-  gap: 12px;
+  gap: 10px;
   background: #ffffff;
-  padding: 1rem;
-  border-radius: 10px;
-  border: 1px solid orange;
+  padding: 10px;
+  line-height: 1.5;
+  border-radius: 5px;
+  border: 1px solid var(--border-color);
   cursor: pointer;
-  transition: transform 0.2s ease-in-out;
 }
 
-.shelter-card:hover {
-  transform: scale(1.02);
-}
-
-.shelter-thumb {
-  width: 80px;
-  height: 80px;
+/* shelter-thumb : 보호소 이미지 */
+.ShelterList .ShelterList-container .ShelterList-contents .shelter-card .shelter-thumb {
+  width: 100px;
+  height: 100px;
   object-fit: cover;
-  border-radius: 8px;
-  border: 1px solid #ccc;
+  border-radius: 5px;
 }
 
-.shelter-info {
-  display: flex;
-  flex-direction: column;
+/* ShelterAnimalList-btn */
+.ShelterList .ShelterList-container .ShelterList-contents .ShelterAnimalList-btn {
+  position: absolute;
+  right: 20px;
+  bottom: 20px;
+  transition: 0.35s;
 }
 
-/* ✅ 로딩 중앙 정렬용 */
+.ShelterList .ShelterList-container .ShelterList-contents .ShelterAnimalList-btn:hover {
+  color: var(--main-color);
+}
+
+/* 로딩 */
 .load-wrapper {
   display: flex;
+  flex-direction: column;
+  gap: 20px;
   justify-content: center;
   align-items: center;
-  height: 80vh;
+  height: 100vh;
   width: 100%;
+  background-color: var(--bg-new);
+}
+
+.load-wrapper .img-box img {
+  width: 300px;
+  margin: 10px;
+  object-fit: cover;
 }
 
 .load {
-  font-size: 40px;
-  font-family: 'RixInooAriDuriR', sans-serif;
+  font-size: var(--font-title-xl-d);
   text-align: center;
-  color: #444;
+  color: var(--title-color);
+  font-weight: 500;
 }

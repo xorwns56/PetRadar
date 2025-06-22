@@ -47,7 +47,6 @@
 .ModalDetail .Modal-container .img-box {
   width: 100%;
   height: 300px;
-  border: 1px solid #000; /* 임의 색상 */
 }
 
 .ModalDetail .Modal-container .img-box img {

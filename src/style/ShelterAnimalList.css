@@ -1,70 +1,46 @@
 .ShelterAnimalList {
-  background: #f9f9f9;
-  min-height: 100vh;
-  font-family: "Pretendard", sans-serif;
+  height: 100vh;
+}
+
+.ShelterAnimalList .ShelterAnimalList-container {
   display: flex;
   flex-direction: column;
+  gap: 10px;
+  height: 100%;
 }
 
-/* 중앙 제목 */
-.PageTitle {
+/* PageTitle */
+.ShelterAnimalList .ShelterAnimalList-container .PageTitle {
   text-align: center;
-  font-size: 28px;
-  font-weight: bold;
-  margin: 24px 0 12px;
-}
-
-/* 검색 영역 */
-.SearchBar {
-  display: flex;
-  gap: 8px;
-  justify-content: center;
-  margin-bottom: 24px;
-  padding: 0 16px;
-  flex-wrap: wrap;
-}
-
-.SearchBar select,
-.SearchBar input {
-  border: 1px solid #ccc;
+  margin-top: 30px;
+  line-height: 1.5;
   padding: 10px;
-  font-size: 14px;
-  border-radius: 6px;
+  font-size: var(--font-title-lg-d);
 }
 
-.SearchBar input {
-  width: 240px;
+/* 정렬 */
+.ShelterAnimalList .ShelterAnimalList-container .SearchBar select {
+  border: 1px solid var(--border-color);
+  border-radius: 5px;
+  font-size: var(--font-small);
+  padding: 5px;
 }
 
-.SearchBar button {
-  background-color: #f5a623;
-  color: white;
-  border: none;
-  padding: 10px 16px;
-  font-weight: bold;
-  border-radius: 6px;
-  cursor: pointer;
-}
-
-/* 리스트 전체 컨테이너 (scroll 책임 X) */
-.ShelterAnimalList-container {
-  padding: 16px;
-  flex: none;
-}
-
-/* 🔽 카드 리스트 자체에 스크롤 + 확장 적용 */
-.MissingItems {
+/* ShelterAnimalItems */
+.ShelterAnimalList .ShelterAnimalItems {
+  width: 100%;
+  height: calc(100vh - 250px);
   display: flex;
   flex-direction: column;
   gap: 20px;
-  padding: 0 8px 100px 8px;
-
-  max-height: 85vh;         /* ✅ 스크롤 높이 지정 */
+  border: 2px solid var(--border-color);
+  padding: 10px;
+  border-radius: 10px;
   overflow-y: auto;
-  scrollbar-width: none;    /* Firefox */
-  -ms-overflow-style: none; /* IE */
+  scrollbar-width: none;
+  -ms-overflow-style: none;
 }
 
-.MissingItems::-webkit-scrollbar {
-  display: none; /* Chrome, Safari */
+.scroll-hidden::-webkit-scrollbar {
+  display: none;
 }
