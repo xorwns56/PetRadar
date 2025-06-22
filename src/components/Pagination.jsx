@@ -1,21 +1,17 @@
 import { useState } from "react";
 import "../style/Pagination.css";
-const Pagination = ({ totalItems, itemSize, pageSize = 10, onClick }) => {
-  const [page, setPage] = useState(1);
+const Pagination = ({ totalItems, page, itemSize, onClick, pageSize = 5 }) => {
   const totalPages = Math.ceil(totalItems / itemSize);
   //const totalPageBlocks = Math.ceil(totalPages / pageSize);
   const currPageBlock = Math.floor((page - 1) / pageSize) + 1;
   const blockEnd = currPageBlock * pageSize;
   const blockStart = blockEnd - pageSize + 1;
   const pageArr = [];
-  for (let page = blockStart; page <= blockEnd; page++) {
-    pageArr.push(page);
+  for (let i = blockStart; i <= blockEnd; i++) {
+    pageArr.push(i);
   }
-  const handlePageChange = (newPage) => {
-    const safeNewPage = Math.min(totalPages, Math.max(1, newPage));
-    setPage(safeNewPage);
-    onClick(safeNewPage);
-  };
+  const handlePageChange = (newPage) =>
+    onClick(Math.min(totalPages, Math.max(1, newPage)));
   return (
     totalPages > 1 && (
       <div className="Pagination">

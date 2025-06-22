@@ -49,7 +49,10 @@ function App() {
                       path="/missingDeclaration"
                       element={<MissingDeclaration />}
                     />
-                    <Route path="/missingReport" element={<MissingReport />} />
+                    <Route
+                      path="/missingReport/:petMissingId"
+                      element={<MissingReport />}
+                    />
 
                     <Route path="/*" element={<NotFound />} />
                   </Routes>

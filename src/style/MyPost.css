@@ -5,8 +5,7 @@
   display: flex;
 }
 
-/* menu-title */
-.MyPost .menu-title {
+.MyPost .post-title {
   text-align: center;
   margin-top: 30px;
   line-height: 1.5;
@@ -14,122 +13,32 @@
   font-size: var(--font-title-lg-d);
 }
 
-.MyPost .MyPost-contents {
+.MyPost .post-content {
   display: flex;
-  height: 85%;
   flex-direction: column;
+  flex: 1;
   padding: 20px;
   border-radius: 10px;
   background-color: var(--bg-white-color);
   border: 1px solid var(--border-color);
 }
 
-/* tabs  */
-.MyPost .MyPost-contents .tabs {
+.MyPost .post-content .missing {
   display: flex;
   gap: 5px;
   overflow-x: auto;
+  overflow-y: hidden;
   scrollbar-width: thin;
 }
 
-/* .tab-container::-webkit-scrollbar {
-  height: 6px;
-}
-
-.tab-container::-webkit-scrollbar-thumb {
-  background-color: #ccc;
-  border-radius: 3px;
-} */
-
-/* tab  -> #은 해시태그 같아서 빼는게 나을 것 같음. */
-.MyPost .MyPost-contents .tabs .tab {
-  border-radius: 5px 5px 0px 0px;
-  padding: 5px 10px;
-  border: var(--border-color);
-  background-color: var(--subtitleL-color);
-  transition: 0.35s;
-  cursor: pointer;
-}
-.MyPost .MyPost-contents .tabs .tab:hover {
-  background-color: var(--main-color);
-  color: var(--text-white);
-  font-weight: bold;
-}
-.MyPost .MyPost-contents .tabs .tab.active {
-  background-color: var(--main-color);
-  color: var(--text-white);
-  font-weight: bold;
-}
-
-.MyPost .MyPost-contents .report {
+.MyPost .post-content .report {
   padding: 10px;
   border: 1px solid var(--border-color);
-  height: calc(100% - 30px);
+  margin-top: -5px;
   background-color: var(--bg-white-color);
-}
-
-.MyPost .MyPost-contents .report .item {
-  height: 50%;
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  padding: 10px;
-  border-radius: 10px;
-  border: 1px solid var(--border-color);
-}
-
-.MyPost .MyPost-contents .item .post-thumbnail {
-  /* aspect-ratio: 1/1; */
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  height: 100%;
-}
-
-.MyPost .MyPost-contents .report .item .post-thumbnail > img {
-  height: 100%;
-  object-fit: cover;
-  border-radius: 10px;
-}
-
-.MyPost .MyPost-contents .report .item .post-info {
-  width: 100%;
-  height: 100%;
-  display: flex;
-  flex-direction: column;
-  gap: 5px;
-  justify-content: center;
-  overflow: hidden;
-}
-
-.MyPost .MyPost-contents .report .item .post-info p {
-  display: block;
-  width: 100%;
-  overflow: hidden;
-  white-space: nowrap;
-  text-overflow: ellipsis;
-  flex-shrink: 1;
-}
-
-.MyPost .MyPost-contents .report .item .post-title {
-  font-weight: 600;
-  font-size: var(--font-subtitle-xl-d);
-}
-
-.MyPost .MyPost-contents .report .item .post-description {
-  font-size: var(--font-size-base);
-}
-
-.MyPost .MyPost-contents .report .item .post-location {
-  font-size: var(--font-small);
-  text-align: right;
-  padding: 10px 20px 0 0;
-  cursor: pointer;
-  transition: 0.35s;
-}
-
-.MyPost .MyPost-contents .report .item .post-location:hover {
-  color: var(--main-color);
+  flex-grow: 1;
+  flex-basis: 0px;
+  overflow-y: auto;
 }
 
 @media screen and (max-width: 768px) {
