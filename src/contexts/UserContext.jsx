@@ -28,6 +28,45 @@ function reducer(state, action) {
       };
       localStorage.setItem("user", JSON.stringify(nextState.users));
       return nextState;
+    case "ADD_ALERT":
+      nextState = {
+        ...state,
+        users: state.users.map((user) =>
+          String(user.id) === String(action.data.id)
+            ? {
+                ...user,
+                alerts: [
+                  ...user.alerts,
+                  {
+                    postId: action.data.postId,
+                    postType: action.data.postType,
+                  },
+                ],
+                lastAlertDate: Date.now(),
+              }
+            : user
+        ),
+      };
+      localStorage.setItem("user", JSON.stringify(nextState.users));
+      return nextState;
+    case "REMOVE_ALERT":
+      nextState = {
+        ...state,
+        users: state.users.map((user) =>
+          String(user.id) === String(action.data.id)
+            ? {
+                ...user,
+                alerts: user.alerts.filter(
+                  (alert) =>
+                    String(alert.postId) !== String(action.data.postId) ||
+                    String(alert.postType) !== String(action.data.postType)
+                ),
+              }
+            : user
+        ),
+      };
+      localStorage.setItem("user", JSON.stringify(nextState.users));
+      return nextState;
     case "LOGIN":
       sessionStorage.setItem("currentUser", JSON.stringify(action.data.id));
       return {
@@ -40,6 +79,7 @@ function reducer(state, action) {
         ...state,
         currentUser: null,
       };
+
     default:
       throw new Error(`Unhandled action type: ${action.type}`);
   }
