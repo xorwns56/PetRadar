@@ -1,16 +1,19 @@
 import '../style/ShelterAnimalList.css';
 import { useState } from 'react';
 import { useParams } from 'react-router-dom';
+import { useModal } from '../hooks/ModalContext';
 import useShelterData from '../api/ShelterData';
 import ShelterAnimalItem from '../components/ShelterAnimalItem';
-import ShelterModalDetail from '../components/ShelterModalDetail';
+import ShelterAnimalModalDetail from '../components/ShelterAnimalModalDetail';
 import Header from '../components/Header';
 
 const ShelterAnimalList = () => {
   const { animals } = useShelterData();
   const { name, addr } = useParams();
+
+  const { isActive, toggleModal } = useModal();
   const [selectedAnimal, setSelectedAnimal] = useState(null);
-  const [isModalOpen, setIsModalOpen] = useState(false);
+
   const [sortOrder, setSortOrder] = useState('newest'); // 최신순 기본
 
   const decodedName = decodeURIComponent(name);
@@ -34,7 +37,7 @@ const ShelterAnimalList = () => {
     });
 
     return filtered.sort((a, b) => {
-      const dateA = parseDate(a.RECEPT_DE); // ✅ 실종일자 기준
+      const dateA = parseDate(a.RECEPT_DE); // 실종일자 기준
       const dateB = parseDate(b.RECEPT_DE);
       return sortOrder === 'newest' ? dateB - dateA : dateA - dateB;
     });
@@ -53,23 +56,29 @@ const ShelterAnimalList = () => {
             <option value="oldest">최신순</option>
           </select>
         </div>
-            <div className="ShelterAnimalItems">
-              {getFilteredData().map((item) => (
-                <ShelterAnimalItem
-                  key={item.ABDM_IDNTFY_NO}
-                  petId={item.ABDM_IDNTFY_NO}
-                  petType={item.SPECIES_NM}
-                  petMissingDate={item.RECEPT_DE}
-                  imageUrl={item.IMAGE_COURS}
-                  onClick={() => {
-                    setSelectedAnimal(item);
-                    setIsModalOpen(true);
-                  }}
-                />
-              ))}
-            </div>
-        {isModalOpen && (
-          <ShelterModalDetail animal={selectedAnimal} onClose={() => setIsModalOpen(false)} onClick={() => {}} />
+        <div className="ShelterAnimalItems">
+          {getFilteredData().map((item) => (
+            <ShelterAnimalItem
+              key={item.ABDM_IDNTFY_NO}
+              petId={item.ABDM_IDNTFY_NO}
+              petType={item.SPECIES_NM}
+              petMissingDate={item.RECEPT_DE}
+              imageUrl={item.IMAGE_COURS}
+              onClick={() => {
+                setSelectedAnimal(item);
+                toggleModal();
+              }}
+            />
+          ))}
+        </div>
+        {isActive && (
+          <ShelterAnimalModalDetail
+            animal={selectedAnimal}
+            onClose={() => {
+              toggleModal();
+              setSelectedAnimal(null);
+            }}
+          />
         )}
       </div>
     </div>
