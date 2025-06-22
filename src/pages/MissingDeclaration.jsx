@@ -9,7 +9,7 @@ import {
   useMissingState,
 } from "../contexts/MissingContext";
 import { useUserState } from "../contexts/UserContext";
-import ReportMap from '../components/ReportMap';
+import ReportMap from "../components/ReportMap";
 
 const MissingDeclaration = () => {
   const dispatch = useMissingDispatch();
@@ -80,13 +80,16 @@ const MissingDeclaration = () => {
     }
   };
 
-  const onLocationSelect = (latlng) =>{
+  const onLocationSelect = (latlng) => {
+    console.log("[📌 onLocationSelect] selected:", latlng);
     setForm((prev) => ({
       ...prev,
-      lat: latlng.lat,
-      lng: latlng.lng,
-    }))
-  }
+      petMissingPoint: {
+        lat: latlng.lat,
+        lng: latlng.lng,
+      },
+    }));
+  };
 
   const onSelectBreed = (breed, value, onChange) => {
     if (breed === "") {
@@ -210,7 +213,7 @@ const MissingDeclaration = () => {
               onChange={handleChange}
               placeholder="실종된 장소를 적어주세요."
             /> */}
-            <ReportMap onSelect={onLocationSelect}/>
+            <ReportMap onSelect={onLocationSelect} />
           </div>
           <div className="MissingDeclarationForm">
             <label htmlFor="imageUpload">사진첨부</label>
