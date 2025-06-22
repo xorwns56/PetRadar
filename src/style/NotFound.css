@@ -53,7 +53,7 @@
 }
 
 /* 모바일 */
-@media (max-width: 768px) {
+@media (max-width: 600px) {
   .NotFound .NotFound-container .text-contents h1 {
     font-size: var(--font-title-xl-m);
   }

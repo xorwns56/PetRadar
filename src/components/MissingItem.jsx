@@ -13,7 +13,7 @@ const MissingItem = ({
   onClick,
   toggleModal,
 }) => {
-  const imageSrc = petImage || getMissingImage(petId) || '/defaultPet.png';
+  const imageSrc = petImage || getMissingImage(petId) || '/image-default.png';
   return (
     <div className="MissingItem">
       <div className="MissingItem-img" onClick={toggleModal}>

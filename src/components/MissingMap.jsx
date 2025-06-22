@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from "react";
-import { useModal } from "../hooks/ModalContext";
-import { useMissingState } from "../contexts/MissingContext";
-import ModalDetail from "../components/ModalDetail";
+import { useModal } from '../hooks/ModalContext';
+import { useMissingState } from "../contexts/MissingContext"; 
+import PetModalDetail from "../components/PetModalDetail"
 
 const MissingMap = () => {
   const missingMapRef = useRef(null);
