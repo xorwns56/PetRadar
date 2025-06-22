@@ -81,7 +81,6 @@ const MissingDeclaration = () => {
   };
 
   const onLocationSelect = (latlng) => {
-    console.log("[📌 onLocationSelect] selected:", latlng);
     setForm((prev) => ({
       ...prev,
       petMissingPoint: {
