@@ -75,7 +75,9 @@ const MissingList = () => {
                 toggleModal();
               }}
               onClick={() => {
+
                 nav("/missingReport");
+
               }}
             />
           ))}
@@ -91,6 +93,7 @@ const MissingList = () => {
           />
         </div>
       </div>
+
       {selectedId !== null && (
         <PetModalDetail
           selectedId={selectedId}
@@ -99,6 +102,7 @@ const MissingList = () => {
           }}
         />
       )}
+
     </div>
   );
 };

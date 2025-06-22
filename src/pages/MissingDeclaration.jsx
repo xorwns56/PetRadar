@@ -32,9 +32,8 @@ const MissingDeclaration = () => {
     petAge: "",
     petMissingDate: "",
     petMissingPlace: "",
-    petMissingPoint: { lat: null, lng: null },
+    petMissingPoint: null,
     petImage: "",
-    id: useUserState.currentUser,
     title: "",
     content: "",
   });
@@ -43,6 +42,7 @@ const MissingDeclaration = () => {
       type: "CREATE",
       data: {
         ...form,
+        id: userState.currentUser,
       },
     });
   };
@@ -53,6 +53,7 @@ const MissingDeclaration = () => {
 
   const handleChange = (e) => {
     const { name, value, files } = e.target;
+
     let newValue;
 
     if (name === "petImage" && files?.[0]) {
@@ -60,20 +61,23 @@ const MissingDeclaration = () => {
       // newValue = URL.createObjectURL(files[0]);
       const reader = new FileReader();
       reader.onloadend = () => {
+        console.log(reader.result);
         setForm((prev) => ({
           ...prev,
           [name]: reader.result,
         }));
       };
-      reader.readAsDataURL(file);
+      reader.readAsDataURL(files[0]);
     } else {
+
       newValue = value;
     }
 
     if (name !== "petImage") {
+
       setForm((prev) => ({
         ...prev,
-        [name]: newValue,
+        [name]: value,
       }));
     }
   };
