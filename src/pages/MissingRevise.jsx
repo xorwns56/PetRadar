@@ -59,7 +59,7 @@ const MissingRevise = () => {
   };
   const onSubmitButtonClick = () => {
     onUpdate();
-    nav("/missingList");
+    nav("/myPage");
   };
 
   const handleChange = (e) => {
