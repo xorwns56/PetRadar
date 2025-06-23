@@ -26,6 +26,7 @@ const MissingReport = () => {
       nav("/missingList", { replace: true });
     }
   }, [params.id]);
+  
   const [form, setForm] = useState({
     title: "",
     content: "",
