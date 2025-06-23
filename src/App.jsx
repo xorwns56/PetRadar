@@ -8,6 +8,7 @@ import MyPage from "./pages/MyPage";
 
 import MissingReport from "./pages/MissingReport";
 import MissingDeclaration from "./pages/MissingDeclaration";
+import MissingRevise from "./pages/MissingRevise";
 import MissingList from "./pages/MissingList";
 
 import ShelterList from "./pages/ShelterList";
@@ -53,10 +54,10 @@ function App() {
                       path="/missingReport/:petMissingId"
                       element={<MissingReport />}
                     />
-                    {/* <Route
+                    <Route
                       path="/missingRevise/:petMissingId"
                       element={<MissingRevise />}
-                    /> */}
+                    />
 
                     <Route path="/*" element={<NotFound />} />
                   </Routes>

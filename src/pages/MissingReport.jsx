@@ -16,6 +16,7 @@ const MissingReport = () => {
   const nav = useNavigate();
   const params = useParams();
   const missingState = useMissingState();
+
   useEffect(() => {
     if (
       !missingState.some(
@@ -26,7 +27,7 @@ const MissingReport = () => {
       nav("/missingList", { replace: true });
     }
   }, [params.id]);
-  
+
   const [form, setForm] = useState({
     title: "",
     content: "",
