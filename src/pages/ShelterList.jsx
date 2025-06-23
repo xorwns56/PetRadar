@@ -1,31 +1,45 @@
-import '../style/ShelterList.css';
-import { useEffect, useRef, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import Map from '../components/Map';
-import useShelterData from '../api/ShelterData';
-import Header from '../components/Header';
+import "../style/ShelterList.css";
+import { useEffect, useRef, useState } from "react";
+import { useNavigate } from "react-router-dom";
+import Map from "../components/Map";
+import useShelterData from "../api/ShelterData";
+import Header from "../components/Header";
+import { useModal } from "../hooks/ModalContext";
+import ShelterInfo from "../components/ShelterInfo";
 
 const ShelterList = () => {
   const { animals, error } = useShelterData();
-  const [dots, setDots] = useState('');
+  const [dots, setDots] = useState("");
   const mapRef = useRef(null);
   const navigate = useNavigate();
+  const [selectedShelter, setSelectedShelter] = useState(null);
+  const { isActive, toggleModal } = useModal();
 
   const uniqueShelters = animals.filter((shelter, index, self) => {
-    const key = `${shelter.SHTER_NM}-${shelter.REFINE_ROADNM_ADDR || shelter.REFINE_LOTNO_ADDR}`;
-    return index === self.findIndex((s) => `${s.SHTER_NM}-${s.REFINE_ROADNM_ADDR || s.REFINE_LOTNO_ADDR}` === key);
+    const key = `${shelter.SHTER_NM}-${
+      shelter.REFINE_ROADNM_ADDR || shelter.REFINE_LOTNO_ADDR
+    }`;
+    return (
+      index ===
+      self.findIndex(
+        (s) =>
+          `${s.SHTER_NM}-${s.REFINE_ROADNM_ADDR || s.REFINE_LOTNO_ADDR}` === key
+      )
+    );
   });
 
   useEffect(() => {
     const interval = setInterval(() => {
-      setDots((prev) => (prev.length >= 3 ? '' : prev + '.'));
+      setDots((prev) => (prev.length >= 3 ? "" : prev + "."));
     }, 500);
     return () => clearInterval(interval);
   }, []);
 
   const handleItemClick = (shelter) => {
     const name = encodeURIComponent(shelter.SHTER_NM);
-    const addr = encodeURIComponent(shelter.REFINE_ROADNM_ADDR || shelter.REFINE_LOTNO_ADDR);
+    const addr = encodeURIComponent(
+      shelter.REFINE_ROADNM_ADDR || shelter.REFINE_LOTNO_ADDR
+    );
     navigate(`/shelter/${name}/${addr}`);
   };
 
@@ -53,10 +67,15 @@ const ShelterList = () => {
           <Map
             shelters={uniqueShelters}
             onSelect={(shelter) => {
-              if (mapRef.current) mapRef.current(shelter); // 지도 클릭시 아무 동작 X
+              if (mapRef.current) mapRef.current(shelter);
+              setSelectedShelter(shelter);
+              toggleModal();
             }}
             setCenterRef={mapRef}
           />
+          {isActive && selectedShelter && (
+            <ShelterInfo shelter={selectedShelter} onClose={toggleModal} />
+          )}
         </div>
 
         <div className="ShelterList-contents">
@@ -64,12 +83,12 @@ const ShelterList = () => {
             <div key={index} className="shelter-card">
               {/* 이미지 클릭 -> 보호소 상세정보 */}
               <img
-                src={shelter.THUMB_IMAGE_COURS || '/image-default.png'}
+                src={shelter.THUMB_IMAGE_COURS || "/image-default.png"}
                 alt="썸네일"
                 className="shelter-thumb"
                 onError={(e) => {
                   e.target.onerror = null;
-                  e.target.src = '/image-default.png';
+                  e.target.src = "/image-default.png";
                 }}
               />
               {/* 이미지 클릭 -> 보호소 상세정보 */}
@@ -77,7 +96,10 @@ const ShelterList = () => {
                 <strong>{shelter.SHTER_NM}</strong>
                 <p>{shelter.REFINE_ROADNM_ADDR || shelter.REFINE_LOTNO_ADDR}</p>
               </div>
-              <div className="ShelterAnimalList-btn" onClick={() => handleItemClick(shelter)}>
+              <div
+                className="ShelterAnimalList-btn"
+                onClick={() => handleItemClick(shelter)}
+              >
                 <p>보호동물 보기 →</p>
               </div>
             </div>
