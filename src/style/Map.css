@@ -7,6 +7,23 @@
   height: 350px;
   z-index: 0;
 }
-.shelterMap{
-  
+.custom-marker-wrapper {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 48px;
+  height: 48px;
+  transition: .35s;
+  cursor: pointer;
+}
+
+.custom-marker-wrapper:hover {
+  transform: scale(1.5);
+}
+
+.custom-marker-image {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  pointer-events: none;
 }
