@@ -47,12 +47,13 @@
 /* img-box : 이미지 */
 .ModalDetail .Modal-container .img-box {
   width: 100%;
-  height: 300px;
+  height: 200px;
 }
 
 .ModalDetail .Modal-container .img-box img {
-  object-fit: contain;
+  object-fit: cover;
   width: 100%;
+  height: 100%;
   border-radius: 10px;
 }
 
@@ -93,9 +94,12 @@
   border-radius: 5px;
   padding: 10px;
   line-height: 1.5;
-  word-break: keep-all; /* 단어 기준으로 줄바꿈 */
-  white-space: normal; /* 기본 줄바꿈 허용 */
-  overflow-wrap: break-word; /* 박스 너비 넘을 경우 줄바꿈 */
+  word-break: keep-all;
+  /* 단어 기준으로 줄바꿈 */
+  white-space: normal;
+  /* 기본 줄바꿈 허용 */
+  overflow-wrap: break-word;
+  /* 박스 너비 넘을 경우 줄바꿈 */
   margin-top: 10px;
 }
 

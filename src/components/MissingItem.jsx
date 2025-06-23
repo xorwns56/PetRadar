@@ -34,8 +34,9 @@ const MissingItem = ({ petMissingId, onClick, toggleModal }) => {
           <p>{genderSymbol[missingPet.petGender] || "-"}</p>
           <p>{missingPet.petName}</p>
         </div>
-        <p className="contents-t2">{missingPet.petAge}(년생)</p>
-        <p className="contents-t3">실종일자 : {missingPet.petMissingDate}</p>
+        <p className="contents-t2">{missingPet.title}</p>
+        <p>{missingPet.petAge}(년생)</p>
+        <p>실종일자 : {missingPet.petMissingDate}</p>
       </div>
       <div className="ReportMove-btn">
         <Button text={"제보하기"} type={"Square_ls"} onClick={onClick} />
