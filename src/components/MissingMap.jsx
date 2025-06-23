@@ -27,7 +27,7 @@ const MissingMap = () => {
       // 스크립트 로드 후 카카오맵 초기화
       window.kakao.maps.load(() => {
         const map = new window.kakao.maps.Map(containerRef.current, {
-          center: new window.kakao.maps.LatLng(37.5665, 126.978), // 초기 중심 좌표(서울)
+          center: new window.kakao.maps.LatLng(37.489996, 126.927081), // 초기 중심 좌표(한정교)
           level: 3, // 초기 줌 레벨
         });
         mapRef.current = map; // 지도 객체 저장
