@@ -71,7 +71,6 @@ const MyPost = ({ id }) => {
                 petImage={item.petImage}
                 onClick={() => {
                   setModalData(item);
-                  console.log(item);
                   toggleModal();
                 }}
               />
