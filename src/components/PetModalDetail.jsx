@@ -32,13 +32,17 @@ const ModalDetail = ({ selectedId, onClick }) => {
               <h3>{genderSymbol[missingPet.petGender] || "-"}</h3>
               <h3>{missingPet.petName}</h3>
             </div>
-            <div className="contents-t2">
+            <div>
               <h3>나이</h3>
               <p>{missingPet.petAge}(년생)</p>
             </div>
-            <div className="contents-t3">
+            <div>
               <h3>실종날짜 </h3>
               <p>{missingPet.petMissingDate}</p>
+            </div>
+            <div className="contents-t4">
+              <h3>제목</h3>
+              <p>{missingPet.title}</p>
             </div>
             <div className="contents-t4">
               <h3>내용</h3>

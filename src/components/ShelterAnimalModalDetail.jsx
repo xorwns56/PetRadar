@@ -8,19 +8,14 @@ const ShelterModalDetail = ({ animal, onClose }) => {
     <div className="ModalDetail active" onClick={onClose}>
       <div className="Modal-container" onClick={(e) => e.stopPropagation()}>
         <div className="Modal-contents">
-          <div className="img-box" style={{ height: '200px' }}>
+          <div className="img-box">
             <img
               src={animal.IMAGE_COURS || '/image-default.png'}
               alt="동물 이미지"
               onError={(e) => {
                 e.target.src = '/image-default.png';
               }}
-              style={{
-                objectFit: 'cover',
-                height: '100%',
-                width: '100%',
-                borderRadius: '10px',
-              }}
+
             />
           </div>
 
