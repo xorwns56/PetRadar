@@ -4,117 +4,123 @@ import { useMissingState } from "../contexts/MissingContext";
 import PetModalDetail from "../components/PetModalDetail";
 import { useNavigate } from "react-router-dom";
 import { useUserState } from "../contexts/UserContext";
+import "../style/MissingMap.css";
 
 const MissingMap = () => {
-  const missingMapRef = useRef(null);
-  const missingList = useMissingState();
-  const missingMarkerMap = useRef(new Map()); // 마커 추적용 map 객체 생성(실종 신고 id 기준)
+  const mapRef = useRef(null); // 카카오 지도 객체 참조
+  const markerMapRef = useRef(new Map()); // 마커(오버레이) 객체 저장용
+  const containerRef = useRef(null); // 지도 컨테이너 DOM 참조
+  const missingList = useMissingState(); // 실종 동물 리스트 상태
   const nav = useNavigate();
   const userState = useUserState();
-  const { isActive, toggleModal } = useModal();
-  const [selectMissingPet, setSelectMissingPet] = useState(null);
+  const { isActive, toggleModal } = useModal(); // 모달 상태 및 토글 함수
+  const [selectedPet, setSelectedPet] = useState(null); // 선택된 동물 정보
+  const [mapLoaded, setMapLoaded] = useState(false); // 지도 로드 완료 여부
 
   useEffect(() => {
+    // 카카오맵 스크립트 동적 로드
     const script = document.createElement("script");
-    script.src = `//dapi.kakao.com/v2/maps/sdk.js?appkey=e26cd2b9a98785f9299bd0fe37542aab&libraries=services&autoload=false`;
+    script.src =
+      "//dapi.kakao.com/v2/maps/sdk.js?appkey=e26cd2b9a98785f9299bd0fe37542aab&libraries=services&autoload=false";
     script.async = true;
 
-    // script 로딩 완료 후 실행
     script.onload = () => {
+      // 스크립트 로드 후 카카오맵 초기화
       window.kakao.maps.load(() => {
-        const missingMapContainer = document.getElementById("missingMap");
-        const options = {
-          center: new window.kakao.maps.LatLng(37.5665, 126.978),
-          level: 3,
-        };
-
-        const map = new window.kakao.maps.Map(missingMapContainer, options);
-        missingMapRef.current = map;
-
-        // missingMarkerMap 마커 id가 missingList에 존재하는지 여부 확인
-        for (let [missingId, missingMarker] of missingMarkerMap.current) {
-          // id가 missingList에 없으면 false
-          let exist = false;
-          // missingList에 id 존재 여부 확인
-          for (let i = 0; i < missingList.length; i++) {
-            if (missingList[i].petMissingId === missingId) {
-              exist = true;
-              break;
-            }
-          }
-          // missingList에는 값이 없는데 마커는 있다면
-          if (!exist) {
-            // 삭제
-            missingMarker.setMap(null);
-            // map에서 제거
-            missingMarkerMap.current.delete(missingId);
-          }
-        }
-
-        // 반복문 돌면서 현재 missingList 기준으로 마커 추가
-        for (let i = 0; i < missingList.length; i++) {
-          // missingList item 하나 받아서 저장
-          const pet = missingList[i];
-          // missingList 내 petMissingId 저장
-          const id = pet.petMissingId;
-
-          // 신고자가 입력한 missingPoint 없으면 continue
-          if (!pet.petMissingPoint) {
-            continue;
-          }
-
-          const petLat = pet.petMissingPoint.lat;
-          const petLng = pet.petMissingPoint.lng;
-
-          // missingPoint 위도나 경도 null일 경우 continue
-          if (petLat === null || petLng === null) {
-            continue;
-          }
-
-          // missingPoint 위도 경도 저장
-          const position = new window.kakao.maps.LatLng(petLat, petLng);
-
-          // 마커에 실종 동물 이미지 넣기 (이상해서 일단 제외. 나중에 방법 다시 찾기;;)
-          // const missingPetImage = pet.petImage || "/image-default.png";
-          // const markerImage = new window.kakao.maps.MarkerImage(
-          //   missingPetImage,
-          //   new window.kakao.maps.Size(40, 40),
-          //   { offset: new window.kakao.maps.Point(20, 20) }
-          // );
-
-          // map에 마커 찍기
-          const marker = new window.kakao.maps.Marker({
-            position: position,
-            map: map,
-            // image: markerImage,
-          });
-
-          // id 기준 마커 저장 (삭제시 필요)
-          missingMarkerMap.current.set(id, marker);
-
-          // map 내에 click 이벤트 (선택된 pet 정보 -> 모달열림)
-          window.kakao.maps.event.addListener(marker, "click", () => {
-            setSelectMissingPet(pet);
-            toggleModal();
-          });
-        }
+        const map = new window.kakao.maps.Map(containerRef.current, {
+          center: new window.kakao.maps.LatLng(37.489996, 126.927081), // 초기 중심 좌표(한정교)
+          level: 3, // 초기 줌 레벨
+        });
+        mapRef.current = map; // 지도 객체 저장
+        setMapLoaded(true); // 지도 로드 완료 상태 변경
       });
     };
-    document.head.appendChild(script);
-  }, [missingList]);
+
+    document.head.appendChild(script); // 스크립트 태그 추가
+  }, []);
+
+  useEffect(() => {
+    // 지도와 카카오맵 객체가 준비되지 않았으면 종료
+    if (!mapLoaded || !mapRef.current || !window.kakao?.maps) return;
+
+    const map = mapRef.current;
+
+    // 기존 마커(오버레이) 모두 제거
+    for (let [id, marker] of markerMapRef.current) {
+      marker.setMap(null);
+    }
+    markerMapRef.current.clear();
+
+    // 실종 동물 리스트 순회하며 마커 생성
+    missingList.forEach((pet) => {
+      const { petMissingId: id, petMissingPoint, petImage } = pet;
+      // 좌표 정보가 없으면 마커 생성하지 않음
+      if (
+        !petMissingPoint ||
+        petMissingPoint.lat == null ||
+        petMissingPoint.lng == null
+      )
+        return;
+
+      const position = new window.kakao.maps.LatLng(
+        petMissingPoint.lat,
+        petMissingPoint.lng
+      );
+
+      // 커스텀 마커용 div 생성
+      const wrapper = document.createElement("div");
+      wrapper.className = "custom-marker-wrappers";
+
+      // 마커에 표시할 이미지 생성
+      const img = document.createElement("img");
+      img.className = "custom-marker-images";
+      img.src = petImage || "/image-default.png"; // 이미지 없으면 기본 이미지
+      img.alt = "missing";
+      wrapper.appendChild(img);
+
+      // 마커 클릭 이벤트 등록
+      wrapper.addEventListener("click", () => {
+        if (mapRef.current) {
+          mapRef.current.setCenter(position); // 지도 중심 이동
+          mapRef.current.setLevel(5); // 줌 레벨 변경
+        }
+
+        setSelectedPet(pet); // 선택된 동물 정보 저장
+        setTimeout(() => {
+          toggleModal(); // 모달 열기
+        }, 200);
+      });
+
+      // 커스텀 오버레이(마커) 생성
+      const overlay = new window.kakao.maps.CustomOverlay({
+        position,
+        content: wrapper,
+        yAnchor: 1,
+      });
+
+      overlay.setMap(map); // 지도에 오버레이 표시
+      markerMapRef.current.set(id, overlay); // 마커 맵에 저장
+    });
+  }, [mapLoaded, missingList, toggleModal]);
+
   return (
     <>
-      <div id="missingMap" style={{ width: "100%", height: "350px" }}></div>
-      {isActive && selectMissingPet && (
+      {/* 카카오맵이 렌더링될 컨테이너 */}
+      <div
+        id="missingMap"
+        ref={containerRef}
+        style={{ width: "100%", height: "350px" }}
+      ></div>
+      {/* 모달이 활성화되고 동물이 선택된 경우 상세 모달 표시 */}
+      {isActive && selectedPet && (
         <PetModalDetail
-          selectedId={selectMissingPet.petMissingId}
-          onClick={() => {
-            nav(`/missingReport/${selectMissingPet.petMissingId}`);
-          }}
-          myMissing={userState.currentUser === selectMissingPet.id}
+          selectedId={selectedPet.petMissingId}
+          onClick={() => nav(`/missingReport/${selectedPet.petMissingId}`)}
+          myMissing={userState.currentUser === selectedPet.id}
         />
       )}
     </>
   );
 };
+
 export default MissingMap;

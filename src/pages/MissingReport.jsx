@@ -1,10 +1,9 @@
 import "../style/MissingReport.css";
 import Header from "../components/Header";
 import Button from "../components/Button";
-import Map from "../components/Map";
 
 import LocationMap from "../components/LocationMap";
-import { useReportDispatch, useReportState } from "../contexts/ReportContext";
+import { useReportDispatch } from "../contexts/ReportContext";
 
 import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
@@ -17,6 +16,7 @@ const MissingReport = () => {
   const nav = useNavigate();
   const params = useParams();
   const missingState = useMissingState();
+
   useEffect(() => {
     if (
       !missingState.some(
@@ -27,6 +27,7 @@ const MissingReport = () => {
       nav("/missingList", { replace: true });
     }
   }, [params.id]);
+
   const [form, setForm] = useState({
     title: "",
     content: "",

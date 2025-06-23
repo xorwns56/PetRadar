@@ -12,6 +12,8 @@ const ModalDetail = ({ selectedId, onClick, myMissing }) => {
     (item) => String(item.petMissingId) === String(selectedId)
   );
 
+  const imageSrc = missingPet.petImage || "/image-default.png";
+
   const genderSymbol = {
     M: "♂",
     F: "♀",
@@ -22,10 +24,7 @@ const ModalDetail = ({ selectedId, onClick, myMissing }) => {
       <div className="Modal-container">
         <div className="Modal-contents">
           <div className="img-box">
-            <img
-              src={missingPet.petImage || "/image-default.png"}
-              alt="missingPet img"
-            />
+            <img src={imageSrc} alt="missingPet img" />
           </div>
           <div className="text-contents">
             <div className="contents-t1">
@@ -33,13 +32,17 @@ const ModalDetail = ({ selectedId, onClick, myMissing }) => {
               <h3>{genderSymbol[missingPet.petGender] || "-"}</h3>
               <h3>{missingPet.petName}</h3>
             </div>
-            <div className="contents-t2">
+            <div>
               <h3>나이</h3>
               <p>{missingPet.petAge}(년생)</p>
             </div>
-            <div className="contents-t3">
+            <div>
               <h3>실종날짜 </h3>
               <p>{missingPet.petMissingDate}</p>
+            </div>
+            <div className="contents-t4">
+              <h3>제목</h3>
+              <p>{missingPet.title}</p>
             </div>
             <div className="contents-t4">
               <h3>내용</h3>

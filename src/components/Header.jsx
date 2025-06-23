@@ -39,7 +39,10 @@ const Header = ({ leftChild }) => {
         >
           {userState.currentUser ? "마이페이지" : "로그인/회원가입"}
         </p>
-        <p className="Msg-bell" onClick={toggleSidebar}></p>
+        <p className="Msg-bell" onClick={toggleSidebar}>
+          {/* 알림 갯수 표시 */}
+          <span className="Msg-cnt">3</span>
+        </p>
       </div>
     </header>
   );

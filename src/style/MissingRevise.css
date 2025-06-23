@@ -1,9 +1,9 @@
-.MissingReport {
+.MissingRevise {
   height: 100%;
 }
 
-/* menu-title */
-.MissingReport .menu-title {
+/* PageTitle */
+.MissingRevise .PageTitle {
   text-align: center;
   margin-top: 30px;
   line-height: 1.5;
@@ -11,12 +11,11 @@
   font-size: var(--font-title-lg-d);
 }
 
-.MissingReport .MissingReport-container {
+.MissingRevise .MissingRevise-container {
   height: 100%;
-  padding: 0;
 }
 
-.MissingReportForms {
+.MissingReviseForms {
   display: flex;
   flex-direction: column;
   gap: 20px;
@@ -29,20 +28,24 @@
   background-color: var(--bg-white-color);
 }
 
-.MissingReportForms .MissingReportForm {
+.scroll-hidden::-webkit-scrollbar {
+  display: none;
+}
+
+.MissingReviseForms .MissingReviseForm {
   display: flex;
   flex-direction: column;
   gap: 10px;
 }
 
-.MissingReportForms .MissingReportForm h4,
-.MissingReportForms .MissingReportForm label {
+.MissingReviseForms .MissingReviseForm h4,
+.MissingReviseForms .MissingReviseForm label {
   font-size: var(--font-subtitle-lg-d);
   font-weight: bold;
 }
 
-.MissingReportForms .MissingReportForm input,
-.MissingReportForms .MissingReportForm select {
+.MissingReviseForms .MissingReviseForm input,
+.MissingReviseForms .MissingReviseForm select {
   width: 100%;
   height: 50px;
   border: 1px solid var(--border-color);
@@ -53,13 +56,13 @@
   transition: border 0.3s;
 }
 
-.MissingReportForms .MissingReportForm input:focus,
-.MissingReportForms .MissingReportForm select:focus,
-.MissingReportForms .MissingReportForm textarea:focus {
+.MissingReviseForms .MissingReviseForm input:focus,
+.MissingReviseForms .MissingReviseForm select:focus,
+.MissingReviseForms .MissingReviseForm textarea:focus {
   border: 1px solid var(--main-color);
 }
 
-.MissingReportForms .MissingReportForm textarea {
+.MissingReviseForms .MissingReviseForm textarea {
   height: 120px;
   border: 1px solid var(--border-color);
   font-size: var(--font-small);

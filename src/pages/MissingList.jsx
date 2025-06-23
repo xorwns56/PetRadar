@@ -83,7 +83,6 @@ const MissingList = () => {
             />
           ))}
         </div>
-
         <div className="MissingList-btn">
           <Button
             text={"실종 동물 신고"}

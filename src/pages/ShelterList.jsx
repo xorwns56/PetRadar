@@ -15,6 +15,7 @@ const ShelterList = () => {
   const { animals, error } = useShelterData();
   const [dots, setDots] = useState("");
   const mapRef = useRef(null);
+  const loadingRef = useRef(null);
 
   const navigate = useNavigate();
   const { isActive, toggleModal } = useModal();
@@ -27,26 +28,33 @@ const ShelterList = () => {
     toggleModal();
   };
 
-  const uniqueShelters = animals.filter((shelter, index, self) => {
-    const key = `${shelter.SHTER_NM}-${
-      shelter.REFINE_ROADNM_ADDR || shelter.REFINE_LOTNO_ADDR
-    }`;
-    return (
-      index ===
-      self.findIndex(
-        (s) =>
-          `${s.SHTER_NM}-${s.REFINE_ROADNM_ADDR || s.REFINE_LOTNO_ADDR}` === key
-      )
-    );
-  });
+  const uniqueShelters = animals
+    .filter((shelter, index, self) => {
+      const key = `${shelter.SHTER_NM}-${
+        shelter.REFINE_ROADNM_ADDR || shelter.REFINE_LOTNO_ADDR
+      }`;
+      return (
+        index ===
+        self.findIndex(
+          (s) =>
+            `${s.SHTER_NM}-${s.REFINE_ROADNM_ADDR || s.REFINE_LOTNO_ADDR}` ===
+            key
+        )
+      );
+    })
+    .slice(0, 5); // 상위 5개만 유지
 
   useEffect(() => {
+    let count = 0;
     const interval = setInterval(() => {
-      setDots((prev) => (prev.length >= 3 ? "" : prev + "."));
+      if (loadingRef.current) {
+        const dots = ".".repeat(count % 4); // "", ".", "..", "..."
+        loadingRef.current.textContent = `로딩중${dots}`;
+        count++;
+      }
     }, 500);
     return () => clearInterval(interval);
   }, []);
-
   const handleItemClick = (shelter) => {
     const name = encodeURIComponent(shelter.SHTER_NM);
     const addr = encodeURIComponent(
@@ -63,7 +71,9 @@ const ShelterList = () => {
         <div className="img-box">
           <img src="/Menu-icon1.png" alt="dog-img" />
         </div>
-        <span className="load">로딩중{dots}</span>
+        <span ref={loadingRef} className="load">
+          로딩중
+        </span>
       </div>
     );
 
@@ -98,7 +108,7 @@ const ShelterList = () => {
               onClick={() => ShelterInfoClick(shelter)}
             >
               <img
-                src={shelter.THUMB_IMAGE_COURS || "/image-default.png"}
+                src={"/image-default.png"}
                 alt="썸네일"
                 className="shelter-thumb"
                 onError={(e) => {

@@ -17,8 +17,8 @@
   height: 30%;
 }
 
-/* menu-title */
-.Home .menu-title {
+/* PageTitle */
+.Home .PageTitle {
   margin-top: 30px;
   line-height: 1.5;
   padding: 20px;
@@ -54,10 +54,6 @@
   border-radius: 10px;
   overflow: hidden;
   transition: .35s;
-}
-
-.Home .map:hover{
-  border: 2px solid var(--main-color);
 }
 
 /* 모바일 */
@@ -101,7 +97,7 @@
   .Home .mainMenu-container {
     flex-direction: column;
     height: auto;
-    gap: 12px;
+    gap: 15px;
   }
 
   .Home .map {
