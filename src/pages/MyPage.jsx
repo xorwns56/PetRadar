@@ -5,23 +5,27 @@ import MyPost from "../components/MyPost";
 import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useUserDispatch, useUserState } from "../contexts/UserContext";
+import { useReportDispatch } from "../contexts/ReportContext";
+import { useMissingDispatch } from "../contexts/MissingContext";
 const MyPage = () => {
   const nav = useNavigate();
   const userState = useUserState();
   const userDispatch = useUserDispatch();
+  const missingDispatch = useMissingDispatch();
+  const reportDispatch = useReportDispatch();
   useEffect(() => {
     if (!userState.currentUser) {
       nav("/", { replace: true });
     }
   }, [userState.currentUser, nav]);
-  const info = userState.users.find(
+  const userInfo = userState.users.find(
     (user) => user.id === userState.currentUser
   );
   const onUpdate = (pw, hp) => {
     userDispatch({
       type: "UPDATE",
       data: {
-        id: info.id,
+        id: userInfo.id,
         pw,
         hp,
       },
@@ -32,7 +36,19 @@ const MyPage = () => {
       userDispatch({
         type: "DELETE",
         data: {
-          id: info.id,
+          id: userInfo.id,
+        },
+      });
+      missingDispatch({
+        type: "CLEAR_USER_DATA",
+        data: {
+          id: userInfo.id,
+        },
+      });
+      reportDispatch({
+        type: "CLEAR_USER_DATA",
+        data: {
+          id: userInfo.id,
         },
       });
       onLogOut();
@@ -51,7 +67,7 @@ const MyPage = () => {
       <div className="MyPage-container inner">
         <div className="MyInfo-container">
           <MyInfo
-            {...info}
+            {...userInfo}
             onUpdate={onUpdate}
             onDelete={onDelete}
             onLogOut={onLogOut}

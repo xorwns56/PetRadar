@@ -24,6 +24,14 @@ function reducer(state, action) {
     nextState = state.filter(
       (item) => String(item.petReportId) !== String(action.data.petReportId)
     );
+  } else if (action.type === "DELETE_BY_MISSING") {
+    nextState = state.filter(
+      (item) => String(item.petMissingId) !== String(action.data.petMissingId)
+    );
+  } else if (action.type === "CLEAR_USER_DATA") {
+    nextState = state.map((item) =>
+      String(item.id) === String(action.data.id) ? { ...item, id: "" } : item
+    );
   } else {
     throw new Error(`Unhandled action type: ${action.type}`);
   }
