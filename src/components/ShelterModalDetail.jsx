@@ -1,6 +1,5 @@
-import Button from '../components/Button';
-import '../style/ModalDetail.css';
-
+import Button from "../components/Button";
+import "../style/ModalDetail.css";
 
 const ShelterModalDetail = ({ animal, onClose }) => {
   if (!animal) return null;
@@ -9,18 +8,18 @@ const ShelterModalDetail = ({ animal, onClose }) => {
     <div className="ModalDetail active" onClick={onClose}>
       <div className="Modal-container" onClick={(e) => e.stopPropagation()}>
         <div className="Modal-contents">
-          <div className="img-box" style={{ height: '200px' }}>
+          <div className="img-box" style={{ height: "200px" }}>
             <img
-              src={animal.IMAGE_COURS || '/image-default.png'}
+              src={"/image-default.png"}
               alt="동물 이미지"
               onError={(e) => {
-                e.target.src = '/image-default.png';
+                e.target.src = "/image-default.png";
               }}
               style={{
-                objectFit: 'cover',
-                height: '100%',
-                width: '100%',
-                borderRadius: '10px',
+                objectFit: "cover",
+                height: "100%",
+                width: "100%",
+                borderRadius: "10px",
               }}
             />
           </div>
@@ -41,7 +40,7 @@ const ShelterModalDetail = ({ animal, onClose }) => {
         </div>
 
         <div className="Modal-btn" onClick={onClose}>
-          <Button text={'X'} type={'Circle'} />
+          <Button text={"X"} type={"Circle"} />
         </div>
       </div>
     </div>

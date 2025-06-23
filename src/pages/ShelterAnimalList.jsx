@@ -1,12 +1,11 @@
-import '../style/ShelterAnimalList.css';
-import { useState } from 'react';
-import { useParams } from 'react-router-dom';
-import { useModal } from '../hooks/ModalContext';
-import useShelterData from '../api/ShelterData';
-import ShelterAnimalItem from '../components/ShelterAnimalItem';
-import ShelterAnimalModalDetail from '../components/ShelterAnimalModalDetail';
-import Header from '../components/Header';
-
+import "../style/ShelterAnimalList.css";
+import { useState } from "react";
+import { useParams } from "react-router-dom";
+import { useModal } from "../hooks/ModalContext";
+import useShelterData from "../api/ShelterData";
+import ShelterAnimalItem from "../components/ShelterAnimalItem";
+import ShelterAnimalModalDetail from "../components/ShelterAnimalModalDetail";
+import Header from "../components/Header";
 
 const ShelterAnimalList = () => {
   const { animals } = useShelterData();
@@ -16,7 +15,6 @@ const ShelterAnimalList = () => {
   const [selectedAnimal, setSelectedAnimal] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [sortOrder, setSortOrder] = useState("newest"); // 최신순 기본
-
 
   const decodedName = decodeURIComponent(name);
   const decodedAddr = decodeURIComponent(addr);
@@ -57,8 +55,8 @@ const ShelterAnimalList = () => {
             value={sortOrder}
             onChange={(e) => setSortOrder(e.target.value)}
           >
-            <option value="newest">오래된순</option>
-            <option value="oldest">최신순</option>
+            <option value="newest">최신순</option>
+            <option value="oldest">오래된순</option>
           </select>
         </div>
         <div className="ShelterAnimalItems">
@@ -66,10 +64,8 @@ const ShelterAnimalList = () => {
             <ShelterAnimalItem
               key={item.ABDM_IDNTFY_NO}
               petId={item.ABDM_IDNTFY_NO}
-
               petAge={item.AGE_INFO}
               petColor={item.COLOR_NM}
-
               petType={item.SPECIES_NM}
               petMissingDate={item.RECEPT_DE}
               imageUrl={item.IMAGE_COURS}
@@ -77,7 +73,6 @@ const ShelterAnimalList = () => {
                 setSelectedAnimal(item);
 
                 toggleModal();
-
               }}
             />
           ))}
@@ -90,7 +85,6 @@ const ShelterAnimalList = () => {
               toggleModal();
               setSelectedAnimal(null);
             }}
-
           />
         )}
       </div>
