@@ -1,10 +1,9 @@
 import "../style/MyPostReportItem.css";
 const MyPostReportItem = ({ title, content, petImage, onClick }) => {
-  const imageSrc = petImage || "/defaultPet.png";
   return (
     <div onClick={onClick} className="MyPostReportItem">
       <div className="thumbnail">
-        <img src={imageSrc} />
+        <img src={petImage || "/image-default.png"} />
       </div>
       <div className="info">
         <p className="title">{title}</p>
