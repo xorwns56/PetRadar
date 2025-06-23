@@ -27,18 +27,21 @@ const ShelterList = () => {
     toggleModal();
   };
 
-  const uniqueShelters = animals.filter((shelter, index, self) => {
-    const key = `${shelter.SHTER_NM}-${
-      shelter.REFINE_ROADNM_ADDR || shelter.REFINE_LOTNO_ADDR
-    }`;
-    return (
-      index ===
-      self.findIndex(
-        (s) =>
-          `${s.SHTER_NM}-${s.REFINE_ROADNM_ADDR || s.REFINE_LOTNO_ADDR}` === key
-      )
-    );
-  });
+  const uniqueShelters = animals
+    .filter((shelter, index, self) => {
+      const key = `${shelter.SHTER_NM}-${
+        shelter.REFINE_ROADNM_ADDR || shelter.REFINE_LOTNO_ADDR
+      }`;
+      return (
+        index ===
+        self.findIndex(
+          (s) =>
+            `${s.SHTER_NM}-${s.REFINE_ROADNM_ADDR || s.REFINE_LOTNO_ADDR}` ===
+            key
+        )
+      );
+    })
+    .slice(0, 5); // 상위 5개만 유지
 
   useEffect(() => {
     const interval = setInterval(() => {
