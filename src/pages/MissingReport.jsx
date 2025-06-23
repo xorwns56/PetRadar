@@ -3,7 +3,7 @@ import Header from "../components/Header";
 import Button from "../components/Button";
 import Map from "../components/Map";
 
-import ReportMap from "../components/ReportMap";
+import LocationMap from "../components/LocationMap";
 import { useReportDispatch, useReportState } from "../contexts/ReportContext";
 
 import { useEffect, useState } from "react";
@@ -34,6 +34,7 @@ const MissingReport = () => {
     petReportPlace: "",
     petReportPoint: null,
   });
+
   const onCreate = () => {
     dispatch({
       type: "CREATE",
@@ -73,6 +74,7 @@ const MissingReport = () => {
   const onLocationSelect = (latlng) => {
     setForm((prev) => ({
       ...prev,
+
       petReportPoint: {
         lat: latlng.lat,
         lng: latlng.lng,
@@ -101,6 +103,7 @@ const MissingReport = () => {
           <div className="MissingReportForm">
             <h3>제목</h3>
             {/* <input type="text" /> */}
+
             <input name="title" value={form.title} onChange={handleChange} />
           </div>
           <div className="MissingReportForm">
@@ -116,7 +119,7 @@ const MissingReport = () => {
           {/* 발견 장소 위치 Map 사용 : css 수정 필요 */}
           <div className="MissingReportForm">
             <h3>발견 장소</h3>
-            <ReportMap onSelect={onLocationSelect} />
+            <LocationMap onSelect={onLocationSelect} />
           </div>
           <div className="MissingReport-btn">
             <Button

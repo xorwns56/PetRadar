@@ -37,6 +37,7 @@
   left: -100px;
   bottom: -100px;
   width: 250px;
+  pointer-events: none;
 }
 
 /* bg icon img */
@@ -67,6 +68,7 @@
   animation-duration: 8s;
   animation-iteration-count: infinite;
   animation-timing-function: ease-in-out;
+  pointer-events: none;
 }
 .Register .bg-icon1 {
   position: absolute;
