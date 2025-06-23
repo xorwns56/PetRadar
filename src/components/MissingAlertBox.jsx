@@ -9,7 +9,7 @@ const MissingAlertBox = () => {
       <div
         className="AlertBox-container"
         onClick={() => {
-          nav('/myPage');
+          nav('/missingList');
         }}
       >
         <div className="alert-icon">
