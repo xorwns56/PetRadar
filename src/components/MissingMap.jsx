@@ -74,18 +74,18 @@ const MissingMap = () => {
           const position = new window.kakao.maps.LatLng(petLat, petLng);
 
           // 마커에 실종 동물 이미지 넣기 (이상해서 일단 제외. 나중에 방법 다시 찾기;;)
-          // const missingPetImage = pet.petImage || "/image-default.png";
-          // const markerImage = new window.kakao.maps.MarkerImage(
-          //   missingPetImage,
-          //   new window.kakao.maps.Size(40, 40),
-          //   { offset: new window.kakao.maps.Point(20, 20) }
-          // );
+          const missingPetImage = pet.petImage || "/image-default.png";
+          const markerImage = new window.kakao.maps.MarkerImage(
+            missingPetImage,
+            new window.kakao.maps.Size(40, 40),
+            { offset: new window.kakao.maps.Point(20, 20) }
+          );
 
           // map에 마커 찍기
           const marker = new window.kakao.maps.Marker({
             position: position,
             map: map,
-            // image: markerImage,
+            image: markerImage,
           });
 
           // id 기준 마커 저장 (삭제시 필요)
