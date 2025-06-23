@@ -22,7 +22,10 @@ const ModalDetail = ({ selectedId, onClick }) => {
       <div className="Modal-container">
         <div className="Modal-contents">
           <div className="img-box">
-            <img src={missingPet.petImage} alt="missingPet img" />
+            <img
+              src={missingPet.petImage || "/image-default.png"}
+              alt="missingPet img"
+            />
           </div>
           <div className="text-contents">
             <div className="contents-t1">
