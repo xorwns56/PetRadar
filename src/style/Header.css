@@ -11,7 +11,7 @@
 }
 
 /* 내부 정렬 */
-.Header > div {
+.Header>div {
   display: flex;
 }
 
@@ -43,6 +43,7 @@
 }
 
 .Header .header_right .Msg-bell {
+  position: relative;
   background-image: url(/public/Msg-Bell.png);
   background-repeat: no-repeat;
   background-position: center;
@@ -52,11 +53,26 @@
   transition: 0.35s;
 }
 
+.Header .header_right .Msg-bell .Msg-cnt {
+  position: absolute;
+  right: -9px;
+  top: -9px;
+  background-color: var(--bg-white-color);
+  width: 20px;
+  height: 20px;
+  display: inline-block;
+  text-align: center;
+  line-height: 20px;
+  border-radius: 50%;
+  color: var(--main-color);
+  font-size: var(--font-small);
+}
+
+
+
 /* 모바일 */
 @media (max-width: 600px) {
   .Header {
     font-size: var(--font-small);
   }
 }
-
-

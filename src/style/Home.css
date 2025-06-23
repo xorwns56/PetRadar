@@ -101,7 +101,7 @@
   .Home .mainMenu-container {
     flex-direction: column;
     height: auto;
-    gap: 12px;
+    gap: 15px;
   }
 
   .Home .map {
