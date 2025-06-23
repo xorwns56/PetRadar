@@ -45,15 +45,10 @@
   z-index: 99;
 }
 
-/* 클릭만 하면 빨간 줄 뜸... -> 회원가입 눌렀을때 안쓴부분 빨간 줄로 */
 .RegisterForm .input_item.err {
   border: 1px solid var(--err-color);
   z-index: 99;
 }
-
-/* .Register .input_item.on > #register_pw {
-  padding-right: 34px;
-} */
 
 .RegisterForm .input_item.on > label,
 .RegisterForm .input_item.focus > label {
@@ -89,7 +84,7 @@
 }
 
 .RegisterForm .btn_login.on {
-  background-color: #ffa516;
+  background-color: var(--main-color);
 }
 
 .RegisterForm .error_message {

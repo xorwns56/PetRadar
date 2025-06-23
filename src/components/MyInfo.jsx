@@ -1,5 +1,5 @@
-import { useState } from "react";
 import "../style/MyInfo.css";
+import { useState } from "react";
 const MyInfo = ({ id, pw, hp, onUpdate, onDelete, onLogOut }) => {
   const [editMode, setEditMode] = useState(false);
   const [pwHide, setPwHide] = useState(false);

@@ -29,6 +29,21 @@
 .ModalDetail .Modal-container .Modal-contents {
   position: relative;
   width: 100%;
+  /* height: calc(100% - 60px); */
+  height: 95%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 20px;
+  padding: 20px;
+  overflow-y: auto;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+.ModalDetail .Modal-container .Modal-contents-pet {
+  position: relative;
+  width: 100%;
   height: calc(100% - 60px);
   display: flex;
   flex-direction: column;
@@ -103,8 +118,8 @@
   margin-top: 10px;
 }
 
-/* Report-btn */
-.ModalDetail .Modal-container .Modal-contents .Report-btn {
+/* Report-btn  실종신고목록 모달*/
+.ModalDetail .Modal-container .Modal-contents-pet .Report-btn {
   width: 100%;
   position: fixed;
   bottom: 0;

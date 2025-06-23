@@ -1,4 +1,4 @@
-/* 🐶 ShelterAnimalList 전체 컨테이너 */
+/* ShelterAnimalList 전체 컨테이너 */
 .ShelterAnimalList {
   height: 100vh;
 }
@@ -10,7 +10,7 @@
   height: 100%;
 }
 
-/* 🏷️ 페이지 제목 */
+/* 페이지 제목 */
 .ShelterAnimalList .PageTitle {
   text-align: center;
   margin-top: 30px;
@@ -20,7 +20,7 @@
   color: var(--title-color);
 }
 
-/* 🔍 정렬/검색 선택 박스 */
+/* 정렬/검색 선택 박스 */
 .ShelterAnimalList .SearchBar select {
   border: 1px solid var(--border-color);
   border-radius: 5px;
@@ -28,7 +28,7 @@
   font-size: var(--font-small);
 }
 
-/* 🐾 동물 카드 목록 컨테이너 */
+/* 동물 카드 목록 컨테이너 */
 .ShelterAnimalList .ShelterAnimalItems {
   width: 100%;
   height: calc(100vh - 250px);
@@ -43,7 +43,7 @@
   -ms-overflow-style: none; /* IE */
 }
 
-/* ✅ 스크롤 제거 (Chrome) */
+/* 스크롤 제거 (Chrome) */
 .ShelterAnimalList .ShelterAnimalItems::-webkit-scrollbar,
 .scroll-hidden::-webkit-scrollbar {
   display: none;
