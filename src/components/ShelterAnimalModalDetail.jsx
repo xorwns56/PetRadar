@@ -1,7 +1,6 @@
 import Button from '../components/Button';
 import '../style/ModalDetail.css';
 
-
 const ShelterModalDetail = ({ animal, onClose }) => {
   if (!animal) return null;
 
@@ -27,7 +26,19 @@ const ShelterModalDetail = ({ animal, onClose }) => {
 
           <div className="text-contents">
             <div className="contents-t1">
-              <h3>{animal.SHTER_NM}</h3>
+              <p className="petType">{animal.SPECIES_NM}</p>
+            </div>
+            <div>
+              <h3>색상</h3>
+              <p>{animal.COLOR_NM}</p>
+            </div>
+            <div>
+              <h3>나이</h3>
+              <p>{animal.AGE_INFO}</p>
+            </div>
+            <div>
+              <h3>특이사항</h3>
+              <p>{animal.SFETR_INFO || '없음'}</p>
             </div>
             <div>
               <h3>보호소 위치</h3>

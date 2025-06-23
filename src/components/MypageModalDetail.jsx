@@ -5,6 +5,7 @@ import { getMissingImage } from "../utils/get-missingPet-image"; // 수정필요
 import { missingPet } from "../utils/missingPet"; // 수정필요
 
 import Button from "./Button";
+import MyPageReportMap from "./MyPageReportMap";
 
 const MypageModalDetail = ({
   title,
@@ -19,7 +20,7 @@ const MypageModalDetail = ({
       <div className="Modal-container">
         <div className="Modal-contents">
           <div className="Map-box">
-            <p>map</p>
+            <MyPageReportMap petReportPoint={petReportPoint} />
           </div>
           <div className="text-contents">
             <div className="contents-t1">

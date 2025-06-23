@@ -1,17 +1,22 @@
-import "../style/ShelterAnimalList.css";
-import { useState } from "react";
-import { useParams } from "react-router-dom";
-import useShelterData from "../api/ShelterData";
-import ShelterAnimalItem from "../components/ShelterAnimalItem";
-import ShelterModalDetail from "../components/ShelterModalDetail";
-import Header from "../components/Header";
+import '../style/ShelterAnimalList.css';
+import { useState } from 'react';
+import { useParams } from 'react-router-dom';
+import { useModal } from '../hooks/ModalContext';
+import useShelterData from '../api/ShelterData';
+import ShelterAnimalItem from '../components/ShelterAnimalItem';
+import ShelterAnimalModalDetail from '../components/ShelterAnimalModalDetail';
+import Header from '../components/Header';
+
 
 const ShelterAnimalList = () => {
   const { animals } = useShelterData();
   const { name, addr } = useParams();
+
+  const { isActive, toggleModal } = useModal();
   const [selectedAnimal, setSelectedAnimal] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [sortOrder, setSortOrder] = useState("newest"); // 최신순 기본
+
 
   const decodedName = decodeURIComponent(name);
   const decodedAddr = decodeURIComponent(addr);
@@ -34,7 +39,7 @@ const ShelterAnimalList = () => {
     });
 
     return filtered.sort((a, b) => {
-      const dateA = parseDate(a.RECEPT_DE); // ✅ 실종일자 기준
+      const dateA = parseDate(a.RECEPT_DE); // 실종일자 기준
       const dateB = parseDate(b.RECEPT_DE);
       return sortOrder === "newest" ? dateB - dateA : dateA - dateB;
     });
@@ -61,21 +66,31 @@ const ShelterAnimalList = () => {
             <ShelterAnimalItem
               key={item.ABDM_IDNTFY_NO}
               petId={item.ABDM_IDNTFY_NO}
+
+              petAge={item.AGE_INFO}
+              petColor={item.COLOR_NM}
+
               petType={item.SPECIES_NM}
               petMissingDate={item.RECEPT_DE}
               imageUrl={item.IMAGE_COURS}
               onClick={() => {
                 setSelectedAnimal(item);
-                setIsModalOpen(true);
+
+                toggleModal();
+
               }}
             />
           ))}
         </div>
-        {isModalOpen && (
-          <ShelterModalDetail
+
+        {isActive && (
+          <ShelterAnimalModalDetail
             animal={selectedAnimal}
-            onClose={() => setIsModalOpen(false)}
-            onClick={() => {}}
+            onClose={() => {
+              toggleModal();
+              setSelectedAnimal(null);
+            }}
+
           />
         )}
       </div>

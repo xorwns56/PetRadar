@@ -1,5 +1,6 @@
 .MyPost {
   width: 560px;
+  margin: 0 auto;
   flex: 1;
   flex-direction: column;
   display: flex;
