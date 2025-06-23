@@ -14,7 +14,7 @@ const Map = ({ shelters, onSelect, setCenterRef }) => {
     script.onload = () => {
       window.kakao.maps.load(() => {
         const map = new window.kakao.maps.Map(mapRef.current, {
-          center: new window.kakao.maps.LatLng(37.5598, 126.9734),
+          center: new window.kakao.maps.LatLng(37.423233, 127.105261),
           level: 12,
         });
         mapInstance.current = map;
@@ -36,7 +36,7 @@ const Map = ({ shelters, onSelect, setCenterRef }) => {
                 result[0].x
               );
 
-              // 🔶 <div> + <img> 형태로 마커 생성
+              // <div> + <img> 형태로 마커 생성
               const markerWrapper = document.createElement("div");
               markerWrapper.className = "custom-marker-wrapper";
 
