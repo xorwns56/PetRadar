@@ -12,6 +12,8 @@ const ModalDetail = ({ selectedId, onClick }) => {
     (item) => String(item.petMissingId) === String(selectedId)
   );
 
+  const imageSrc = missingPet.petImage || "/image-default.png";
+
   const genderSymbol = {
     M: "♂",
     F: "♀",
@@ -22,7 +24,7 @@ const ModalDetail = ({ selectedId, onClick }) => {
       <div className="Modal-container">
         <div className="Modal-contents">
           <div className="img-box">
-            <img src={missingPet.petImage} alt="missingPet img" />
+            <img src={imageSrc} alt="missingPet img" />
           </div>
           <div className="text-contents">
             <div className="contents-t1">
