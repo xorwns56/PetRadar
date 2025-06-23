@@ -35,13 +35,7 @@ function reducer(state, action) {
           String(user.id) === String(action.data.id)
             ? {
                 ...user,
-                alerts: [
-                  ...user.alerts,
-                  {
-                    postId: action.data.postId,
-                    postType: action.data.postType,
-                  },
-                ],
+                alerts: [...user.alerts, ...action.data.alerts],
                 lastAlertDate: Date.now(),
               }
             : user
