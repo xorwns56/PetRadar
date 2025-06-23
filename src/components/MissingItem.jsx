@@ -3,7 +3,7 @@ import { getMissingImage } from "../utils/get-missingPet-image";
 import { useMissingState } from "../contexts/MissingContext";
 import Button from "./Button";
 
-const MissingItem = ({ petMissingId, onClick, toggleModal }) => {
+const MissingItem = ({ petMissingId, onClick, toggleModal, myMissing }) => {
   const missingList = useMissingState();
 
   const missingPet = missingList.find(
@@ -39,7 +39,9 @@ const MissingItem = ({ petMissingId, onClick, toggleModal }) => {
         <p>실종일자 : {missingPet.petMissingDate}</p>
       </div>
       <div className="ReportMove-btn">
-        <Button text={"제보하기"} type={"Square_ls"} onClick={onClick} />
+        {!myMissing && (
+          <Button text={"제보하기"} type={"Square_ls"} onClick={onClick} />
+        )}
       </div>
     </div>
   );

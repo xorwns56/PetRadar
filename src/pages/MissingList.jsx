@@ -8,9 +8,11 @@ import PetModalDetail from "../components/PetModalDetail";
 import { useNavigate } from "react-router-dom";
 import { useModal } from "../hooks/ModalContext";
 import { useMissingState } from "../contexts/MissingContext";
+import { useUserState } from "../contexts/UserContext";
 
 const MissingList = () => {
-  const [selectedId, setSelectedId] = useState(null);
+  const [selectedItem, setSelectedItem] = useState(null);
+  const userState = useUserState();
   const { toggleModal } = useModal();
   const nav = useNavigate();
   const [sortType, setSortType] = useState("latest");
@@ -71,12 +73,13 @@ const MissingList = () => {
               key={item.petMissingId}
               {...item}
               toggleModal={() => {
-                setSelectedId(item.petMissingId);
+                setSelectedItem(item);
                 toggleModal();
               }}
               onClick={() => {
                 nav(`/missingReport/${item.petMissingId}`);
               }}
+              myMissing={userState.currentUser === item.id}
             />
           ))}
         </div>
@@ -91,12 +94,13 @@ const MissingList = () => {
         </div>
       </div>
 
-      {selectedId !== null && (
+      {selectedItem && (
         <PetModalDetail
-          selectedId={selectedId}
+          selectedId={selectedItem.petMissingId}
           onClick={() => {
-            nav(`/missingReport/${selectedId}}`);
+            nav(`/missingReport/${selectedItem.petMissingId}}`);
           }}
+          myMissing={userState.currentUser === selectedItem.id}
         />
       )}
     </div>

@@ -3,6 +3,7 @@ import { useModal } from "../hooks/ModalContext";
 import { useMissingState } from "../contexts/MissingContext";
 import PetModalDetail from "../components/PetModalDetail";
 import { useNavigate } from "react-router-dom";
+import { useUserState } from "../contexts/UserContext";
 import "../style/MissingMap.css";
 
 const MissingMap = () => {
@@ -11,7 +12,7 @@ const MissingMap = () => {
   const containerRef = useRef(null); // 지도 컨테이너 DOM 참조
   const missingList = useMissingState(); // 실종 동물 리스트 상태
   const nav = useNavigate();
-
+  const userState = useUserState();
   const { isActive, toggleModal } = useModal(); // 모달 상태 및 토글 함수
   const [selectedPet, setSelectedPet] = useState(null); // 선택된 동물 정보
   const [mapLoaded, setMapLoaded] = useState(false); // 지도 로드 완료 여부
@@ -115,6 +116,7 @@ const MissingMap = () => {
         <PetModalDetail
           selectedId={selectedPet.petMissingId}
           onClick={() => nav(`/missingReport/${selectedPet.petMissingId}`)}
+          myMissing={userState.currentUser === selectedPet.id}
         />
       )}
     </>
