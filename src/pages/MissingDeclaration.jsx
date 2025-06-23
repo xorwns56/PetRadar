@@ -150,7 +150,7 @@ const MissingDeclaration = () => {
     <div className="MissingDeclaration">
       <Header leftChild={true} />{" "}
       <div className="MissingDeclaration-container inner">
-        <div className="menu-title">
+        <div className="PageTitle">
           <h3>실종 동물 신고</h3>
         </div>
         <div className="MissingDeclarationForms">
