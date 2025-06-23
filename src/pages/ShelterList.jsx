@@ -1,17 +1,15 @@
-
 import ShelterInfo from "../components/ShelterInfo";
 
-import '../style/ShelterList.css';
-import { useEffect, useRef, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import "../style/ShelterList.css";
+import { useEffect, useRef, useState } from "react";
+import { useNavigate } from "react-router-dom";
 
-import { useModal } from '../hooks/ModalContext';
-import ShelterModalDetail from '../components/ShelterModalDetail';
+import { useModal } from "../hooks/ModalContext";
+import ShelterModalDetail from "../components/ShelterModalDetail";
 
-import Map from '../components/Map';
-import useShelterData from '../api/ShelterData';
-import Header from '../components/Header';
-
+import Map from "../components/Map";
+import useShelterData from "../api/ShelterData";
+import Header from "../components/Header";
 
 const ShelterList = () => {
   const { animals, error } = useShelterData();
@@ -19,8 +17,10 @@ const ShelterList = () => {
   const mapRef = useRef(null);
 
   const navigate = useNavigate();
+  const { isActive, toggleModal } = useModal();
   const [selectedShelter, setSelectedShelter] = useState(null);
-  const { isActive, toggleModal } = useModal();  const [selectedAnimal, setSelectedAnimal] = useState(null);
+
+  const [selectedAnimal, setSelectedAnimal] = useState(null);
 
   const ShelterInfoClick = (shelter) => {
     setSelectedAnimal(shelter);
@@ -92,7 +92,11 @@ const ShelterList = () => {
 
         <div className="ShelterList-contents">
           {uniqueShelters.map((shelter, index) => (
-            <div key={index} className="shelter-card" onClick={() => ShelterInfoClick(shelter)}>
+            <div
+              key={index}
+              className="shelter-card"
+              onClick={() => ShelterInfoClick(shelter)}
+            >
               <img
                 src={shelter.THUMB_IMAGE_COURS || "/image-default.png"}
                 alt="썸네일"
@@ -108,7 +112,6 @@ const ShelterList = () => {
               </div>
               <div
                 className="ShelterAnimalList-btn"
-
                 onClick={(e) => {
                   e.stopPropagation(); //버튼 클릭 시 모달도 같이 열리는 걸 방지
                   handleItemClick(shelter);
