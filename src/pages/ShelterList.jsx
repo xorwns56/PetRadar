@@ -98,7 +98,7 @@ const ShelterList = () => {
               onClick={() => ShelterInfoClick(shelter)}
             >
               <img
-                src={shelter.THUMB_IMAGE_COURS || "/image-default.png"}
+                src={"/image-default.png"}
                 alt="썸네일"
                 className="shelter-thumb"
                 onError={(e) => {

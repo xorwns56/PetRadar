@@ -1,4 +1,5 @@
 import "../style/ModalDetail.css";
+import "../style/ShelterInfo.css";
 import Button from "../components/Button";
 
 const ShelterInfo = ({ shelter, onClose }) => {
@@ -9,6 +10,9 @@ const ShelterInfo = ({ shelter, onClose }) => {
       <div className="Modal-container" onClick={(e) => e.stopPropagation()}>
         <div className="Modal-contents">
           <div className="text-contents">
+            <div className="ShelterInfoIMG">
+              <img src="../public/image-default.png" />
+            </div>
             <div>
               <h3>보호소명:</h3>
               <p>{shelter.SHTER_NM}</p>
