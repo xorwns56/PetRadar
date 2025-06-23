@@ -106,10 +106,9 @@ const MissingMap = () => {
       <div id="missingMap" style={{ width: "100%", height: "350px" }}></div>
       {isActive && selectMissingPet && (
         <PetModalDetail
-
           selectedId={selectMissingPet.petMissingId}
           onClick={() => {
-            nav("/missingReport");
+            nav(`/missingReport/${selectMissingPet.petMissingId}`);
           }}
         />
       )}
