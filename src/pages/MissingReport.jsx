@@ -117,7 +117,7 @@ const MissingReport = () => {
               placeholder="상세한 설명을 적어주세요."
             />
           </div>
-          {/* 발견 장소 위치 Map 사용 : css 수정 필요 */}
+          
           <div className="MissingReportForm">
             <h3>발견 장소</h3>
             <LocationMap onSelect={onLocationSelect} />

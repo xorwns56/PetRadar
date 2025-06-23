@@ -1,16 +1,38 @@
 .custom-marker-wrappers {
+  position: relative;
   width: 60px;
   height: 60px;
   border-radius: 50%;
-  overflow: hidden;
-  border: 2px solid #ffa516;
-
+  /* overflow: hidden; */
+  border: 2px solid var(--bg-white-color);
   cursor: pointer;
-  transition: .35s; 
+  transition: 0.35s;
+  z-index: 10;
+}
+
+.custom-marker-wrappers::after {
+  content: '';
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  width: 100px;
+  height: 100px;
+  background-color: var(--main-color);
+  border-radius: 50%;
+  z-index: -1;
+  opacity: 0.1;
+  transition: 0.3s;
 }
 
 .custom-marker-wrappers:hover {
-  transform: scale(1.5); 
+  transform: scale(1.5);
+}
+
+.custom-marker-wrappers:hover::after {
+  width: 150px;
+  height: 150px;
+  opacity: 0.2;
 }
 
 .custom-marker-images {

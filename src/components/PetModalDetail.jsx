@@ -22,7 +22,7 @@ const ModalDetail = ({ selectedId, onClick }) => {
   return (
     <div className={`ModalDetail ${isActive ? "active" : ""}`}>
       <div className="Modal-container">
-        <div className="Modal-contents">
+        <div className="Modal-contents-pet">
           <div className="img-box">
             <img src={imageSrc} alt="missingPet img" />
           </div>

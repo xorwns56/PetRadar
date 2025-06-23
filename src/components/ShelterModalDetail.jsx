@@ -29,11 +29,11 @@ const ShelterModalDetail = ({ animal, onClose }) => {
               <h3>{animal.SHTER_NM}</h3>
             </div>
             <div>
-              <h3>보호소 위치</h3>
+              <h3>주소</h3>
               <p>{animal.PROTECT_PLC}</p>
             </div>
             <div>
-              <h3>보호소 전화번호</h3>
+              <h3>전화번호</h3>
               <p>{animal.SHTER_TELNO}</p>
             </div>
           </div>

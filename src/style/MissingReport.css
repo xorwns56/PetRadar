@@ -70,3 +70,8 @@
   transition: border 0.3s;
   border-radius: 5px;
 }
+
+#locationMap {
+  border: 1px solid var(--border-color);
+  border-radius: 5px;
+}

@@ -1,4 +1,4 @@
-/* 🐾 ShelterList 전체 높이 */
+/* ShelterList 전체 높이 */
 .ShelterList {
   height: 100vh;
 }
@@ -10,7 +10,7 @@
   height: 100%;
 }
 
-/* 🏷️ 페이지 제목 */
+/* 페이지 제목 */
 .ShelterList .PageTitle {
   text-align: center;
   margin: 30px;
@@ -20,7 +20,7 @@
   color: var(--title-color);
 }
 
-/* 🗺️ 지도 영역 */
+/* 지도 영역 */
 .ShelterList .Map-wrapper {
   height: 30%;
   min-height: 200px;
@@ -34,7 +34,7 @@
   border-color: var(--main-color);
 }
 
-/* 📋 보호소 리스트 영역 */
+/* 보호소 리스트 영역 */
 .ShelterList .ShelterList-contents {
   display: flex;
   flex-direction: column;
@@ -43,14 +43,14 @@
   height: 51%;
   padding-bottom: 30px;
   overflow-y: auto;
-  scrollbar-width: none; /* Firefox */
-  -ms-overflow-style: none; /* IE */
+  scrollbar-width: none; 
+  -ms-overflow-style: none; 
 }
 .ShelterList .ShelterList-contents::-webkit-scrollbar {
-  display: none; /* Chrome */
+  display: none; 
 }
 
-/* 🧾 보호소 카드 */
+/* 보호소 카드 */
 .shelter-card {
   position: relative;
   display: flex;
@@ -63,7 +63,7 @@
   cursor: pointer;
 }
 
-/* 🖼️ 보호소 썸네일 */
+/* 보호소 썸네일 */
 .shelter-thumb {
   width: 100px;
   height: 100px;
@@ -71,7 +71,7 @@
   border-radius: 5px;
 }
 
-/* 🔘 상세 이동 버튼 */
+/* 상세 이동 버튼 */
 .ShelterAnimalList-btn {
   position: absolute;
   right: 20px;
@@ -82,7 +82,7 @@
   color: var(--main-color);
 }
 
-/* ⏳ 로딩 화면 */
+/* 로딩 화면 */
 .load-wrapper {
   display: flex;
   flex-direction: column;

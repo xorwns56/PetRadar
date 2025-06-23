@@ -1,6 +1,6 @@
+import "../style/ListItem.css";
 import { useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
-import "../style/ListItem.css";
 
 const ShelterListSection = ({ shelters = [], selected }) => {
   const containerRef = useRef();
@@ -34,7 +34,6 @@ const ShelterListSection = ({ shelters = [], selected }) => {
               style={{
                 backgroundColor:
                   selected?.SHTER_ID === shelter.SHTER_ID ? "#f0f0f0" : "#fff",
-                cursor: "pointer",
                 padding: "30px",
                 borderBottom: "1px solid #ddd",
               }}
