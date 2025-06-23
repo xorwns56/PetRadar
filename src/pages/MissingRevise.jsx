@@ -157,7 +157,7 @@ const MissingRevise = () => {
     <div className="MissingRevise">
       <Header leftChild={true} />{" "}
       <div className="MissingRevise-container inner">
-        <div className="menu-title">
+        <div className="PageTitle">
           <h3>실종 동물 신고</h3>
         </div>
         <div className="MissingReviseForms">

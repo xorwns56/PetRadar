@@ -1,9 +1,9 @@
 .MissingRevise {
-  height: 100vh;
+  height: 100%;
 }
 
-/* menu-title */
-.MissingRevise .menu-title {
+/* PageTitle */
+.MissingRevise .PageTitle {
   text-align: center;
   margin-top: 30px;
   line-height: 1.5;
@@ -19,16 +19,13 @@
   display: flex;
   flex-direction: column;
   gap: 20px;
-  margin: 30px 20px 0 20px;
+  margin: 30px auto;
+  margin-bottom: 0;
   border-radius: 50px 50px 0 0;
-  border: 2px solid #f0eeeb;
-  width: 100%;
-  max-height: calc(100vh - 200px);
+  border: 2px solid var(--border-color);
+  width: 90%;
   padding: 40px;
-  overflow-y: auto;
-  scrollbar-width: none;
-  -ms-overflow-style: none;
-  background-color: #fff;
+  background-color: var(--bg-white-color);
 }
 
 .scroll-hidden::-webkit-scrollbar {

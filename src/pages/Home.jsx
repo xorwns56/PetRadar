@@ -13,7 +13,7 @@ const Home = () => {
       <Header rightChild={'로그인/회원가입'} />
       <div className="main-container inner">
         <div className="menu-titleBox">
-          <div className="menu-title">
+          <div className="PageTitle">
             <h2>
               길 잃은 아이를 <br /> 바로 신고해주세요.
             </h2>
