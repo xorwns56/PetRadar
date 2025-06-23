@@ -11,7 +11,7 @@ import { useMissingState } from "../contexts/MissingContext";
 import { useUserState } from "../contexts/UserContext";
 
 const MissingList = () => {
-  const [selectedId, setSelectedId] = useState(null);
+  const [selectedItem, setSelectedItem] = useState(null);
   const userState = useUserState();
   const { toggleModal } = useModal();
   const nav = useNavigate();
@@ -73,7 +73,7 @@ const MissingList = () => {
               key={item.petMissingId}
               {...item}
               toggleModal={() => {
-                setSelectedId(item.petMissingId);
+                setSelectedItem(item);
                 toggleModal();
               }}
               onClick={() => {
@@ -95,12 +95,13 @@ const MissingList = () => {
         </div>
       </div>
 
-      {selectedId !== null && (
+      {selectedItem && (
         <PetModalDetail
-          selectedId={selectedId}
+          selectedId={selectedItem.petMissingId}
           onClick={() => {
-            nav(`/missingReport/${selectedId}}`);
+            nav(`/missingReport/${selectedItem.petMissingId}}`);
           }}
+          myMissing={userState.currentUser === selectedItem.id}
         />
       )}
     </div>

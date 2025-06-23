@@ -4,7 +4,7 @@ import { getMissingImage } from "../utils/get-missingPet-image";
 import { useMissingState } from "../contexts/MissingContext";
 import Button from "./Button";
 
-const ModalDetail = ({ selectedId, onClick }) => {
+const ModalDetail = ({ selectedId, onClick, myMissing }) => {
   const { isActive, toggleModal } = useModal();
   const missingList = useMissingState();
 
@@ -47,7 +47,9 @@ const ModalDetail = ({ selectedId, onClick }) => {
             </div>
           </div>
           <div className="Report-btn">
-            <Button text={"제보하기"} type={"Square_D"} onClick={onClick} />
+            {!myMissing && (
+              <Button text={"제보하기"} type={"Square_D"} onClick={onClick} />
+            )}
           </div>
         </div>
         <div className="Modal-btn" onClick={toggleModal}>

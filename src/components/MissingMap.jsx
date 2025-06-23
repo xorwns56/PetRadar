@@ -3,13 +3,14 @@ import { useModal } from "../hooks/ModalContext";
 import { useMissingState } from "../contexts/MissingContext";
 import PetModalDetail from "../components/PetModalDetail";
 import { useNavigate } from "react-router-dom";
+import { useUserState } from "../contexts/UserContext";
 
 const MissingMap = () => {
   const missingMapRef = useRef(null);
   const missingList = useMissingState();
   const missingMarkerMap = useRef(new Map()); // 마커 추적용 map 객체 생성(실종 신고 id 기준)
   const nav = useNavigate();
-
+  const userState = useUserState();
   const { isActive, toggleModal } = useModal();
   const [selectMissingPet, setSelectMissingPet] = useState(null);
 
@@ -110,6 +111,7 @@ const MissingMap = () => {
           onClick={() => {
             nav(`/missingReport/${selectMissingPet.petMissingId}`);
           }}
+          myMissing={userState.currentUser === selectMissingPet.id}
         />
       )}
     </>
