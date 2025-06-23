@@ -1,6 +1,7 @@
 import Button from '../components/Button';
 import '../style/ModalDetail.css';
 
+
 const ShelterModalDetail = ({ animal, onClose }) => {
   if (!animal) return null;
 
