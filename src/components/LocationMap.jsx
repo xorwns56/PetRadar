@@ -14,7 +14,10 @@ const LocationMap = ({ onSelect }) => {
         const locationMapContainer = document.getElementById("locationMap");
 
         const options = {
-          center: new window.kakao.maps.LatLng(37.489996, 126.927081),
+          center: new window.kakao.maps.LatLng(
+            37.374659507684,
+            126.73570005568
+          ),
           level: 3,
         };
 
