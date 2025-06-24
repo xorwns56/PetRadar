@@ -18,6 +18,11 @@ const ModalDetail = ({ selectedId, onClick, myMissing }) => {
     M: "♂",
     F: "♀",
   };
+  const petTypeChange = {
+    dog: "강아지",
+    cat: "고양이",
+    etc: "기타 동물",
+  };
 
   return (
     <div className={`ModalDetail ${isActive ? "active" : ""}`}>
@@ -28,7 +33,9 @@ const ModalDetail = ({ selectedId, onClick, myMissing }) => {
           </div>
           <div className="text-contents">
             <div className="contents-t1">
-              <h3 className="petType">{missingPet.petType}</h3>
+              <h3 className="petType">
+                {petTypeChange[missingPet.petType] || "-"}
+              </h3>
               <h3>{genderSymbol[missingPet.petGender] || "-"}</h3>
               <h3>{missingPet.petName}</h3>
             </div>
