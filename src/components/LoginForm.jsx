@@ -1,18 +1,20 @@
-import { useState } from 'react';
-import '../style/LoginForm.css';
+import { useState } from "react";
+import "../style/LoginForm.css";
 const LoginForm = ({ onLoginCheck, onLoginSuccess }) => {
   const onSubmit = (event) => {
     event.preventDefault();
     if (!input.id) {
-      setErrMsg('아이디를 입력해주세요.');
+      setErrMsg("아이디를 입력해주세요.");
       return;
     }
     if (!input.pw) {
-      setErrMsg('비밀번호를 입력해주세요.');
+      setErrMsg("비밀번호를 입력해주세요.");
       return;
     }
     if (!onLoginCheck(input.id, input.pw)) {
-      setErrMsg('아이디 또는 비밀번호가 잘못 되었습니다. 아이디와 비밀번호를 정확히 입력해 주세요.');
+      setErrMsg(
+        "아이디 또는 비밀번호가 잘못 되었습니다. 아이디와 비밀번호를 정확히 입력해 주세요."
+      );
       return;
     }
     onLoginSuccess(input.id);
@@ -22,11 +24,11 @@ const LoginForm = ({ onLoginCheck, onLoginSuccess }) => {
     pw: false,
   });
   const [input, setInput] = useState({
-    id: '',
-    pw: '',
+    id: "",
+    pw: "",
   });
   const [pwHide, setPwHide] = useState(true);
-  const [errMsg, setErrMsg] = useState('');
+  const [errMsg, setErrMsg] = useState("");
   const onChangeInput = (event) => {
     setInput({
       ...input,
@@ -36,7 +38,7 @@ const LoginForm = ({ onLoginCheck, onLoginSuccess }) => {
   const onDeleteInput = (name) => {
     setInput({
       ...input,
-      [name]: '',
+      [name]: "",
     });
   };
   const onFocus = (event) => {
@@ -55,7 +57,11 @@ const LoginForm = ({ onLoginCheck, onLoginSuccess }) => {
   return (
     <div className="LoginForm">
       <form onSubmit={onSubmit} autoComplete="off">
-        <div className={`input_item id ${focus.id ? 'focus' : ''} ${input.id ? 'on' : ''}`}>
+        <div
+          className={`input_item id ${focus.id ? "focus" : ""} ${
+            input.id ? "on" : ""
+          }`}
+        >
           <input
             type="text"
             name="id"
@@ -70,18 +76,22 @@ const LoginForm = ({ onLoginCheck, onLoginSuccess }) => {
             {/* delete button */}
             <button
               type="button"
-              className={`btn_delete ${input.id ? '' : 'hide'}`}
+              className={`btn_delete ${input.id ? "" : "hide"}`}
               onClick={() => {
-                onDeleteInput('id');
+                onDeleteInput("id");
               }}
             >
               <img src="/deleteIcon.png" />
             </button>
           </div>
         </div>
-        <div className={`input_item pw ${focus.pw ? 'focus' : ''} ${input.pw ? 'on' : ''}`}>
+        <div
+          className={`input_item pw ${focus.pw ? "focus" : ""} ${
+            input.pw ? "on" : ""
+          }`}
+        >
           <input
-            type={pwHide ? 'password' : 'text'}
+            type={pwHide ? "password" : "text"}
             name="pw"
             id="user_pw"
             onChange={onChangeInput}
@@ -94,27 +104,30 @@ const LoginForm = ({ onLoginCheck, onLoginSuccess }) => {
             {/* view button */}
             <button
               type="button"
-              className={`btn_view ${input.pw ? '' : 'hide'}`}
+              className={`btn_view ${input.pw ? "" : "hide"}`}
               onClick={() => {
                 setPwHide(!pwHide);
               }}
             >
-              <img src={`/${pwHide ? 'close' : 'open'}EyeIcon.png`} />
+              <img src={`/${pwHide ? "close" : "open"}EyeIcon.png`} />
             </button>
             {/* delete button */}
             <button
               type="button"
-              className={`btn_delete ${input.pw ? '' : 'hide'}`}
+              className={`btn_delete ${input.pw ? "" : "hide"}`}
               onClick={() => {
-                onDeleteInput('pw');
+                onDeleteInput("pw");
               }}
             >
               <img src="/deleteIcon.png" />
             </button>
           </div>
         </div>
-        <div className={`error_message ${errMsg ? '' : 'hide'}`}>{errMsg}</div>
-        <button type="submit" className={`btn_login ${input.id && input.pw ? 'on' : ''}`}>
+        <div className={`error_message ${errMsg ? "" : "hide"}`}>{errMsg}</div>
+        <button
+          type="submit"
+          className={`btn_login ${input.id && input.pw ? "on" : ""}`}
+        >
           로그인
         </button>
       </form>
