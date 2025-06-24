@@ -70,16 +70,26 @@ const MissingMap = () => {
         petMissingPoint.lng
       );
 
-      // 커스텀 마커용 div 생성
+      // 최상위 래퍼
+      const outerWrapper = document.createElement("div");
+      outerWrapper.className = "custom-marker-outer-wrapper";
+
+      // 중간 래퍼
       const wrapper = document.createElement("div");
       wrapper.className = "custom-marker-wrappers";
 
-      // 마커에 표시할 이미지 생성
+      // 이미지 래퍼
+      const imgWrapper = document.createElement("div");
+      imgWrapper.className = "custom-marker-img-wrapper";
+
       const img = document.createElement("img");
       img.className = "custom-marker-images";
-      img.src = petImage || "/image-default.png"; // 이미지 없으면 기본 이미지
+      img.src = petImage || "/image-default.png";
       img.alt = "missing";
-      wrapper.appendChild(img);
+
+      imgWrapper.appendChild(img);
+      wrapper.appendChild(imgWrapper);
+      outerWrapper.appendChild(wrapper);
 
       // 마커 클릭 이벤트 등록
       wrapper.addEventListener("click", () => {
@@ -97,7 +107,7 @@ const MissingMap = () => {
       // 커스텀 오버레이(마커) 생성
       const overlay = new window.kakao.maps.CustomOverlay({
         position,
-        content: wrapper,
+        content: outerWrapper,
         yAnchor: 1,
       });
 
