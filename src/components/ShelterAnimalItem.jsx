@@ -1,20 +1,31 @@
-import '../style/ShelterAnimalItem.css';
+import "../style/ShelterAnimalItem.css";
 
-const ShelterAnimalItem = ({ petId, petType, petAge, petColor,petMissingDate, imageUrl, onClick }) => {
+const ShelterAnimalItem = ({
+  petId,
+  petType,
+  petAge,
+  petColor,
+  petMissingDate,
+  imageUrl,
+  onClick,
+}) => {
   //실종일자 (-)추가
   const formatDate = (dateStr) => {
     if (!dateStr || dateStr.length !== 8) return dateStr;
-    return `${dateStr.slice(0, 4)}-${dateStr.slice(4, 6)}-${dateStr.slice(6, 8)}`;
+    return `${dateStr.slice(0, 4)}-${dateStr.slice(4, 6)}-${dateStr.slice(
+      6,
+      8
+    )}`;
   };
 
   return (
     <div className="ShelterAnimalItem" onClick={onClick}>
       <div className="ShelterAnimalItem-img">
         <img
-          src={imageUrl || '/image-default.png'}
+          src={imageUrl || "/image-default.png"}
           alt="유기동물"
           onError={(e) => {
-            e.target.src = '/image-default.png';
+            e.target.src = "/image-default.png";
           }}
         />
       </div>
@@ -29,7 +40,7 @@ const ShelterAnimalItem = ({ petId, petType, petAge, petColor,petMissingDate, im
           <p>나이 : {petAge}</p>
         </div>
         <div>
-          <p>실종일자 : {formatDate(petMissingDate)}</p>
+          <p>입소일자 : {formatDate(petMissingDate)}</p>
         </div>
       </div>
     </div>

@@ -52,7 +52,7 @@ const MissingList = () => {
       <Header leftChild={true} />
       <div className="MissingList-conatiner inner">
         <div className="PageTitle">
-          <h3>실종동물 목록</h3>
+          <h3>실종 동물 목록</h3>
         </div>
         {/* search-box */}
         <div className="search-box">
