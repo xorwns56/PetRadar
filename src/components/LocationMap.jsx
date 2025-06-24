@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 
-const LocationMap = ({ onSelect }) => {
+const LocationMap = ({ onSelect, initPoint }) => {
   const [location, setLocation] = useState(null);
   const markerRef = useRef(null);
 
@@ -13,16 +13,33 @@ const LocationMap = ({ onSelect }) => {
       window.kakao.maps.load(() => {
         const locationMapContainer = document.getElementById("locationMap");
 
+        const center = initPoint
+          ? new window.kakao.maps.LatLng(initPoint.lat, initPoint.lng)
+          : new window.kakao.maps.LatLng(37.374659507684, 126.73570005568);
+
         const options = {
-          center: new window.kakao.maps.LatLng(
-            37.374659507684,
-            126.73570005568
-          ),
+          center,
           level: 3,
         };
 
         const map = new window.kakao.maps.Map(locationMapContainer, options);
         setLocation(map);
+
+        // 이미지 마커 설정
+        const markerImage = new window.kakao.maps.MarkerImage(
+          "/orangeMarker.png", // <-- 여기에 마커로 쓸 이미지 경로
+          new window.kakao.maps.Size(40, 40), // 마커 크기
+          { offset: new window.kakao.maps.Point(20, 40) } // 기준점 위치
+        );
+
+        if (initPoint) {
+          const initMarker = new window.kakao.maps.Marker({
+            position: center,
+            image: markerImage,
+          });
+          initMarker.setMap(map);
+          markerRef.current = initMarker;
+        }
 
         window.kakao.maps.event.addListener(
           map,
@@ -33,13 +50,6 @@ const LocationMap = ({ onSelect }) => {
             if (markerRef.current) {
               markerRef.current.setMap(null);
             }
-
-            // 이미지 마커 설정
-            const markerImage = new window.kakao.maps.MarkerImage(
-              "/orangeMarker.png", // <-- 여기에 마커로 쓸 이미지 경로
-              new window.kakao.maps.Size(40, 40), // 마커 크기
-              { offset: new window.kakao.maps.Point(20, 40) } // 기준점 위치
-            );
 
             const newMarker = new window.kakao.maps.Marker({
               position: clickedLocation,
@@ -61,7 +71,7 @@ const LocationMap = ({ onSelect }) => {
     };
 
     document.head.appendChild(script);
-  }, []);
+  }, [initPoint]);
 
   return (
     <div id="locationMap" style={{ width: "100%", height: "350px" }}></div>

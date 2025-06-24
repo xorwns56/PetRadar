@@ -32,17 +32,23 @@ const MissingList = () => {
   };
   const sortedData = getSortedData();
 
-  const [search, setSearch] = useState("");
-  const onChangeSearch = (e) => {
-    setSearch(e.target.value);
+  const [searchInput, setSearchInput] = useState("");
+  const [searchBtn, setSearchBtn] = useState("");
+
+  const onChangeInput = (e) => {
+    setSearchInput(e.target.value);
   };
+  const onClickChange = () => {
+    setSearchBtn(searchInput);
+  };
+
   const getFilterTitle = () => {
-    if (search === "") {
+    if (searchInput === "") {
       return sortedData;
     }
 
     return sortedData.filter((item) =>
-      item.title?.toLowerCase().includes(search.toLowerCase())
+      item.title?.toLowerCase().includes(searchBtn.toLowerCase())
     );
   };
   const getFilterTitleData = getFilterTitle();
@@ -61,11 +67,16 @@ const MissingList = () => {
             <option value={"oldest"}>오래된 순</option>
           </select>
           <input
-            value={search}
-            onChange={onChangeSearch}
+            value={searchInput}
+            onChange={onChangeInput}
+            // onKeyDown={(e) => {
+            //   if (e.key === "Enter") {
+            //     onClickChange();
+            //   }
+            // }}
             placeholder="검색할 제목을 입력하세요."
           />
-          <Button text={"조회"} type={"Square"} />
+          <Button text={"조회"} type={"Square"} onClick={onClickChange} />
         </div>
         {/* "MissingItems */}
         <div className="MissingItems">
