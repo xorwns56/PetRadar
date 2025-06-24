@@ -1,13 +1,16 @@
-import '../style/MyPost.css';
-import { useEffect, useRef, useState } from 'react';
-import Pagination from './Pagination';
-import MypageModalDetail from './MypageModalDetail';
-import { useModal } from '../hooks/ModalContext';
-import MyPostReportItem from './MyPostReportItem';
-import MyPostMissingItem from './MyPostMissingItem';
-import { useMissingDispatch, useMissingState } from '../contexts/MissingContext';
-import { useReportDispatch, useReportState } from '../contexts/ReportContext';
-import { useNavigate } from 'react-router-dom';
+import "../style/MyPost.css";
+import { useEffect, useRef, useState } from "react";
+import Pagination from "./Pagination";
+import MypageModalDetail from "./MypageModalDetail";
+import { useModal } from "../hooks/ModalContext";
+import MyPostReportItem from "./MyPostReportItem";
+import MyPostMissingItem from "./MyPostMissingItem";
+import {
+  useMissingDispatch,
+  useMissingState,
+} from "../contexts/MissingContext";
+import { useReportDispatch, useReportState } from "../contexts/ReportContext";
+import { useNavigate } from "react-router-dom";
 
 const slice = (items, page, itemSize) => {
   const end = page * itemSize;
@@ -29,7 +32,9 @@ const MyPost = ({ id }) => {
     .toSorted((prev, next) => {
       return next.createDate - prev.createDate;
     });
-  const [petMissingItem, setPetMissingItem] = useState(myMissing.length > 0 ? myMissing[0] : null);
+  const [petMissingItem, setPetMissingItem] = useState(
+    myMissing.length > 0 ? myMissing[0] : null
+  );
   useEffect(() => {
     if (isActive) toggleModal();
   }, []);
@@ -41,7 +46,10 @@ const MyPost = ({ id }) => {
   }, [petMissingItem]);
   const missingReport = reportState
     .filter((item) => {
-      return petMissingItem && String(item.petMissingId) === String(petMissingItem.petMissingId);
+      return (
+        petMissingItem &&
+        String(item.petMissingId) === String(petMissingItem.petMissingId)
+      );
     })
     .toSorted((prev, next) => {
       return next.createDate - prev.createDate;
@@ -57,6 +65,9 @@ const MyPost = ({ id }) => {
         <h3>나의 실종신고</h3>
       </div>
       <div className="post-content">
+        <div className="none-text">
+          <p>현재 실종신고가 존재하지 않습니다.</p>
+        </div>
         {petMissingItem && (
           <>
             <div className="missing">
@@ -88,13 +99,17 @@ const MyPost = ({ id }) => {
                 <span>|</span>
                 <p
                   onClick={() => {
-                    if (confirm(`${petMissingItem.petName}의 실종신고를 정말 삭제하시겠습니까?`)) {
+                    if (
+                      confirm(
+                        `${petMissingItem.petName}의 실종신고를 정말 삭제하시겠습니까?`
+                      )
+                    ) {
                       missingDispatch({
-                        type: 'DELETE',
+                        type: "DELETE",
                         data: { petMissingId: petMissingItem.petMissingId },
                       });
                       reportDispatch({
-                        type: 'DELETE_BY_MISSING',
+                        type: "DELETE_BY_MISSING",
                         data: { petMissingId: petMissingItem.petMissingId },
                       });
                       setPetMissingItem(null);
@@ -121,7 +136,12 @@ const MyPost = ({ id }) => {
                 );
               })}
             </div>
-            <Pagination totalItems={missingReport.length} page={page} onClick={onPageClick} itemSize={itemSize} />
+            <Pagination
+              totalItems={missingReport.length}
+              page={page}
+              onClick={onPageClick}
+              itemSize={itemSize}
+            />
           </>
         )}
       </div>

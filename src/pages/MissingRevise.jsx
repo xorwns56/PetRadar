@@ -283,16 +283,20 @@ const MissingRevise = () => {
             />
           </div>
           <div className="MissingRevise-btn">
-            <Button
-              onClick={onSubmitButtonClick}
-              text={"수정하기"}
-              type={"Square_lg"}
-            ></Button>
-            <Button
-              onClick={onCancellation}
-              text={"취소하기"}
-              // type={"Square_lg"}
-            ></Button>
+            <div>
+              <Button
+                onClick={onCancellation}
+                text={"취소하기"}
+                type={"Square_lc"}
+              ></Button>
+            </div>
+            <div>
+              <Button
+                onClick={onSubmitButtonClick}
+                text={"수정하기"}
+                type={"Square_lg"}
+              ></Button>
+            </div>
           </div>
         </div>
       </div>

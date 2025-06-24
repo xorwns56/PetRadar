@@ -31,7 +31,7 @@ const MissingMap = () => {
           center: new window.kakao.maps.LatLng(
             37.374659507684,
             126.73570005568
-          ), // 초기 중심 좌표(한정교)
+          ), // 초기 중심 좌표(배곧)
           level: 3, // 초기 줌 레벨
         });
         mapRef.current = map; // 지도 객체 저장

@@ -73,3 +73,11 @@
   transition: border 0.3s;
   border-radius: 5px;
 }
+
+.MissingRevise-btn {
+  display: flex;
+}
+
+.MissingRevise-btn>div {
+  width: 50%;
+}

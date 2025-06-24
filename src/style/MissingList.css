@@ -49,13 +49,14 @@
   height: calc(100vh - 400px);
   display: flex;
   flex-direction: column;
-  gap: 20px;
+  gap: 10px;
   border: 2px solid var(--border-color);
   padding: 10px;
   border-radius: 10px;
   overflow-y: auto;
   scrollbar-width: none;
   -ms-overflow-style: none;
+  background-color: var(--bg-white-color);
 }
 
 .scroll-hidden::-webkit-scrollbar {
