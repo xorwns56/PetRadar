@@ -1,4 +1,4 @@
-import { createContext, useReducer, useContext } from "react";
+import { createContext, useReducer, useContext, useEffect } from "react";
 function reducer(state, action) {
   let nextState;
   if (action.type === "CREATE") {
@@ -33,6 +33,8 @@ function reducer(state, action) {
       (item) =>
         item.petMissingUser !== action.data.id && item.id !== action.data.id
     );
+  } else if (action.type === "STORAGE") {
+    nextState = action.data ? JSON.parse(action.data) : [];
   } else {
     throw new Error(`Unhandled action type: ${action.type}`);
   }
@@ -47,6 +49,15 @@ export const ReportProvider = ({ children }) => {
     reducer,
     stored ? JSON.parse(stored) : []
   );
+  useEffect(() => {
+    const onStorage = (e) => {
+      if (e.key === "report") {
+        dispatch({ type: "STORAGE", data: e.newValue });
+      }
+    };
+    window.addEventListener("storage", onStorage);
+    return () => window.removeEventListener("storage", onStorage);
+  }, []);
   return (
     <ReportStateContext.Provider value={state}>
       <ReportDispatchContext.Provider value={dispatch}>

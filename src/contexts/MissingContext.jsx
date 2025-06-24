@@ -27,6 +27,8 @@ function reducer(state, action) {
     );
   } else if (action.type === "DELETE_USER_DATA") {
     nextState = state.filter((item) => item.id !== action.data.id);
+  } else if (action.type === "STORAGE") {
+    nextState = action.data ? JSON.parse(action.data) : [];
   } else {
     throw new Error(`Unhandled action type: ${action.type}`);
   }
@@ -44,8 +46,7 @@ export const MissingProvider = ({ children }) => {
   useEffect(() => {
     const onStorage = (e) => {
       if (e.key === "missing") {
-        //const storage = e.newValue ? JSON.parse(e.newValue) : [];
-        console.log(e.newValue);
+        dispatch({ type: "STORAGE", data: e.newValue });
       }
     };
     window.addEventListener("storage", onStorage);
