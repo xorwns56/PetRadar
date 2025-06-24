@@ -28,32 +28,44 @@ const LocationMap = ({ onSelect }) => {
           map,
           "click",
           function (mouseEvent) {
-            const location = mouseEvent.latLng;
+            const clickedLocation = mouseEvent.latLng;
 
             if (markerRef.current) {
               markerRef.current.setMap(null);
             }
 
+            // 이미지 마커 설정
+            const markerImage = new window.kakao.maps.MarkerImage(
+              "/orangeMarker.png", // <-- 여기에 마커로 쓸 이미지 경로
+              new window.kakao.maps.Size(40, 40), // 마커 크기
+              { offset: new window.kakao.maps.Point(20, 40) } // 기준점 위치
+            );
+
             const newMarker = new window.kakao.maps.Marker({
-              position: location,
+              position: clickedLocation,
+              image: markerImage,
             });
+
             newMarker.setMap(map);
             markerRef.current = newMarker;
 
             if (onSelect) {
               onSelect({
-                lat: location.getLat(),
-                lng: location.getLng(),
+                lat: clickedLocation.getLat(),
+                lng: clickedLocation.getLng(),
               });
             }
           }
         );
       });
     };
+
     document.head.appendChild(script);
   }, []);
+
   return (
     <div id="locationMap" style={{ width: "100%", height: "350px" }}></div>
   );
 };
+
 export default LocationMap;
