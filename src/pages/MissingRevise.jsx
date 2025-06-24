@@ -249,8 +249,8 @@ const MissingRevise = () => {
           <div className="MissingReviseForm">
             <h4>실종장소</h4>
             <LocationMap
+              init={form.petMissingPoint}
               onSelect={onLocationSelect}
-              initPoint={form.petMissingPoint}
             />
           </div>
           <div className="MissingReviseForm">

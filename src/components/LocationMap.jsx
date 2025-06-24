@@ -1,8 +1,37 @@
 import { useEffect, useRef, useState } from "react";
 
-const LocationMap = ({ onSelect, initPoint }) => {
+const LocationMap = ({ init, onSelect }) => {
+
   const [location, setLocation] = useState(null);
   const markerRef = useRef(null);
+  const isInit = useRef(false);
+
+  const handleMapClick = (map, latlng) => {
+    if (markerRef.current) {
+      markerRef.current.setMap(null);
+    }
+
+    const markerImage = new window.kakao.maps.MarkerImage(
+      "/orangeMarker.png",
+      new window.kakao.maps.Size(40, 40),
+      { offset: new window.kakao.maps.Point(20, 40) }
+    );
+
+    const newMarker = new window.kakao.maps.Marker({
+      position: latlng,
+      image: markerImage,
+    });
+
+    newMarker.setMap(map);
+    markerRef.current = newMarker;
+
+    if (onSelect) {
+      onSelect({
+        lat: latlng.getLat(),
+        lng: latlng.getLng(),
+      });
+    }
+  };
 
   useEffect(() => {
     const script = document.createElement("script");
@@ -46,32 +75,24 @@ const LocationMap = ({ onSelect, initPoint }) => {
           "click",
           function (mouseEvent) {
             const clickedLocation = mouseEvent.latLng;
-
-            if (markerRef.current) {
-              markerRef.current.setMap(null);
-            }
-
-            const newMarker = new window.kakao.maps.Marker({
-              position: clickedLocation,
-              image: markerImage,
-            });
-
-            newMarker.setMap(map);
-            markerRef.current = newMarker;
-
-            if (onSelect) {
-              onSelect({
-                lat: clickedLocation.getLat(),
-                lng: clickedLocation.getLng(),
-              });
-            }
+            handleMapClick(map, clickedLocation);
           }
         );
       });
     };
-
     document.head.appendChild(script);
   }, [initPoint]);
+
+  useEffect(() => {
+    if (!isInit.current && init && location) {
+      handleMapClick(
+        location,
+        new window.kakao.maps.LatLng(init.lat, init.lng)
+      );
+      isInit.current = true;
+      location.setCenter(new window.kakao.maps.LatLng(init.lat, init.lng));
+    }
+  }, [init, location]);
 
   return (
     <div id="locationMap" style={{ width: "100%", height: "350px" }}></div>
