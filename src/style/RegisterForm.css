@@ -27,7 +27,7 @@
   border-radius: 0 0 8px 8px;
 }
 
-.RegisterForm .input_item > label {
+.RegisterForm .input_item>label {
   position: absolute;
   left: auto;
   top: auto;
@@ -50,8 +50,8 @@
   z-index: 99;
 }
 
-.RegisterForm .input_item.on > label,
-.RegisterForm .input_item.focus > label {
+.RegisterForm .input_item.on>label,
+.RegisterForm .input_item.focus>label {
   top: 3px;
   font-size: var(--font-caption);
 }
@@ -63,7 +63,7 @@
   background: none;
 }
 
-.RegisterForm .btn_view > img {
+.RegisterForm .btn_view>img {
   width: 100%;
   object-fit: cover;
 }
@@ -85,6 +85,7 @@
 
 .RegisterForm .btn_login.on {
   background-color: var(--main-color);
+  color: var(--text-white);
 }
 
 .RegisterForm .error_message {
@@ -92,5 +93,5 @@
   color: var(--err-color);
   font-weight: 600;
   text-align: left;
-  padding: 10px 5px;
+  padding: 5px;
 }
