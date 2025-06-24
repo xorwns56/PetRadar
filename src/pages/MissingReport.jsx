@@ -4,7 +4,6 @@ import Button from "../components/Button";
 
 import LocationMap from "../components/LocationMap";
 import { useReportDispatch } from "../contexts/ReportContext";
-
 import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { useUserState } from "../contexts/UserContext";
@@ -16,17 +15,18 @@ const MissingReport = () => {
   const nav = useNavigate();
   const params = useParams();
   const missingState = useMissingState();
-
+  const [currMissing, setCurrMissing] = useState({});
   useEffect(() => {
-    if (
-      !missingState.some(
-        (item) => String(item.petMissingId) === String(params.petMissingId)
-      )
-    ) {
+    const missing = missingState.find(
+      (item) => String(item.petMissingId) === String(params.petMissingId)
+    );
+    if (!missing) {
       alert("해당 게시글이 없어 제보할 수 없습니다.");
       nav("/missingList", { replace: true });
+      return;
     }
-  }, [params.id]);
+    setCurrMissing(missing);
+  }, [params.petMissingId]);
 
   const [form, setForm] = useState({
     title: "",
@@ -42,7 +42,8 @@ const MissingReport = () => {
       data: {
         ...form,
         id: userState.currentUser,
-        petMissingId: params.petMissingId,
+        petMissingUser: currMissing.id,
+        petMissingId: currMissing.petMissingId,
       },
     });
   };
@@ -58,7 +59,6 @@ const MissingReport = () => {
       if (!files[0]) return;
       const reader = new FileReader();
       reader.onloadend = () => {
-        console.log(reader.result);
         setForm((prev) => ({
           ...prev,
           [name]: reader.result,
@@ -117,7 +117,7 @@ const MissingReport = () => {
               placeholder="상세한 설명을 적어주세요."
             />
           </div>
-          
+
           <div className="MissingReportForm">
             <h3>발견 장소</h3>
             <LocationMap onSelect={onLocationSelect} />

@@ -8,6 +8,9 @@ const Header = ({ leftChild }) => {
   const location = useLocation();
   const nav = useNavigate();
   const userState = useUserState();
+  const userInfo = userState.users.find(
+    (user) => user.id === userState.currentUser
+  );
   return (
     <header className="Header">
       <div className="header_left">
@@ -39,10 +42,13 @@ const Header = ({ leftChild }) => {
         >
           {userState.currentUser ? "마이페이지" : "로그인/회원가입"}
         </p>
-        <p className="Msg-bell" onClick={toggleSidebar}>
-          {/* 알림 갯수 표시 */}
-          <span className="Msg-cnt">3</span>
-        </p>
+        {userState.currentUser && (
+          <p className="Msg-bell" onClick={toggleSidebar}>
+            {userInfo && userInfo.alerts && (
+              <span className="Msg-cnt">{userInfo.alerts.length}</span>
+            )}
+          </p>
+        )}
       </div>
     </header>
   );

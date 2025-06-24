@@ -21,6 +21,7 @@ const MissingList = () => {
   };
   const missingState = useMissingState();
   const getSortedData = () => {
+    console.log("a");
     return missingState.toSorted((prev, next) => {
       if (sortType === "oldest") {
         return prev.createDate - next.createDate;
