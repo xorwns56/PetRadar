@@ -248,7 +248,10 @@ const MissingRevise = () => {
           </div>
           <div className="MissingReviseForm">
             <h4>실종장소</h4>
-            <LocationMap onSelect={onLocationSelect} />
+            <LocationMap
+              onSelect={onLocationSelect}
+              initPoint={form.petMissingPoint}
+            />
           </div>
           <div className="MissingReviseForm">
             <label htmlFor="imageUpload">사진첨부</label>
