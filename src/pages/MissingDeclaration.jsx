@@ -57,30 +57,13 @@ const MissingDeclaration = () => {
     (_, i) => currentYear - i
   );
 
-  const isForm = () => {
-    return (
-      form.petName &&
-      form.petType &&
-      form.petGender &&
-      form.petBreed &&
-      form.petAge &&
-      form.petMissingDate &&
-      form.petMissingPoint &&
-      form.title &&
-      form.content
-    );
-  };
-
   const formKeys = [
     "petName",
     "petType",
     "petGender",
-    // "petBreed",
     "petAge",
     "petMissingDate",
-    "petMissingPlace",
     "petMissingPoint",
-    "petImage",
     "title",
     "content",
   ];
@@ -89,9 +72,9 @@ const MissingDeclaration = () => {
     petName: "반려동물 이름",
     petType: "종류",
     petGender: "성별",
-    // petBreed: "품종",
     petAge: "출생년도",
     petMissingDate: "실종일자",
+    petMissingPoint: "실종위치",
     title: "제목",
     content: "내용",
   };
