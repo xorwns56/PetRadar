@@ -41,6 +41,7 @@
   overflow-y: auto;
   scrollbar-width: none;
   -ms-overflow-style: none;
+  background-color: var(--bg-white-color);
 }
 
 /* 스크롤 제거 (Chrome) */
