@@ -38,6 +38,16 @@
   height: 50px;
 }
 
+.Button_Square_lc {
+  width: 100%;
+  padding: 10px 20px;
+  border-radius: 5px;
+  height: 50px;
+  background-color: var(--bg-white-color);
+
+  color: var(--title-color);
+}
+
 .Button_Square_D {
   width: 100%;
   height: 50px;
