@@ -9,6 +9,7 @@ import {
   useMissingState,
 } from "../contexts/MissingContext";
 import { useUserState } from "../contexts/UserContext";
+import useFormFocus from "../hooks/useFormFocus";
 import LocationMap from "../components/LocationMap";
 
 const MissingDeclaration = () => {
@@ -37,6 +38,7 @@ const MissingDeclaration = () => {
     title: "",
     content: "",
   });
+
   const onCreate = () => {
     dispatch({
       type: "CREATE",
@@ -69,9 +71,35 @@ const MissingDeclaration = () => {
     );
   };
 
+  const formKeys = [
+    "petName",
+    "petType",
+    "petGender",
+    // "petBreed",
+    "petAge",
+    "petMissingDate",
+    "petMissingPlace",
+    "petMissingPoint",
+    "petImage",
+    "title",
+    "content",
+  ];
+
+  const formKeysLabel = {
+    petName: "반려동물 이름",
+    petType: "종류",
+    petGender: "성별",
+    // petBreed: "품종",
+    petAge: "출생년도",
+    petMissingDate: "실종일자",
+    title: "제목",
+    content: "내용",
+  };
+
+  const { handleRef, checkInput } = useFormFocus(form, formKeys, formKeysLabel);
+
   const onSubmitButtonClick = () => {
-    if (!isForm()) {
-      alert("모든 항목을 입력해주세요");
+    if (!checkInput()) {
       return;
     }
     onCreate();
@@ -155,6 +183,7 @@ const MissingDeclaration = () => {
             <h4>반려동물 이름</h4>
             <input
               name="petName"
+              ref={handleRef("petName")}
               value={form.petName}
               onChange={handleChange}
               placeholder="이름"
@@ -162,7 +191,12 @@ const MissingDeclaration = () => {
           </div>
           <div className="MissingDeclarationForm">
             <h4>종류</h4>
-            <select name="petType" value={form.petType} onChange={handleChange}>
+            <select
+              name="petType"
+              ref={handleRef("petType")}
+              value={form.petType}
+              onChange={handleChange}
+            >
               <option value="">아래에서 선택해주세요</option>
               <option value={"dog"}>강아지</option>
               <option value={"cat"}>고양이</option>
@@ -173,6 +207,7 @@ const MissingDeclaration = () => {
             <h4>성별</h4>
             <select
               name="petGender"
+              ref={handleRef("petGender")}
               value={form.petGender}
               onChange={handleChange}
             >
@@ -187,7 +222,12 @@ const MissingDeclaration = () => {
           </div>
           <div className="MissingDeclarationForm">
             <h4>출생년도</h4>
-            <select name="petAge" value={form.petAge} onChange={handleChange}>
+            <select
+              name="petAge"
+              ref={handleRef("petAge")}
+              value={form.petAge}
+              onChange={handleChange}
+            >
               <option value="">출생년도를 선택해주세요</option>
               {yearOption.map((year) => (
                 <option key={year} value={year}>
@@ -200,6 +240,7 @@ const MissingDeclaration = () => {
             <h4>실종일자</h4>
             <input
               name="petMissingDate"
+              ref={handleRef("petMissingDate")}
               value={form.petMissingDate}
               onChange={handleChange}
               type="date"
@@ -222,12 +263,18 @@ const MissingDeclaration = () => {
           </div>
           <div className="MissingDeclarationForm">
             <h4>제목</h4>
-            <input name="title" value={form.title} onChange={handleChange} />
+            <input
+              name="title"
+              ref={handleRef("title")}
+              value={form.title}
+              onChange={handleChange}
+            />
           </div>
           <div className="MissingDeclarationForm">
             <h4>내용</h4>
             <textarea
               name="content"
+              ref={handleRef("content")}
               value={form.content}
               onChange={handleChange}
               placeholder="상세한 설명을 적어주세요."
