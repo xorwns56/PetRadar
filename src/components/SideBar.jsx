@@ -86,6 +86,7 @@ const SideBar = () => {
             <ReportAlertBox
               key={`${alert.postType}_${alert.postId}`}
               {...alert}
+              currentUser={userState.currentUser}
               onAlertClick={() => nav("/myPage")}
               onAlertClose={() => onAlertClose(alert)}
             />

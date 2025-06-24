@@ -1,28 +1,31 @@
-import { Link, useNavigate } from 'react-router-dom';
-import '../style/Login.css';
-import LoginForm from '../components/LoginForm';
-import { useUserDispatch, useUserState } from '../contexts/UserContext';
-import { useEffect } from 'react';
+import { Link, useNavigate } from "react-router-dom";
+import "../style/Login.css";
+import LoginForm from "../components/LoginForm";
+import { useUserDispatch, useUserState } from "../contexts/UserContext";
+import { useEffect } from "react";
 const Login = () => {
   const nav = useNavigate();
   const userState = useUserState();
   const userDispatch = useUserDispatch();
   useEffect(() => {
     if (userState.currentUser) {
-      nav('/', { replace: true });
+      nav("/", { replace: true });
     }
   }, [userState.currentUser, nav]);
+  const isExist = (id) => {
+    return userState.users.some((user) => user.id === id);
+  };
   const onLoginCheck = (id, pw) => {
     return userState.users.some((user) => user.id === id && user.pw === pw);
   };
   const onLoginSuccess = (id) => {
     userDispatch({
-      type: 'LOGIN',
+      type: "LOGIN",
       data: {
         id,
       },
     });
-    nav('/', { replace: true });
+    nav("/", { replace: true });
   };
   return (
     <>
@@ -34,7 +37,11 @@ const Login = () => {
             </Link>
           </div>
           <div className="Login-contents">
-            <LoginForm onLoginCheck={onLoginCheck} onLoginSuccess={onLoginSuccess} />
+            <LoginForm
+              isExist={isExist}
+              onLoginCheck={onLoginCheck}
+              onLoginSuccess={onLoginSuccess}
+            />
             <div className="register-btn">
               <Link className="register" to="/register">
                 회원가입 →
@@ -46,9 +53,9 @@ const Login = () => {
           </div>
         </div>
         <div className="bg-icons">
-          <img className='bg-icon bg-icon1'  src="/bg-icon.png" alt="bg-icon1" />
-          <img className='bg-icon bg-icon2'  src="/bg-icon.png" alt="bg-icon1" />
-          <img className='bg-icon bg-icon3'  src="/bg-icon.png" alt="bg-icon1" />
+          <img className="bg-icon bg-icon1" src="/bg-icon.png" alt="bg-icon1" />
+          <img className="bg-icon bg-icon2" src="/bg-icon.png" alt="bg-icon1" />
+          <img className="bg-icon bg-icon3" src="/bg-icon.png" alt="bg-icon1" />
         </div>
       </div>
     </>

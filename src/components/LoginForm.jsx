@@ -1,10 +1,14 @@
 import { useState } from "react";
 import "../style/LoginForm.css";
-const LoginForm = ({ onLoginCheck, onLoginSuccess }) => {
+const LoginForm = ({ isExist, onLoginCheck, onLoginSuccess }) => {
   const onSubmit = (event) => {
     event.preventDefault();
     if (!input.id) {
       setErrMsg("아이디를 입력해주세요.");
+      return;
+    }
+    if (!isExist(input.id)) {
+      setErrMsg("없는 회원입니다.");
       return;
     }
     if (!input.pw) {
@@ -73,9 +77,9 @@ const LoginForm = ({ onLoginCheck, onLoginSuccess }) => {
           />
           <label htmlFor="login_id">아이디</label>
           <div className="loginIcon-box">
-            {/* delete button */}
             <button
               type="button"
+              tabIndex={-1}
               className={`btn_delete ${input.id ? "" : "hide"}`}
               onClick={() => {
                 onDeleteInput("id");
@@ -104,6 +108,7 @@ const LoginForm = ({ onLoginCheck, onLoginSuccess }) => {
             {/* view button */}
             <button
               type="button"
+              tabIndex={-1}
               className={`btn_view ${input.pw ? "" : "hide"}`}
               onClick={() => {
                 setPwHide(!pwHide);
@@ -114,6 +119,7 @@ const LoginForm = ({ onLoginCheck, onLoginSuccess }) => {
             {/* delete button */}
             <button
               type="button"
+              tabIndex={-1}
               className={`btn_delete ${input.pw ? "" : "hide"}`}
               onClick={() => {
                 onDeleteInput("pw");
