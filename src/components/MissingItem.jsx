@@ -17,6 +17,12 @@ const MissingItem = ({ petMissingId, onClick, toggleModal, myMissing }) => {
     F: "♀",
   };
 
+  const petTypeChange = {
+    dog: "강아지",
+    cat: "고양이",
+    etc: "기타 동물",
+  };
+
   return (
     <div className="MissingItem">
       <div className="MissingItem-img" onClick={toggleModal}>
@@ -30,7 +36,7 @@ const MissingItem = ({ petMissingId, onClick, toggleModal, myMissing }) => {
       </div>
       <div className="contents" onClick={toggleModal}>
         <div className="contents-t1">
-          <p className="petType">{missingPet.petType}</p>
+          <p className="petType">{petTypeChange[missingPet.petType] || "-"}</p>
           <p>{genderSymbol[missingPet.petGender] || "-"}</p>
           <p>{missingPet.petName}</p>
         </div>

@@ -57,16 +57,44 @@ const MissingRevise = () => {
       },
     });
   };
+
+  const today = new Date().toISOString().split("T")[0];
+  const startYear = 2000;
+  const currentYear = new Date().getFullYear();
+  const yearOption = Array.from(
+    { length: currentYear - startYear + 1 },
+    (_, i) => currentYear - i
+  );
+
+  const isForm = () => {
+    return (
+      form.petName &&
+      form.petType &&
+      form.petGender &&
+      form.petBreed &&
+      form.petAge &&
+      form.petMissingDate &&
+      form.petMissingPoint &&
+      form.title &&
+      form.content
+    );
+  };
+
   const onSubmitButtonClick = () => {
+    if (!isForm()) {
+      alert("모든 항목을 입력해주세요");
+      return;
+    }
     onUpdate();
     nav("/myPage");
   };
 
   const handleChange = (e) => {
     const { name, value, files } = e.target;
-
+    if (name === "petType") {
+      setForm({ ...form, petBreed: "" });
+    }
     if (name === "petImage" && files?.[0]) {
-      const file = files[0];
       const reader = new FileReader();
       reader.onloadend = () => {
         console.log(reader.result);
@@ -76,7 +104,9 @@ const MissingRevise = () => {
         }));
       };
       reader.readAsDataURL(files[0]);
-    } else if (name !== "petImage") {
+    }
+
+    if (name !== "petImage") {
       setForm((prev) => ({
         ...prev,
         [name]: value,
@@ -100,57 +130,33 @@ const MissingRevise = () => {
   };
 
   const onSelectBreed = (breed, value, onChange) => {
-    if (breed === "") {
-      return (
-        <div>
-          <select name="petBreed">
-            <option value="" placeholder="">
-              아래에서 선택해주세요
-            </option>
-          </select>
-        </div>
-      );
-    }
-    if (breed === "dog") {
-      return (
-        <div>
-          <select name="petBreed" value={value} onChange={onChange}>
-            {dogBreed.map((dog) => (
+    return (
+      <div>
+        <select name="petBreed" value={value} onChange={onChange}>
+          <option value="" placeholder="">
+            아래에서 선택해주세요
+          </option>
+          {breed === "dog" &&
+            dogBreed.map((dog) => (
               <option key={dog.dogTypeNum} value={dog.dogType}>
                 {dog.dogType}
               </option>
             ))}
-          </select>
-        </div>
-      );
-    }
-    if (breed === "cat") {
-      return (
-        <div>
-          <select name="petBreed" value={value} onChange={onChange}>
-            {catBreed.map((cat) => (
+          {breed === "cat" &&
+            catBreed.map((cat) => (
               <option key={cat.catTypeNum} value={cat.catType}>
                 {cat.catType}
               </option>
             ))}
-          </select>
-        </div>
-      );
-    }
-    if (breed === "etc") {
-      return (
-        <div>
-          <select name="petBreed" value={value} onChange={onChange}>
-            {etcBreed.map((etc) => (
+          {breed === "etc" &&
+            etcBreed.map((etc) => (
               <option key={etc.etcTypeNum} value={etc.etcType}>
                 {etc.etcType}
               </option>
             ))}
-          </select>
-        </div>
-      );
-    }
-    return null;
+        </select>
+      </div>
+    );
   };
 
   return (
@@ -196,13 +202,15 @@ const MissingRevise = () => {
             {onSelectBreed(form.petType, form.petBreed, handleChange)}
           </div>
           <div className="MissingReviseForm">
-            <h4>나이</h4>
-            <input
-              name="petAge"
-              value={form.petAge}
-              onChange={handleChange}
-              placeholder="나이"
-            />
+            <h4>출생년도</h4>
+            <select name="petAge" value={form.petAge} onChange={handleChange}>
+              <option value="">출생년도를 선택해주세요</option>
+              {yearOption.map((year) => (
+                <option key={year} value={year}>
+                  {year} (년생)
+                </option>
+              ))}
+            </select>
           </div>
           <div className="MissingReviseForm">
             <h4>실종일자</h4>
@@ -211,6 +219,7 @@ const MissingRevise = () => {
               value={form.petMissingDate}
               onChange={handleChange}
               type="date"
+              max={today}
             />
           </div>
           <div className="MissingReviseForm">
