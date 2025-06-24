@@ -40,13 +40,13 @@ const MyPage = () => {
         },
       });
       missingDispatch({
-        type: "CLEAR_USER_DATA",
+        type: "DELETE_USER_DATA",
         data: {
           id: userInfo.id,
         },
       });
       reportDispatch({
-        type: "CLEAR_USER_DATA",
+        type: "DELETE_USER_DATA",
         data: {
           id: userInfo.id,
         },

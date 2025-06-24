@@ -1,4 +1,4 @@
-import { createContext, useReducer, useContext } from "react";
+import { createContext, useReducer, useContext, useEffect } from "react";
 function reducer(state, action) {
   let nextState;
   if (action.type === "CREATE") {
@@ -18,17 +18,15 @@ function reducer(state, action) {
   } else if (action.type === "UPDATE") {
     nextState = state.map((item) =>
       String(item.petMissingId) === String(action.data.petMissingId)
-        ? { ...action.data, updateDate: Date.now() }
+        ? { ...item, ...action.data, updateDate: Date.now() }
         : item
     );
   } else if (action.type === "DELETE") {
     nextState = state.filter(
       (item) => String(item.petMissingId) !== String(action.data.petMissingId)
     );
-  } else if (action.type === "CLEAR_USER_DATA") {
-    nextState = state.map((item) =>
-      String(item.id) === String(action.data.id) ? { ...item, id: "" } : item
-    );
+  } else if (action.type === "DELETE_USER_DATA") {
+    nextState = state.filter((item) => item.id !== action.data.id);
   } else {
     throw new Error(`Unhandled action type: ${action.type}`);
   }
@@ -43,6 +41,17 @@ export const MissingProvider = ({ children }) => {
     reducer,
     stored ? JSON.parse(stored) : []
   );
+  useEffect(() => {
+    const onStorage = (e) => {
+      if (e.key === "missing") {
+        //const storage = e.newValue ? JSON.parse(e.newValue) : [];
+        console.log(e.newValue);
+      }
+    };
+    window.addEventListener("storage", onStorage);
+    return () => window.removeEventListener("storage", onStorage);
+  }, []);
+
   return (
     <MissingStateContext.Provider value={state}>
       <MissingDispatchContext.Provider value={dispatch}>

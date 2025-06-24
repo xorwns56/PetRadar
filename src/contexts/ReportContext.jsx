@@ -17,7 +17,7 @@ function reducer(state, action) {
   } else if (action.type === "UPDATE") {
     nextState = state.map((item) =>
       String(item.petReportId) === String(action.data.petReportId)
-        ? { ...action.data, updateDate: Date.now() }
+        ? { ...item, ...action.data, updateDate: Date.now() }
         : item
     );
   } else if (action.type === "DELETE") {
@@ -28,9 +28,10 @@ function reducer(state, action) {
     nextState = state.filter(
       (item) => String(item.petMissingId) !== String(action.data.petMissingId)
     );
-  } else if (action.type === "CLEAR_USER_DATA") {
-    nextState = state.map((item) =>
-      String(item.id) === String(action.data.id) ? { ...item, id: "" } : item
+  } else if (action.type === "DELETE_USER_DATA") {
+    nextState = state.filter(
+      (item) =>
+        item.petMissingUser !== action.data.id && item.id !== action.data.id
     );
   } else {
     throw new Error(`Unhandled action type: ${action.type}`);

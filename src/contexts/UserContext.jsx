@@ -6,7 +6,7 @@ function reducer(state, action) {
     case "CREATE":
       nextState = {
         ...state,
-        users: [...state.users, action.data],
+        users: [...state.users, { ...action.data, createDate: Date.now() }],
       };
       localStorage.setItem("user", JSON.stringify(nextState.users));
       return nextState;
@@ -14,7 +14,9 @@ function reducer(state, action) {
       nextState = {
         ...state,
         users: state.users.map((item) =>
-          String(item.id) === String(action.data.id) ? action.data : item
+          String(item.id) === String(action.data.id)
+            ? { ...item, ...action.data }
+            : item
         ),
       };
       localStorage.setItem("user", JSON.stringify(nextState.users));
@@ -35,7 +37,7 @@ function reducer(state, action) {
           String(user.id) === String(action.data.id)
             ? {
                 ...user,
-                alerts: [...user.alerts, ...action.data.alerts],
+                alerts: [...action.data.alerts, ...(user.alerts || [])],
                 lastAlertDate: Date.now(),
               }
             : user
@@ -50,7 +52,7 @@ function reducer(state, action) {
           String(user.id) === String(action.data.id)
             ? {
                 ...user,
-                alerts: user.alerts.filter(
+                alerts: (user.alerts || []).filter(
                   (alert) =>
                     String(alert.postId) !== String(action.data.postId) ||
                     String(alert.postType) !== String(action.data.postType)
