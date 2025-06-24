@@ -14,8 +14,8 @@ const useFormFocus = (formState, formKeys, formKeysLabel = {}) => {
         inputRef.current[key]?.focus();
         return false;
       }
-      return true;
     }
+    return true;
   };
 
   const handleRef = (key) => (e) => {
