@@ -6,7 +6,6 @@
   padding-bottom: 10px;
   border-bottom: 1px solid var(--border-color);
   cursor: pointer;
-  background-color: var(--bg-white-color);
 }
 
 .ShelterAnimalItem:last-child {
