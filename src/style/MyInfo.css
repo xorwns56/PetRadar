@@ -68,6 +68,7 @@
   border-radius: 5px;
   background-color: var(--main-color);
   color: var(--text-white);
+  cursor: pointer;
 }
 
 /* DeleteAccount-btn */
