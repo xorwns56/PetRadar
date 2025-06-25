@@ -34,7 +34,7 @@
 }
 
 /* 반응형 수정 필요  */
-@media (min-width: 768px) {
+/* @media (min-width: 768px) {
   .SideBar {
     width: 100%;
     right: -100%;
@@ -43,4 +43,4 @@
   .SideBar.active {
     right: 0;
   }
-}
+} */
