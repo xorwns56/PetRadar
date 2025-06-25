@@ -94,8 +94,8 @@ const MissingMap = () => {
       // 마커 클릭 이벤트 등록
       wrapper.addEventListener("click", () => {
         if (mapRef.current) {
-          mapRef.current.setCenter(position); // 지도 중심 이동
-          mapRef.current.setLevel(5); // 줌 레벨 변경
+          // mapRef.current.setCenter(position); // 지도 중심 이동
+          //mapRef.current.setLevel(5); // 줌 레벨 변경
         }
 
         setSelectedPet(pet); // 선택된 동물 정보 저장
