@@ -1,4 +1,4 @@
-![PetRadar 로고](./assets/Frame%20112.png)
+![PetRadar Logo](https://github.com/ahyoun611/PetRadar/blob/main/public/gitImg.png?raw=true)
 
 # 🐾 반려동물 위치 기반 실종 신고 플랫폼
 > 빠르고 효율적인 실종 동물 찾기를 돕는 웹 서비스  
