@@ -1,12 +1,12 @@
 import "../style/RegisterForm.css";
 import { useState } from "react";
-const RegisterForm = ({ isExist, onCreate, onRegister }) => {
-  const formCheck = (name) => {
+const RegisterForm = ({ isExist, onRegister }) => {
+  const formCheck = async (name) => {
     const newErrMsg = {};
     const idRegex = /^[a-z0-9]*$/;
     if (!input.id) {
       newErrMsg.id = "아이디를 입력해주세요.";
-    } else if (isExist(input.id)) {
+    } else if (await isExist(input.id)) {
       newErrMsg.id = "사용할 수 없는 아이디입니다. 다른 아이디를 입력해주세요.";
     } else if (!idRegex.test(input.id)) {
       newErrMsg.id = "ID는 영문 소문자와 숫자만 입력 가능합니다.";
@@ -27,11 +27,10 @@ const RegisterForm = ({ isExist, onCreate, onRegister }) => {
     setErrMsg(name ? { ...errMsg, [name]: newErrMsg[name] } : newErrMsg);
     return JSON.stringify(newErrMsg) === "{}";
   };
-  const onSubmit = (event) => {
+  const onSubmit = async (event) => {
     event.preventDefault();
-    if (!formCheck()) return;
-    onCreate(input.id, input.pw, input.hp);
-    onRegister();
+    if (!await formCheck()) return;
+    onRegister(input.id, input.pw, input.hp);
   };
   const [focus, setFocus] = useState({
     id: false,

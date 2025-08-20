@@ -3,8 +3,10 @@ import RegisterForm from '../components/RegisterForm';
 import { useUserDispatch, useUserState } from '../contexts/UserContext';
 import { Link, useNavigate } from 'react-router-dom';
 import { useEffect } from 'react';
+import api from "../api/api";
 const Register = () => {
   const nav = useNavigate();
+  /*
   const userState = useUserState();
   const userDispatch = useUserDispatch();
   useEffect(() => {
@@ -12,22 +14,35 @@ const Register = () => {
       nav('/', { replace: true });
     }
   }, [userState.currentUser, nav]);
-  const isExist = (id) => {
-    return userState.users.some((user) => user.id === id);
+  */
+
+  const isExist = async (id) => {
+    try {
+      const response = await api.get("/api/user/check-exist", { params : {id} });
+      console.log(response.data);
+      return response.data;
+    } catch (error) {
+      console.error("Error checking user existence:", error);
+      return false;
+    }
   };
-  const onCreate = (id, pw, hp) => {
-    userDispatch({
-      type: 'CREATE',
-      data: {
-        id,
-        pw,
-        hp,
-      },
-    });
+
+  const onRegister = async (id, pw, hp) => {
+    try {
+      await api.post("/api/user/register", { id, pw, hp });
+      nav("/login", { replace: true });
+    } catch (error) {
+      // 에러 발생 시 처리
+      if (error.response) {
+        alert("회원가입에 실패했습니다. 입력 정보를 확인해주세요.");
+      } else if (error.request) {
+        alert("서버에 연결할 수 없습니다. 잠시 후 다시 시도해주세요.");
+      } else {
+        alert("예상치 못한 오류가 발생했습니다.");
+      }
+    }
   };
-  const onRegister = () => {
-    nav('/login', { replace: true });
-  };
+
   return (
     <div className="Register">
       <div className="Register-container">
@@ -37,7 +52,7 @@ const Register = () => {
           </Link>
         </div>
         <div className="Register-contents">
-          <RegisterForm isExist={isExist} onCreate={onCreate} onRegister={onRegister} />
+          <RegisterForm isExist={isExist} onRegister={onRegister} />
           <div className="login-img">
             <img src="/Menu-icon1.png" alt="login-img" />
           </div>

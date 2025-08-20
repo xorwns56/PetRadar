@@ -3,6 +3,7 @@ import "../style/Login.css";
 import LoginForm from "../components/LoginForm";
 import { useUserDispatch, useUserState } from "../contexts/UserContext";
 import { useEffect } from "react";
+import axios from "axios";
 const Login = () => {
   const nav = useNavigate();
   const userState = useUserState();
@@ -15,6 +16,28 @@ const Login = () => {
   const isExist = (id) => {
     return userState.users.some((user) => user.id === id);
   };
+  const onLogin = async (id, pw) => {
+    try {
+      const response = await axios.post("/api/auth/login", {
+        id,
+        pw,
+      });
+      if (response.status === 200) {
+        sessionStorage.setItem("accessToken", response.data.accessToken);
+        nav("/", { replace: true });
+        return true;
+      }
+    } catch (error) {
+      if (error.response && error.response.status === 401) {
+        alert("아이디 또는 비밀번호가 올바르지 않습니다.");
+      } else {
+        alert("로그인 중 오류가 발생했습니다.");
+        console.error("Login error:", error);
+      }
+      return false;
+    }
+  };
+  /*
   const onLoginCheck = (id, pw) => {
     return userState.users.some((user) => user.id === id && user.pw === pw);
   };
@@ -27,6 +50,7 @@ const Login = () => {
     });
     nav("/", { replace: true });
   };
+  */
   return (
     <>
       <div className="Login">
@@ -39,8 +63,7 @@ const Login = () => {
           <div className="Login-contents">
             <LoginForm
               isExist={isExist}
-              onLoginCheck={onLoginCheck}
-              onLoginSuccess={onLoginSuccess}
+              onLogin={onLogin}
             />
             <div className="register-btn">
               <Link className="register" to="/register">
