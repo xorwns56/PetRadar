@@ -3,27 +3,35 @@ import "../style/Login.css";
 import LoginForm from "../components/LoginForm";
 import { useUserDispatch, useUserState } from "../contexts/UserContext";
 import { useEffect } from "react";
-import axios from "axios";
+import api from "../api/api";
 const Login = () => {
   const nav = useNavigate();
-  const userState = useUserState();
-  const userDispatch = useUserDispatch();
+  /*
   useEffect(() => {
     if (userState.currentUser) {
       nav("/", { replace: true });
     }
   }, [userState.currentUser, nav]);
-  const isExist = (id) => {
-    return userState.users.some((user) => user.id === id);
-  };
+  */
+  const isExist = async (id) => {
+      try {
+        const response = await api.get("/api/user/check-exist", { params : {id} });
+        return response.data;
+      } catch (error) {
+        console.error("isExist : ", error);
+        return false;
+      }
+    };
   const onLogin = async (id, pw) => {
     try {
-      const response = await axios.post("/api/auth/login", {
+      const response = await api.post("/api/auth/login", {
         id,
         pw,
       });
       if (response.status === 200) {
-        sessionStorage.setItem("accessToken", response.data.accessToken);
+        api.login(response.data.accessToken);
+        console.log(api.isAuthenticated);
+        console.log(response.data.accessToken);
         nav("/", { replace: true });
         return true;
       }

@@ -1,24 +1,22 @@
 import { useState } from "react";
 import "../style/LoginForm.css";
 const LoginForm = ({ isExist, onLogin }) => {
-  const onSubmit = (event) => {
+  const onSubmit = async (event) => {
     event.preventDefault();
     if (!input.id) {
       setErrMsg("아이디를 입력해주세요.");
       return;
     }
-    /*
-    if (!isExist(input.id)) {
+    if (!await isExist(input.id)) {
       setErrMsg("없는 회원입니다.");
       return;
     }
-*/
 
     if (!input.pw) {
       setErrMsg("비밀번호를 입력해주세요.");
       return;
     }
-    if(!onLogin(input.id, input.pw)){
+    if(!await onLogin(input.id, input.pw)){
         setErrMsg(
             "아이디 또는 비밀번호가 잘못 되었습니다. 아이디와 비밀번호를 정확히 입력해 주세요."
         );
