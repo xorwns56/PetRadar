@@ -30,8 +30,6 @@ const Login = () => {
       });
       if (response.status === 200) {
         api.login(response.data.accessToken);
-        console.log(api.isAuthenticated);
-        console.log(response.data.accessToken);
         nav("/", { replace: true });
         return true;
       }
@@ -45,20 +43,7 @@ const Login = () => {
       return false;
     }
   };
-  /*
-  const onLoginCheck = (id, pw) => {
-    return userState.users.some((user) => user.id === id && user.pw === pw);
-  };
-  const onLoginSuccess = (id) => {
-    userDispatch({
-      type: "LOGIN",
-      data: {
-        id,
-      },
-    });
-    nav("/", { replace: true });
-  };
-  */
+
   return (
     <>
       <div className="Login">

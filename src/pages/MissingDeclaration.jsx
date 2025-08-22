@@ -4,26 +4,22 @@ import { dogBreed, catBreed, etcBreed } from "../utils/get-pet-breed";
 import Header from "../components/Header";
 import Button from "../components/Button";
 import { useNavigate } from "react-router-dom";
-import {
-  useMissingDispatch,
-  useMissingState,
-} from "../contexts/MissingContext";
-import { useUserState } from "../contexts/UserContext";
 import useFormFocus from "../hooks/useFormFocus";
 import LocationMap from "../components/LocationMap";
+import api from "../api/api";
 
 const MissingDeclaration = () => {
-  const dispatch = useMissingDispatch();
-  const userState = useUserState();
-  //const data = useMissingState();
   const nav = useNavigate();
-
+  const [isLoading, setIsLoading] = useState(true);
   useEffect(() => {
-    if (!userState.currentUser) {
-      alert("실종 신고에는 로그인이 필요합니다.");
-      nav("/login", { replace: true });
+    if(!api.isAuthenticated()){
+        alert("실종 신고에는 로그인이 필요합니다.");
+        nav("/login", { replace: true });
+        return;
     }
-  }, [userState.currentUser, nav]);
+    setIsLoading(false);
+  }, [nav]);
+
 
   const [form, setForm] = useState({
     petName: "",
@@ -39,15 +35,6 @@ const MissingDeclaration = () => {
     content: "",
   });
 
-  const onCreate = () => {
-    dispatch({
-      type: "CREATE",
-      data: {
-        ...form,
-        id: userState.currentUser,
-      },
-    });
-  };
 
   const today = new Date().toISOString().split("T")[0];
   const startYear = 2000;
@@ -81,12 +68,22 @@ const MissingDeclaration = () => {
 
   const { handleRef, checkInput } = useFormFocus(form, formKeys, formKeysLabel);
 
-  const onSubmitButtonClick = () => {
+  const onSubmitButtonClick = async () => {
     if (!checkInput()) {
       return;
     }
-    onCreate();
-    nav("/missingList");
+    try {
+        // form 상태를 그대로 API 요청 본문에 전달
+        const response = await api.post("/api/missing", form);
+        nav("/missingList");
+      } catch (error) {
+        if (error.response && error.response.status === 403) {
+            alert("로그인이 만료되었습니다. 다시 로그인해주세요.");
+            nav("/login", { replace: true });
+        } else {
+            alert("신고 제출에 실패했습니다. 다시 시도해주세요.");
+        }
+      }
   };
 
   const handleChange = (e) => {
@@ -154,7 +151,7 @@ const MissingDeclaration = () => {
     );
   };
 
-  return (
+  return (!isLoading &&
     <div className="MissingDeclaration">
       <Header leftChild={true} />{" "}
       <div className="MissingDeclaration-container inner">

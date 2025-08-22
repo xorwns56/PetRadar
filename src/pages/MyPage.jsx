@@ -4,7 +4,6 @@ import MyInfo from "../components/MyInfo";
 import MyPost from "../components/MyPost";
 import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { useUserDispatch, useUserState } from "../contexts/UserContext";
 import { useReportDispatch } from "../contexts/ReportContext";
 import { useMissingDispatch } from "../contexts/MissingContext";
 const MyPage = () => {
