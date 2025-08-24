@@ -1,28 +1,52 @@
 import "../style/MissingList.css";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Button from "../components/Button";
 import Header from "../components/Header";
 import MissingItem from "../components/MissingItem";
-
 import PetModalDetail from "../components/PetModalDetail";
 import { useNavigate } from "react-router-dom";
 import { useModal } from "../hooks/ModalContext";
-import { useMissingState } from "../contexts/MissingContext";
-import { useUserState } from "../contexts/UserContext";
+import api from "../api/api";
 
 const MissingList = () => {
   const [selectedItem, setSelectedItem] = useState(null);
-  const userState = useUserState();
   const { toggleModal } = useModal();
   const nav = useNavigate();
   const [sortType, setSortType] = useState("latest");
   const onChangeSortType = (e) => {
     setSortType(e.target.value);
   };
-  const missingState = useMissingState();
-  const getSortedData = () => {
-    console.log("a");
-    return missingState.toSorted((prev, next) => {
+  const [missingList, setMissingList] = useState([]);
+  const [currentUser, setCurrentUser] = useState(null);
+  useEffect(() => {
+      // missing list 데이터 가져오기
+      const fetchMissingList = async () => {
+        try {
+          const response = await api.get("/api/missing");
+          setMissingList(response.data);
+          console.log(response.data);
+        } catch (error) {
+          console.error("Failed to fetch missing list:", error);
+        }
+      };
+      // 현재 로그인된 사용자 정보 가져오기
+      const fetchCurrentUser = async () => {
+        try {
+          const response = await api.get("/api/user/me");
+          setCurrentUser(response.data);
+          console.log(response.data);
+        } catch (error) {
+            console.error("Failed to fetch missing list:", error);
+        }
+      };
+
+      fetchMissingList();
+      fetchCurrentUser();
+    }, []); // 빈 배열을 넣어 컴포넌트가 처음 렌더링될 때만 실행
+
+
+  const getSortedList = () => {
+    return missingList.toSorted((prev, next) => {
       if (sortType === "oldest") {
         return prev.createDate - next.createDate;
       } else {
@@ -30,7 +54,7 @@ const MissingList = () => {
       }
     });
   };
-  const sortedData = getSortedData();
+  const sortedList = getSortedList();
 
   const [searchInput, setSearchInput] = useState("");
   const [searchBtn, setSearchBtn] = useState("");
@@ -44,10 +68,9 @@ const MissingList = () => {
 
   const getFilterTitle = () => {
     if (searchInput === "") {
-      return sortedData;
+      return sortedList;
     }
-
-    return sortedData.filter((item) =>
+    return sortedList.filter((item) =>
       item.title?.toLowerCase().includes(searchBtn.toLowerCase())
     );
   };
@@ -56,7 +79,7 @@ const MissingList = () => {
   return (
     <div className="MissingList">
       <Header leftChild={true} />
-      <div className="MissingList-conatiner inner">
+      <div className="MissingList-container inner">
         <div className="PageTitle">
           <h3>실종 동물 목록</h3>
         </div>
@@ -82,16 +105,16 @@ const MissingList = () => {
         <div className="MissingItems">
           {getFilterTitleData.map((item) => (
             <MissingItem
-              key={item.petMissingId}
-              {...item}
+              key={item.id}
+              missingDTO={item}
               toggleModal={() => {
                 setSelectedItem(item);
                 toggleModal();
               }}
               onClick={() => {
-                nav(`/missingReport/${item.petMissingId}`);
+                nav(`/missingReport/${item.id}`);
               }}
-              myMissing={userState.currentUser === item.id}
+              myMissing={currentUser.id === item.userId}
             />
           ))}
         </div>

@@ -1,5 +1,4 @@
 import axios from "axios";
-import { jwtDecode } from "jwt-decode";
 
 // axios 인스턴스 생성 및 HttpOnly 쿠키 자동 포함 설정
 const api = axios.create({

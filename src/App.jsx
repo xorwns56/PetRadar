@@ -22,9 +22,12 @@ import { ModalProvider } from "./hooks/ModalContext";
 import { ReportProvider } from "./contexts/ReportContext";
 import { MissingProvider } from "./contexts/MissingContext";
 
+import { AuthProvider } from "./contexts/AuthContext"
+
 function App() {
   return (
     <>
+      <AuthProvider>
       <UserProvider>
         <MissingProvider>
           <ReportProvider>
@@ -67,6 +70,7 @@ function App() {
           </ReportProvider>
         </MissingProvider>
       </UserProvider>
+      </AuthProvider>
     </>
   );
 }

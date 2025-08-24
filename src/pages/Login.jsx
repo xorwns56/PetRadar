@@ -3,9 +3,11 @@ import "../style/Login.css";
 import LoginForm from "../components/LoginForm";
 import { useUserDispatch, useUserState } from "../contexts/UserContext";
 import { useEffect } from "react";
+import { useAuth } from '../contexts/AuthContext';
 import api from "../api/api";
 const Login = () => {
   const nav = useNavigate();
+  const { login } = useAuth();
   /*
   useEffect(() => {
     if (userState.currentUser) {
@@ -15,7 +17,7 @@ const Login = () => {
   */
   const isExist = async (id) => {
       try {
-        const response = await api.get("/api/user/check-exist", { params : {id} });
+        const response = await api.get("/api/auth/check-exist", { params : {id} });
         return response.data;
       } catch (error) {
         console.error("isExist : ", error);
@@ -29,7 +31,7 @@ const Login = () => {
         pw,
       });
       if (response.status === 200) {
-        api.login(response.data.accessToken);
+        login(response.data.accessToken);
         nav("/", { replace: true });
         return true;
       }

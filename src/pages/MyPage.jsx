@@ -20,6 +20,9 @@ const MyPage = () => {
   const userInfo = userState.users.find(
     (user) => user.id === userState.currentUser
   );
+
+
+
   const onUpdate = (pw, hp) => {
     userDispatch({
       type: "UPDATE",

@@ -7,18 +7,20 @@ import { useNavigate } from "react-router-dom";
 import useFormFocus from "../hooks/useFormFocus";
 import LocationMap from "../components/LocationMap";
 import api from "../api/api";
+import { useAuth } from '../contexts/AuthContext';
 
 const MissingDeclaration = () => {
   const nav = useNavigate();
   const [isLoading, setIsLoading] = useState(true);
+  const { isLogin } = useAuth();
   useEffect(() => {
-    if(!api.isAuthenticated()){
+    if(!isLogin){
         alert("실종 신고에는 로그인이 필요합니다.");
         nav("/login", { replace: true });
         return;
     }
     setIsLoading(false);
-  }, [nav]);
+  }, [isLogin, nav]);
 
 
   const [form, setForm] = useState({
@@ -77,12 +79,7 @@ const MissingDeclaration = () => {
         const response = await api.post("/api/missing", form);
         nav("/missingList");
       } catch (error) {
-        if (error.response && error.response.status === 403) {
-            alert("로그인이 만료되었습니다. 다시 로그인해주세요.");
-            nav("/login", { replace: true });
-        } else {
-            alert("신고 제출에 실패했습니다. 다시 시도해주세요.");
-        }
+          alert("신고 제출에 실패했습니다. 다시 시도해주세요.");
       }
   };
 

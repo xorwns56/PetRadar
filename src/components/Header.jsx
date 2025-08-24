@@ -3,22 +3,23 @@ import { useLocation, useNavigate } from "react-router-dom";
 import { useSidebar } from "../hooks/SidebarContext";
 import { useEffect, useState } from "react";
 import api from "../api/api";
+import { useAuth } from '../contexts/AuthContext';
 
 const Header = ({ leftChild }) => {
   const { toggleSidebar } = useSidebar();
   const location = useLocation();
   const nav = useNavigate();
-  const isAuthenticated = api.isAuthenticated();
+  const { isLogin } = useAuth();
   const [alerts, setAlerts] = useState(null);
     // useEffect 훅을 사용하여 컴포넌트가 처음 마운트될 때 API를 호출
     useEffect(() => {
       // 사용자가 인증되었을 때만 API를 호출
-      if (isAuthenticated) {
+      if (isLogin) {
 
           //api 호출(알림 받아오는 로직)
 
       }
-    }, [isAuthenticated]);
+    }, [isLogin]);
 
   return (
     <header className="Header">
@@ -46,12 +47,12 @@ const Header = ({ leftChild }) => {
       <div className="header_right">
         <p
           onClick={() => {
-            nav(isAuthenticated ? "/myPage" : "/login");
+            nav(isLogin ? "/myPage" : "/login");
           }}
         >
-          {isAuthenticated ? "마이페이지" : "로그인/회원가입"}
+          {isLogin ? "마이페이지" : "로그인/회원가입"}
         </p>
-        {isAuthenticated && (
+        {isLogin && (
           <p className="Msg-bell" onClick={toggleSidebar}>
             {alerts && (
               <span className="Msg-cnt">{alerts}</span>
