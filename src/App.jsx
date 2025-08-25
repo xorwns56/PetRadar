@@ -27,11 +27,11 @@ import { AuthProvider } from "./contexts/AuthContext"
 function App() {
   return (
     <>
-      <AuthProvider>
       <UserProvider>
         <MissingProvider>
           <ReportProvider>
             <BrowserRouter>
+            <AuthProvider>
               <SidebarProvider>
                 <SideBar />
                 <ModalProvider>
@@ -66,11 +66,11 @@ function App() {
                   </Routes>
                 </ModalProvider>
               </SidebarProvider>
+            </AuthProvider>
             </BrowserRouter>
           </ReportProvider>
         </MissingProvider>
       </UserProvider>
-      </AuthProvider>
     </>
   );
 }

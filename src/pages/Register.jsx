@@ -2,9 +2,10 @@ import '../style/Register.css';
 import RegisterForm from '../components/RegisterForm';
 import { Link, useNavigate } from 'react-router-dom';
 import { useEffect } from 'react';
-import api from "../api/api";
+import { useAuth } from '../contexts/AuthContext';
 const Register = () => {
   const nav = useNavigate();
+  const { api } = useAuth();
   /*
   const userState = useUserState();
   const userDispatch = useUserDispatch();

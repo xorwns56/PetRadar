@@ -6,42 +6,29 @@ import MissingItem from "../components/MissingItem";
 import PetModalDetail from "../components/PetModalDetail";
 import { useNavigate } from "react-router-dom";
 import { useModal } from "../hooks/ModalContext";
-import api from "../api/api";
+import { useAuth } from '../contexts/AuthContext';
 
 const MissingList = () => {
   const [selectedItem, setSelectedItem] = useState(null);
   const { toggleModal } = useModal();
   const nav = useNavigate();
+  const { api, userId } = useAuth();
   const [sortType, setSortType] = useState("latest");
   const onChangeSortType = (e) => {
     setSortType(e.target.value);
   };
   const [missingList, setMissingList] = useState([]);
-  const [currentUser, setCurrentUser] = useState(null);
   useEffect(() => {
       // missing list 데이터 가져오기
       const fetchMissingList = async () => {
         try {
           const response = await api.get("/api/missing");
           setMissingList(response.data);
-          console.log(response.data);
         } catch (error) {
           console.error("Failed to fetch missing list:", error);
         }
       };
-      // 현재 로그인된 사용자 정보 가져오기
-      const fetchCurrentUser = async () => {
-        try {
-          const response = await api.get("/api/user/me");
-          setCurrentUser(response.data);
-          console.log(response.data);
-        } catch (error) {
-            console.error("Failed to fetch missing list:", error);
-        }
-      };
-
       fetchMissingList();
-      fetchCurrentUser();
     }, []); // 빈 배열을 넣어 컴포넌트가 처음 렌더링될 때만 실행
 
 
@@ -114,7 +101,7 @@ const MissingList = () => {
               onClick={() => {
                 nav(`/missingReport/${item.id}`);
               }}
-              myMissing={currentUser.id === item.userId}
+              myMissing={userId && userId === item.userId}
             />
           ))}
         </div>

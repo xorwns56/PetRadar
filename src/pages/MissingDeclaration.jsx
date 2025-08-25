@@ -6,21 +6,20 @@ import Button from "../components/Button";
 import { useNavigate } from "react-router-dom";
 import useFormFocus from "../hooks/useFormFocus";
 import LocationMap from "../components/LocationMap";
-import api from "../api/api";
 import { useAuth } from '../contexts/AuthContext';
 
 const MissingDeclaration = () => {
   const nav = useNavigate();
   const [isLoading, setIsLoading] = useState(true);
-  const { isLogin } = useAuth();
+  const { isAuthenticated, api } = useAuth();
   useEffect(() => {
-    if(!isLogin){
+    if(!isAuthenticated){
         alert("실종 신고에는 로그인이 필요합니다.");
         nav("/login", { replace: true });
         return;
     }
     setIsLoading(false);
-  }, [isLogin, nav]);
+  }, [isAuthenticated, nav]);
 
 
   const [form, setForm] = useState({

@@ -1,13 +1,11 @@
 import { Link, useNavigate } from "react-router-dom";
 import "../style/Login.css";
 import LoginForm from "../components/LoginForm";
-import { useUserDispatch, useUserState } from "../contexts/UserContext";
 import { useEffect } from "react";
 import { useAuth } from '../contexts/AuthContext';
-import api from "../api/api";
 const Login = () => {
   const nav = useNavigate();
-  const { login } = useAuth();
+  const { login, api } = useAuth();
   /*
   useEffect(() => {
     if (userState.currentUser) {
@@ -31,18 +29,14 @@ const Login = () => {
         pw,
       });
       if (response.status === 200) {
-        login(response.data.accessToken);
+        login(response.data.accessToken, response.data.userId);
         nav("/", { replace: true });
         return true;
       }
     } catch (error) {
-      if (error.response && error.response.status === 401) {
-        alert("아이디 또는 비밀번호가 올바르지 않습니다.");
-      } else {
         alert("로그인 중 오류가 발생했습니다.");
         console.error("Login error:", error);
-      }
-      return false;
+        return false;
     }
   };
 
