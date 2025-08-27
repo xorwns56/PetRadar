@@ -1,5 +1,6 @@
 import React, { createContext, useState, useEffect, useContext, useMemo } from 'react';
 import axios from 'axios';
+import { jwtDecode } from "jwt-decode";
 import { useNavigate } from 'react-router-dom';
 
 // AuthContext 생성
@@ -24,20 +25,16 @@ export const useAuth = () => {
 export const AuthProvider = ({ children }) => {
     // sessionStorage에서 accessToken과 userId를 초기 상태로 설정
     const [isAuthenticated, setIsAuthenticated] = useState(!!sessionStorage.getItem('accessToken'));
-    const [userId, setUserId] = useState(Number(sessionStorage.getItem('userId')) || -1);
     const navigate = useNavigate();
 
     /**
      * 로그인 함수
      * 토큰과 사용자 ID를 sessionStorage에 저장하고 상태를 업데이트합니다.
      * @param {string} token - 서버로부터 받은 JWT 토큰
-     * @param {string} id - 서버로부터 받은 사용자 ID
      */
-    const login = (token, id) => {
+    const login = (token) => {
         sessionStorage.setItem('accessToken', token);
-        sessionStorage.setItem('userId', id);
         setIsAuthenticated(true);
-        setUserId(id);
     };
 
     /**
@@ -46,11 +43,23 @@ export const AuthProvider = ({ children }) => {
      */
     const logout = () => {
         sessionStorage.removeItem('accessToken');
-        sessionStorage.removeItem('userId');
         setIsAuthenticated(false);
-        setUserId(-1);
         navigate('/login');
     };
+
+    const userId = useMemo(() => {
+        const accessToken = sessionStorage.getItem('accessToken');
+        if (accessToken) {
+            try {
+                const decodedToken = jwtDecode(accessToken);
+                return Number(decodedToken.sub) || -1;
+            } catch (error) {
+                console.error("Failed to decode JWT:", error);
+                return -1;
+            }
+        }
+        return -1;
+    }, [isAuthenticated]);
 
     /**
      * axios API 인스턴스 생성 및 설정
@@ -99,7 +108,6 @@ export const AuthProvider = ({ children }) => {
         const accessToken = sessionStorage.getItem('accessToken');
         if (!accessToken && isAuthenticated) {
             setIsAuthenticated(false);
-            setUserId(-1);
         }
     }, [isAuthenticated]);
 

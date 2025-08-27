@@ -1,12 +1,27 @@
 import '../style/Home.css';
 import Header from '../components/Header';
-import Map from '../components/Map';
 import MainMenu from '../components/MainMenu';
 import { useNavigate } from 'react-router-dom';
 import MissingMap from '../components/MissingMap';
+import {useState, useEffect} from "react";
+import { useAuth } from '../contexts/AuthContext';
 
 const Home = () => {
   const nav = useNavigate();
+  const [missingList, setMissingList] = useState([]);
+  const { api } = useAuth();
+  useEffect(() => {
+        // missing list 데이터 가져오기
+        const fetchMissingList = async () => {
+            try {
+                const response = await api.get("/api/missing");
+                setMissingList(response.data);
+            } catch (error) {
+                console.error("Failed to fetch missing list:", error);
+            }
+        };
+        fetchMissingList();
+    }, []);
 
   return (
     <div className="Home ">
@@ -64,7 +79,7 @@ const Home = () => {
           />
         </div>
         <div className="map">
-          <MissingMap />
+          <MissingMap missingList={missingList}/>
         </div>
       </div>
     </div>

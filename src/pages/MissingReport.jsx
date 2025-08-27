@@ -3,31 +3,14 @@ import Header from "../components/Header";
 import Button from "../components/Button";
 
 import LocationMap from "../components/LocationMap";
-import { useReportDispatch } from "../contexts/ReportContext";
 import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import { useUserState } from "../contexts/UserContext";
-import { useMissingState } from "../contexts/MissingContext";
+import { useAuth } from "../contexts/AuthContext.jsx";
 
 const MissingReport = () => {
-  const dispatch = useReportDispatch();
-  const userState = useUserState();
   const nav = useNavigate();
   const params = useParams();
-  const missingState = useMissingState();
-  const [currMissing, setCurrMissing] = useState({});
-  useEffect(() => {
-    const missing = missingState.find(
-      (item) => String(item.petMissingId) === String(params.petMissingId)
-    );
-    if (!missing) {
-      alert("해당 게시글이 없어 제보할 수 없습니다.");
-      nav("/missingList", { replace: true });
-      return;
-    }
-    setCurrMissing(missing);
-  }, [params.petMissingId]);
-
+  const { api } = useAuth();
   const [form, setForm] = useState({
     title: "",
     content: "",
@@ -35,22 +18,13 @@ const MissingReport = () => {
     petReportPlace: "",
     petReportPoint: null,
   });
-
-  const onCreate = () => {
-    dispatch({
-      type: "CREATE",
-      data: {
-        ...form,
-        id: userState.currentUser,
-        petMissingUser: currMissing.id,
-        petMissingId: currMissing.petMissingId,
-      },
-    });
-  };
-
-  const onSubmitButtonClick = () => {
-    onCreate();
-    nav("/missingList");
+  const onSubmitButtonClick = async () => {
+      try {
+          const response = await api.post(`/api/report/missing/${params.petMissingId}`, form);
+          nav("/missingList");
+      } catch (error) {
+          alert("제보 등록에 실패했습니다. 다시 시도해주세요.");
+      }
   };
 
   const handleChange = (e) => {

@@ -29,7 +29,7 @@ const Login = () => {
         pw,
       });
       if (response.status === 200) {
-        login(response.data.accessToken, response.data.userId);
+        login(response.data.accessToken);
         nav("/", { replace: true });
         return true;
       }

@@ -101,7 +101,7 @@ const MissingList = () => {
               onClick={() => {
                 nav(`/missingReport/${item.id}`);
               }}
-              myMissing={userId && userId === item.userId}
+              myMissing={userId === item.userId}
             />
           ))}
         </div>
