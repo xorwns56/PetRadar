@@ -1,31 +1,16 @@
 import "../style/MissingRevise.css";
-import { useUserState } from "../contexts/UserContext";
-import {
-  useMissingState,
-  useMissingDispatch,
-} from "../contexts/MissingContext";
-
 import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-
 import { dogBreed, catBreed, etcBreed } from "../utils/get-pet-breed";
-
 import Header from "../components/Header";
 import Button from "../components/Button";
 import LocationMap from "../components/LocationMap";
-
 import useFormFocus from "../hooks/useFormFocus";
 
 const MissingRevise = () => {
-  const userState = useUserState();
-  const missingList = useMissingState();
-  const dispatch = useMissingDispatch();
   const params = useParams();
   const nav = useNavigate();
 
-  const reviseList = missingList.find(
-    (item) => String(item.petMissingId) === String(params.petMissingId)
-  );
   const [form, setForm] = useState({
     petName: "",
     petType: "",
@@ -41,15 +26,20 @@ const MissingRevise = () => {
   });
 
   useEffect(() => {
-    if (!reviseList) {
-      alert("해당 게시글이 없어 게시글을 수정할 수 없습니다.");
-      nav("/myPage", { replace: true });
-    } else {
-      setForm({ ...reviseList });
-    }
-  }, [reviseList]);
+      const fetchMissingDetail = async () => {
+          try {
+            const response = await api.get(`/api/missing/${params.petMissingId}`);
+            console.log(response);
+            //setForm({ ...reviseList });
+          } catch (error) {
+            console.error("Failed to fetch missing detail:", error);
+          }
+        };
+        fetchMissingDetail();
+  }, []);
 
   const onUpdate = () => {
+      /*
     dispatch({
       type: "UPDATE",
       data: {
@@ -58,6 +48,7 @@ const MissingRevise = () => {
         petMissingId: params.petMissingId,
       },
     });
+*/
   };
 
   const today = new Date().toISOString().split("T")[0];

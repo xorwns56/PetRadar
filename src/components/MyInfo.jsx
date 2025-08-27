@@ -1,12 +1,20 @@
 import "../style/MyInfo.css";
-import { useState } from "react";
-const MyInfo = ({ id, pw, hp, onUpdate, onDelete, onLogOut }) => {
+import { useState, useEffect } from "react";
+const MyInfo = ({ userInfo, onUpdate, onDelete, onLogOut }) => {
   const [editMode, setEditMode] = useState(false);
   const [pwHide, setPwHide] = useState(false);
   const [input, setInput] = useState({
-    pw,
-    hp,
+    pw : userInfo.pw,
+    hp : userInfo.hp
   });
+
+  useEffect(() => {
+      setInput({
+        pw: userInfo.pw,
+        hp: userInfo.hp,
+      });
+    }, [userInfo]);
+
   const [focus, setFocus] = useState({
     pw: false,
     hp: false,
@@ -41,7 +49,7 @@ const MyInfo = ({ id, pw, hp, onUpdate, onDelete, onLogOut }) => {
             <tr>
               <th>아이디</th>
               <td>
-                <span>{id}</span>
+                <span>{userInfo.id}</span>
               </td>
             </tr>
             {editMode ? (
@@ -77,7 +85,7 @@ const MyInfo = ({ id, pw, hp, onUpdate, onDelete, onLogOut }) => {
               <tr>
                 <th>연락처</th>
                 <td>
-                  <span>{hp}</span>
+                  <span>{userInfo.hp}</span>
                 </td>
               </tr>
             )}

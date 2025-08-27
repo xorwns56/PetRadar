@@ -2,28 +2,30 @@ import "../style/MyPage.css";
 import Header from "../components/Header";
 import MyInfo from "../components/MyInfo";
 import MyPost from "../components/MyPost";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { useReportDispatch } from "../contexts/ReportContext";
-import { useMissingDispatch } from "../contexts/MissingContext";
+import { useAuth } from "../contexts/AuthContext.jsx";
 const MyPage = () => {
   const nav = useNavigate();
-  const userState = useUserState();
-  const userDispatch = useUserDispatch();
-  const missingDispatch = useMissingDispatch();
-  const reportDispatch = useReportDispatch();
+  const [userInfo, setUserInfo] = useState({});
+  const { api } = useAuth();
   useEffect(() => {
-    if (!userState.currentUser) {
-      nav("/", { replace: true });
-    }
-  }, [userState.currentUser, nav]);
-  const userInfo = userState.users.find(
-    (user) => user.id === userState.currentUser
-  );
-
-
+      const fetchMe = async () => {
+          try {
+            const response = await api.get("/api/user/me");
+            setUserInfo({
+                id : response.data.loginId,
+                hp : response.data.hp
+            });
+          } catch (error) {
+            console.error("Failed to fetch me:", error);
+          }
+        };
+        fetchMe();
+  }, []);
 
   const onUpdate = (pw, hp) => {
+      /*
     userDispatch({
       type: "UPDATE",
       data: {
@@ -32,8 +34,10 @@ const MyPage = () => {
         hp,
       },
     });
+    */
   };
   const onDelete = () => {
+      /*
     if (confirm("탈퇴 시 모든 정보가 삭제됩니다. 정말 탈퇴하시겠습니까?")) {
       userDispatch({
         type: "DELETE",
@@ -55,12 +59,15 @@ const MyPage = () => {
       });
       onLogOut();
     }
+    */
   };
 
   const onLogOut = () => {
+      /*
     userDispatch({
       type: "LOGOUT",
     });
+    */
   };
 
   return (
@@ -69,13 +76,13 @@ const MyPage = () => {
       <div className="MyPage-container inner">
         <div className="MyInfo-container">
           <MyInfo
-            {...userInfo}
+            userInfo={userInfo}
             onUpdate={onUpdate}
             onDelete={onDelete}
             onLogOut={onLogOut}
           />
         </div>
-        <MyPost id={userState.currentUser} />
+{/*         <MyPost id={userState.currentUser} /> */}
       </div>
     </div>
   );
