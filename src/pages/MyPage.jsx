@@ -8,7 +8,7 @@ import { useAuth } from "../contexts/AuthContext.jsx";
 const MyPage = () => {
   const nav = useNavigate();
   const [userInfo, setUserInfo] = useState({});
-  const { api } = useAuth();
+  const { api, logout } = useAuth();
   useEffect(() => {
       const fetchMe = async () => {
           try {
@@ -24,17 +24,17 @@ const MyPage = () => {
         fetchMe();
   }, []);
 
-  const onUpdate = (pw, hp) => {
-      /*
-    userDispatch({
-      type: "UPDATE",
-      data: {
-        id: userInfo.id,
-        pw,
-        hp,
-      },
-    });
-    */
+  const onUpdate = async (pw, hp) => {
+      try {
+          const response = await api.patch("/api/user/me", {
+              pw: pw,
+              hp: hp
+          });
+          setUserInfo((prevUserInfo)=> ({...prevUserInfo, pw:pw, hp:hp}));
+      } catch (error) {
+          console.error("Failed to update user:", error);
+          throw error;
+      }
   };
   const onDelete = () => {
       /*
@@ -63,11 +63,8 @@ const MyPage = () => {
   };
 
   const onLogOut = () => {
-      /*
-    userDispatch({
-      type: "LOGOUT",
-    });
-    */
+    logout();
+    nav("/");
   };
 
   return (

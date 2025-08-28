@@ -4,16 +4,20 @@ const MyInfo = ({ userInfo, onUpdate, onDelete, onLogOut }) => {
   const [editMode, setEditMode] = useState(false);
   const [pwHide, setPwHide] = useState(false);
   const [input, setInput] = useState({
-    pw : userInfo.pw,
-    hp : userInfo.hp
+    pw : "",
+    hp : ""
   });
-
   useEffect(() => {
-      setInput({
-        pw: userInfo.pw,
-        hp: userInfo.hp,
-      });
+      initInput();
     }, [userInfo]);
+
+  const initInput = ()=>{
+      setInput({
+          pw: "",
+          hp: userInfo.hp,
+      });
+  }
+
 
   const [focus, setFocus] = useState({
     pw: false,
@@ -55,7 +59,20 @@ const MyInfo = ({ userInfo, onUpdate, onDelete, onLogOut }) => {
             {editMode ? (
               <>
                 <tr>
-                  <th>비밀번호</th>
+                  <th>연락처</th>
+                  <td>
+                      <input
+                          type="text"
+                          name="hp"
+                          onChange={onChangeInput}
+                          onFocus={onFocus}
+                          onBlur={onBlur}
+                          value={input.hp}
+                      />
+                  </td>
+                </tr>
+                <tr>
+                  <th>새 비밀번호</th>
                   <td>
                     <input
                       type={pwHide ? "password" : "text"}
@@ -64,19 +81,6 @@ const MyInfo = ({ userInfo, onUpdate, onDelete, onLogOut }) => {
                       onFocus={onFocus}
                       onBlur={onBlur}
                       value={input.pw}
-                    />
-                  </td>
-                </tr>
-                <tr>
-                  <th>연락처</th>
-                  <td>
-                    <input
-                      type="text"
-                      name="hp"
-                      onChange={onChangeInput}
-                      onFocus={onFocus}
-                      onBlur={onBlur}
-                      value={input.hp}
                     />
                   </td>
                 </tr>
@@ -97,9 +101,14 @@ const MyInfo = ({ userInfo, onUpdate, onDelete, onLogOut }) => {
               <button  onClick={onDelete}>회원 탈퇴</button>
               <div className="h_btn">
                 <button
-                  onClick={() => {
-                    onUpdate(input.pw, input.hp);
-                    setEditMode(false);
+                  onClick={async () => {
+                    try {
+                        await onUpdate(input.pw, input.hp);
+                        setEditMode(false);
+                    }catch(error) {
+                        alert(error.response.data);
+                        initInput();
+                    }
                   }}
                 >
                   확인
