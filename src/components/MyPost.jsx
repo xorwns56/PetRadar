@@ -1,16 +1,12 @@
 import "../style/MyPost.css";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import Pagination from "./Pagination";
 import MypageModalDetail from "./MypageModalDetail";
 import { useModal } from "../hooks/ModalContext";
 import MyPostReportItem from "./MyPostReportItem";
 import MyPostMissingItem from "./MyPostMissingItem";
-import {
-  useMissingDispatch,
-  useMissingState,
-} from "../contexts/MissingContext";
-import { useReportDispatch, useReportState } from "../contexts/ReportContext";
 import { useNavigate } from "react-router-dom";
+import { useAuth } from "../contexts/AuthContext.jsx";
 
 const slice = (items, page, itemSize) => {
   const end = page * itemSize;
@@ -21,10 +17,9 @@ const slice = (items, page, itemSize) => {
 const MyPost = ({ id }) => {
   const nav = useNavigate();
   const { isActive, toggleModal } = useModal();
-  const missingState = useMissingState();
-  const missingDispatch = useMissingDispatch();
-  const reportState = useReportState();
-  const reportDispatch = useReportDispatch();
+    const { api } = useAuth();
+  const { myMissing, setMyMissing } = useState();
+  /*
   const myMissing = missingState
     .filter((item) => {
       return item.id === id;
@@ -32,11 +27,34 @@ const MyPost = ({ id }) => {
     .toSorted((prev, next) => {
       return next.createDate - prev.createDate;
     });
+
+   */
   const [petMissingItem, setPetMissingItem] = useState(
     myMissing.length > 0 ? myMissing[0] : null
   );
+
+
+
+
   useEffect(() => {
     if (isActive) toggleModal();
+
+      const fetchMyMissing = async () => {
+          try {
+              const response = await api.get("/api/missing/me");
+                console.log(response.data);
+              /*
+              setUserInfo({
+                  id : response.data.loginId,
+                  hp : response.data.hp
+              });
+               */
+          } catch (error) {
+              console.error("Failed to fetch missing:", error);
+          }
+      };
+      fetchMyMissing();
+
   }, []);
   useEffect(() => {
     setPage(1);

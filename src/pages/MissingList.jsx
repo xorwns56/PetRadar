@@ -22,7 +22,13 @@ const MissingList = () => {
       // missing list 데이터 가져오기
       const fetchMissingList = async () => {
         try {
-          const response = await api.get("/api/missing");
+          const response = await api.get("/api/missing", {
+            params: {
+                page: 0,
+                size: 5,
+                sort: "createdAt,desc"
+            }
+          });
           setMissingList(response.data);
         } catch (error) {
           console.error("Failed to fetch missing list:", error);
