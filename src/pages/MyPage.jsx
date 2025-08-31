@@ -36,30 +36,16 @@ const MyPage = () => {
           throw error;
       }
   };
-  const onDelete = () => {
-      /*
+  const onDelete = async () => {
     if (confirm("탈퇴 시 모든 정보가 삭제됩니다. 정말 탈퇴하시겠습니까?")) {
-      userDispatch({
-        type: "DELETE",
-        data: {
-          id: userInfo.id,
-        },
-      });
-      missingDispatch({
-        type: "DELETE_USER_DATA",
-        data: {
-          id: userInfo.id,
-        },
-      });
-      reportDispatch({
-        type: "DELETE_USER_DATA",
-        data: {
-          id: userInfo.id,
-        },
-      });
-      onLogOut();
+        try {
+            await api.delete("/api/user/me");
+            onLogOut();
+          } catch (error) {
+            console.error("Failed to delete user:", error);
+            alert("삭제에 실패했습니다.");
+          }
     }
-    */
   };
 
   const onLogOut = () => {
@@ -79,7 +65,7 @@ const MyPage = () => {
             onLogOut={onLogOut}
           />
         </div>
-{/*         <MyPost id={userState.currentUser} /> */}
+        <MyPost/>
       </div>
     </div>
   );

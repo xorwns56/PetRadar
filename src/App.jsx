@@ -17,19 +17,12 @@ import NotFound from "./pages/NotFound";
 import SideBar from "./components/SideBar";
 
 import { SidebarProvider } from "./hooks/SidebarContext";
-import { UserProvider } from "./contexts/UserContext";
 import { ModalProvider } from "./hooks/ModalContext";
-import { ReportProvider } from "./contexts/ReportContext";
-import { MissingProvider } from "./contexts/MissingContext";
-
 import { AuthProvider } from "./contexts/AuthContext"
 
 function App() {
   return (
     <>
-      <UserProvider>
-        <MissingProvider>
-          <ReportProvider>
             <BrowserRouter>
             <AuthProvider>
               <SidebarProvider>
@@ -68,9 +61,6 @@ function App() {
               </SidebarProvider>
             </AuthProvider>
             </BrowserRouter>
-          </ReportProvider>
-        </MissingProvider>
-      </UserProvider>
     </>
   );
 }

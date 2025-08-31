@@ -8,75 +8,63 @@ import MyPostMissingItem from "./MyPostMissingItem";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../contexts/AuthContext.jsx";
 
-const slice = (items, page, itemSize) => {
-  const end = page * itemSize;
-  const start = end - itemSize;
-  return items.slice(start, end);
-};
-
-const MyPost = ({ id }) => {
+const MyPost = () => {
   const nav = useNavigate();
   const { isActive, toggleModal } = useModal();
-    const { api } = useAuth();
-  const { myMissing, setMyMissing } = useState();
-  /*
-  const myMissing = missingState
-    .filter((item) => {
-      return item.id === id;
-    })
-    .toSorted((prev, next) => {
-      return next.createDate - prev.createDate;
-    });
-
-   */
-  const [petMissingItem, setPetMissingItem] = useState(
-    myMissing.length > 0 ? myMissing[0] : null
-  );
-
-
-
-
-  useEffect(() => {
-    if (isActive) toggleModal();
-
-      const fetchMyMissing = async () => {
-          try {
-              const response = await api.get("/api/missing/me");
-                console.log(response.data);
-              /*
-              setUserInfo({
-                  id : response.data.loginId,
-                  hp : response.data.hp
-              });
-               */
-          } catch (error) {
-              console.error("Failed to fetch missing:", error);
-          }
-      };
-      fetchMyMissing();
-
-  }, []);
-  useEffect(() => {
-    setPage(1);
-    if (!petMissingItem && myMissing.length > 0) {
-      setPetMissingItem(myMissing[0]);
-    }
-  }, [petMissingItem]);
-  const missingReport = reportState
-    .filter((item) => {
-      return (
-        petMissingItem &&
-        String(item.petMissingId) === String(petMissingItem.petMissingId)
-      );
-    })
-    .toSorted((prev, next) => {
-      return next.createDate - prev.createDate;
-    });
+  const { api } = useAuth();
+  const [ myMissing, setMyMissing ] = useState([]);
+  const [ petMissingItem, setPetMissingItem ] = useState(null);
   const [page, setPage] = useState(1);
   const itemSize = 2;
-  const sliceItems = slice(missingReport, page, itemSize);
+  const [reports, setReports] = useState([]);
+  const [totalReports, setTotalReports] = useState(0);
+
   const onPageClick = (page) => setPage(page);
-  const [modalData, setModalData] = useState({});
+  const [modalData, setModalData] = useState(null);
+  useEffect(() => {
+    if (isActive) toggleModal();
+    const fetchMyMissing = async () => {
+      try {
+          const response = await api.get("/api/missing/me");
+          setMyMissing(response.data);
+          if(response.data.length > 0){
+              setPetMissingItem(response.data[0]);
+          }
+      } catch (error) {
+          console.error("Failed to fetch missing:", error);
+      }
+    };
+    fetchMyMissing();
+  }, []);
+
+  useEffect(() => {
+    setPage(1);
+  }, [petMissingItem]);
+
+    useEffect(() => {
+      const fetchReports = async () => {
+        if (!petMissingItem) return; // 반려동물이 선택되지 않았으면 아무것도 가져오지 않음
+        try {
+          // API 엔드포인트에 petMissingId, page, itemSize를 파라미터로 전달합니다.
+          const response = await api.get(
+            `/api/report/missing/${petMissingItem.id}`,
+            {
+              params: {
+                page: page - 1,
+                size: itemSize,
+                sort: "createdAt,desc"
+              },
+            }
+          );
+          setReports(response.data.content); // 응답 데이터의 'content' 배열을 reports 상태에 저장
+          setTotalReports(response.data.totalElements); // 응답 데이터의 'totalElements'를 totalReports 상태에 저장
+        } catch (error) {
+          console.error("Failed to fetch reports:", error);
+        }
+      };
+      fetchReports();
+    }, [petMissingItem, page]);
+
   return (
     <div className="MyPost">
       <div className="post-title">
@@ -86,20 +74,21 @@ const MyPost = ({ id }) => {
         <div className="none-text">
           <p>현재 실종신고가 존재하지 않습니다.</p>
         </div>
-        {petMissingItem && (
+        {(
           <>
             <div className="missing">
               {myMissing.map((item) => {
                 return (
                   <MyPostMissingItem
-                    key={`petMissing${item.petMissingId}`}
+                    key={`petMissing${item.id}`}
                     petName={item.petName}
-                    isActive={item.petMissingId === petMissingItem.petMissingId}
+                    isActive={item.id === petMissingItem.id}
                     onClick={() => setPetMissingItem(item)}
                   />
                 );
               })}
             </div>
+            {petMissingItem && (
             <div className="MyPostMissingList">
               <div className="MyPostMissingList-container">
                 <div className="title">
@@ -109,28 +98,30 @@ const MyPost = ({ id }) => {
               <div className="btn">
                 <p
                   onClick={() => {
-                    nav(`/missingRevise/${petMissingItem.petMissingId}`);
+                    nav(`/missingRevise/${petMissingItem.id}`);
                   }}
                 >
                   수정
                 </p>
                 <span>|</span>
                 <p
-                  onClick={() => {
+                  onClick={async () => {
                     if (
                       confirm(
                         `${petMissingItem.petName}의 실종신고를 정말 삭제하시겠습니까?`
                       )
                     ) {
-                      missingDispatch({
-                        type: "DELETE",
-                        data: { petMissingId: petMissingItem.petMissingId },
-                      });
-                      reportDispatch({
-                        type: "DELETE_BY_MISSING",
-                        data: { petMissingId: petMissingItem.petMissingId },
-                      });
-                      setPetMissingItem(null);
+                      try {
+                        await api.delete(`/api/missing/${petMissingItem.id}`);
+                        const updatedMissingList = myMissing.filter(
+                          (item) => item.id !== petMissingItem.id
+                        );
+                        setMyMissing(updatedMissingList);
+                        setPetMissingItem(updatedMissingList.length > 0 ? updatedMissingList[0] : null);
+                      } catch (error) {
+                        console.error("Failed to delete missing item:", error);
+                        alert("삭제에 실패했습니다.");
+                      }
                     }
                   }}
                 >
@@ -138,11 +129,12 @@ const MyPost = ({ id }) => {
                 </p>
               </div>
             </div>
+            )}
             <div className="report">
-              {sliceItems.map((item) => {
+              {reports.map((item) => {
                 return (
                   <MyPostReportItem
-                    key={`petReport${item.petReportId}`}
+                    key={`petReport${item.id}`}
                     title={item.title}
                     content={item.content}
                     petImage={item.petImage}
@@ -155,7 +147,7 @@ const MyPost = ({ id }) => {
               })}
             </div>
             <Pagination
-              totalItems={missingReport.length}
+              totalItems={totalReports}
               page={page}
               onClick={onPageClick}
               itemSize={itemSize}

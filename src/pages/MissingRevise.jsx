@@ -6,11 +6,12 @@ import Header from "../components/Header";
 import Button from "../components/Button";
 import LocationMap from "../components/LocationMap";
 import useFormFocus from "../hooks/useFormFocus";
+import { useAuth } from '../contexts/AuthContext';
 
 const MissingRevise = () => {
   const params = useParams();
   const nav = useNavigate();
-
+  const { api } = useAuth();
   const [form, setForm] = useState({
     petName: "",
     petType: "",
@@ -29,8 +30,7 @@ const MissingRevise = () => {
       const fetchMissingDetail = async () => {
           try {
             const response = await api.get(`/api/missing/${params.petMissingId}`);
-            console.log(response);
-            //setForm({ ...reviseList });
+            setForm({ ...response.data });
           } catch (error) {
             console.error("Failed to fetch missing detail:", error);
           }
@@ -38,18 +38,6 @@ const MissingRevise = () => {
         fetchMissingDetail();
   }, []);
 
-  const onUpdate = () => {
-      /*
-    dispatch({
-      type: "UPDATE",
-      data: {
-        ...form,
-        id: userState.currentUser,
-        petMissingId: params.petMissingId,
-      },
-    });
-*/
-  };
 
   const today = new Date().toISOString().split("T")[0];
   const startYear = 2000;
@@ -83,12 +71,16 @@ const MissingRevise = () => {
 
   const { handleRef, checkInput } = useFormFocus(form, formKeys, formKeysLabel);
 
-  const onSubmitButtonClick = () => {
+  const onSubmitButtonClick = async () => {
     if (!checkInput()) {
       return;
     }
-    onUpdate();
-    nav("/myPage");
+    try {
+        const response = await api.patch(`/api/missing/${params.petMissingId}`, {...form});
+        nav("/myPage");
+    } catch (error) {
+        console.error("Failed to update :", error);
+    }
   };
 
   const handleChange = (e) => {
