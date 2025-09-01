@@ -8,15 +8,21 @@ const Header = ({ leftChild }) => {
   const { toggleSidebar } = useSidebar();
   const location = useLocation();
   const nav = useNavigate();
-  const { isAuthenticated } = useAuth();
+  const { isAuthenticated, api } = useAuth();
   const [alerts, setAlerts] = useState(null);
     // useEffect 훅을 사용하여 컴포넌트가 처음 마운트될 때 API를 호출
     useEffect(() => {
       // 사용자가 인증되었을 때만 API를 호출
       if (isAuthenticated) {
-
-          //api 호출(알림 받아오는 로직)
-
+          const fetchNotification = async () => {
+              try{
+                  const response = api.get("/api/notification/me");
+                  console.log(response.data);
+              } catch (error) {
+                  console.error("Failed to fetch notification : ", error);
+              }
+          };
+          fetchNotification();
       }
     }, [isAuthenticated]);
 
