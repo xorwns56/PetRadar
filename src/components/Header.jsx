@@ -8,7 +8,7 @@ const Header = ({ leftChild }) => {
   const { toggleSidebar } = useSidebar();
   const location = useLocation();
   const nav = useNavigate();
-  const { isAuthenticated, userId } = useAuth();
+  const { isAuthenticated, userId, api } = useAuth();
   const [alerts, setAlerts] = useState(null);
     // useEffect 훅을 사용하여 컴포넌트가 처음 마운트될 때 API를 호출
     useEffect(() => {
@@ -33,6 +33,15 @@ const Header = ({ leftChild }) => {
               console.error("SSE 연결 오류", err);
               // 자동 재연결은 브라우저가 해주지만, 필요시 eventSource.close() 해도 됨
             };
+          const fetchNotification = async () => {
+              try{
+                  const response = api.get("/api/notification/me");
+                  console.log(response.data);
+              } catch (error) {
+                  console.error("Failed to fetch notification : ", error);
+              }
+          };
+          fetchNotification();
       }
         return () => {
           if (eventSource) {
