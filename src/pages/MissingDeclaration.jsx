@@ -74,8 +74,13 @@ const MissingDeclaration = () => {
       return;
     }
     try {
-        // form 상태를 그대로 API 요청 본문에 전달
-        const response = await api.post("/api/missing", form);
+        const { petMissingPoint, ...restOfForm } = form;
+        const requestBody = {
+          ...restOfForm,
+          latitude: petMissingPoint?.lat || null,
+          longitude: petMissingPoint?.lng || null,
+        };
+        const response = await api.post("/api/missing", requestBody);
         nav("/missingList");
       } catch (error) {
           alert("신고 제출에 실패했습니다. 다시 시도해주세요.");

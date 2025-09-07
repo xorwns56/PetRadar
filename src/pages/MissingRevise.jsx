@@ -76,7 +76,13 @@ const MissingRevise = () => {
       return;
     }
     try {
-        const response = await api.patch(`/api/missing/${params.petMissingId}`, {...form});
+        const { petMissingPoint, ...restOfForm } = form;
+          const requestBody = {
+            ...restOfForm,
+            latitude: petMissingPoint?.lat || null,
+            longitude: petMissingPoint?.lng || null,
+          };
+        const response = await api.patch(`/api/missing/${params.petMissingId}`, requestBody);
         nav("/myPage");
     } catch (error) {
         console.error("Failed to update :", error);

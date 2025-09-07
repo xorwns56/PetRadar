@@ -20,7 +20,13 @@ const MissingReport = () => {
   });
   const onSubmitButtonClick = async () => {
       try {
-          const response = await api.post(`/api/report/missing/${params.petMissingId}`, form);
+          const { petReportPoint, ...restOfForm } = form;
+          const requestBody = {
+            ...restOfForm,
+            latitude: petReportPoint ? petReportPoint.lat : null,
+            longitude: petReportPoint ? petReportPoint.lng : null,
+          };
+          const response = await api.post(`/api/report/missing/${params.petMissingId}`, requestBody);
           nav("/missingList");
       } catch (error) {
           alert("제보 등록에 실패했습니다. 다시 시도해주세요.");

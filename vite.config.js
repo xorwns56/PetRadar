@@ -9,16 +9,8 @@ export default defineConfig({
         '/api': {
           target: 'http://localhost:8080',
           changeOrigin: true,
+          ws:true
         }
       }
-    /*
-    proxy: {
-      '/api': {
-        target: 'https://apis.data.go.kr',
-        changeOrigin: true,
-        rewrite: path => path.replace(/^\/api/, '')
-      }
-    }
-    */
   }
 })

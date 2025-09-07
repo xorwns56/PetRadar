@@ -5,51 +5,41 @@ import { useEffect, useState } from "react";
 import { useAuth } from '../contexts/AuthContext';
 
 const Header = ({ leftChild }) => {
-  const { toggleSidebar } = useSidebar();
+  const { toggleSidebar, alerts } = useSidebar();
   const location = useLocation();
   const nav = useNavigate();
-  const { isAuthenticated, userId, api } = useAuth();
-  const [alerts, setAlerts] = useState(null);
+  const { isAuthenticated, api, socket } = useAuth();
     // useEffect 훅을 사용하여 컴포넌트가 처음 마운트될 때 API를 호출
+    /*
     useEffect(() => {
-        let eventSource;
-      // 사용자가 인증되었을 때만 API를 호출
-      if (isAuthenticated) {
-          //api 호출(알림 받아오는 로직)
-          eventSource = new EventSource(`/api/sse/${userId}`);
-
-            eventSource.addEventListener("heartbeat", (event) => {
-              console.log("heartbeat:", event.data);
-            });
-
-            eventSource.addEventListener("newPost", (event) => {
-              console.log("알림:", event.data);
-
-              // 알림 갯수 증가 (예: 새 글 알림 카운트)
-              setAlerts((prev) => (prev ? prev + 1 : 1));
-            });
-
-            eventSource.onerror = (err) => {
-              console.error("SSE 연결 오류", err);
-              // 자동 재연결은 브라우저가 해주지만, 필요시 eventSource.close() 해도 됨
-            };
-          const fetchNotification = async () => {
-              try{
-                  const response = api.get("/api/notification/me");
-                  console.log(response.data);
-              } catch (error) {
-                  console.error("Failed to fetch notification : ", error);
-              }
-          };
-          fetchNotification();
-      }
-        return () => {
-          if (eventSource) {
-            eventSource.close();
-            console.log("🔌 SSE 연결 해제");
+        if(!isAuthenticated) return;
+        const fetchNotification = async () => {
+          try{
+              const response = await api.get("/api/notification/me");
+              console.log(response.data);
+          } catch (error) {
+              console.error("Failed to fetch notification : ", error);
           }
         };
+        fetchNotification();
     }, [isAuthenticated]);
+*/
+
+/*
+    useEffect(() => {
+        if(!socket) return;
+        const subscription = socket.subscribe("/user/queue/notification", (message) => {
+          const data = JSON.parse(message.body);
+          console.log("새 알림:", data);
+          //setAlerts((prev) => (prev || 0) + 1); // 카운트 증가 예시
+        });
+        return () => {
+            console.log("구독 해제");
+          subscription.unsubscribe();
+        };
+
+    }, [socket]);
+*/
 
   return (
     <header className="Header">
@@ -85,7 +75,7 @@ const Header = ({ leftChild }) => {
         {isAuthenticated && (
           <p className="Msg-bell" onClick={toggleSidebar}>
             {alerts && (
-              <span className="Msg-cnt">{alerts}</span>
+              <span className="Msg-cnt">{alerts.length}</span>
             )}
           </p>
         )}
