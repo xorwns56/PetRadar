@@ -8,39 +8,7 @@ const Header = ({ leftChild }) => {
   const { toggleSidebar, alerts } = useSidebar();
   const location = useLocation();
   const nav = useNavigate();
-  const { isAuthenticated, api, socket } = useAuth();
-    // useEffect 훅을 사용하여 컴포넌트가 처음 마운트될 때 API를 호출
-    /*
-    useEffect(() => {
-        if(!isAuthenticated) return;
-        const fetchNotification = async () => {
-          try{
-              const response = await api.get("/api/notification/me");
-              console.log(response.data);
-          } catch (error) {
-              console.error("Failed to fetch notification : ", error);
-          }
-        };
-        fetchNotification();
-    }, [isAuthenticated]);
-*/
-
-/*
-    useEffect(() => {
-        if(!socket) return;
-        const subscription = socket.subscribe("/user/queue/notification", (message) => {
-          const data = JSON.parse(message.body);
-          console.log("새 알림:", data);
-          //setAlerts((prev) => (prev || 0) + 1); // 카운트 증가 예시
-        });
-        return () => {
-            console.log("구독 해제");
-          subscription.unsubscribe();
-        };
-
-    }, [socket]);
-*/
-
+  const { isAuthenticated } = useAuth();
   return (
     <header className="Header">
       <div className="header_left">

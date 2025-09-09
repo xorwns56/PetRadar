@@ -19,31 +19,24 @@ const MissingList = () => {
   };
   const [missingList, setMissingList] = useState([]);
   useEffect(() => {
-      // missing list 데이터 가져오기
       const fetchMissingList = async () => {
         try {
-          const response = await api.get("/api/missing", {
-            params: {
-                page: 0,
-                size: 5,
-                sort: "createdAt,desc"
-            }
-          });
+          const response = await api.get("/api/missing");
           setMissingList(response.data);
         } catch (error) {
           console.error("Failed to fetch missing list:", error);
         }
       };
       fetchMissingList();
-    }, []); // 빈 배열을 넣어 컴포넌트가 처음 렌더링될 때만 실행
+    }, []);
 
 
   const getSortedList = () => {
     return missingList.toSorted((prev, next) => {
       if (sortType === "oldest") {
-        return prev.createDate - next.createDate;
+        return prev.id - next.id;
       } else {
-        return next.createDate - prev.createDate;
+        return next.id - prev.id;
       }
     });
   };
@@ -124,11 +117,11 @@ const MissingList = () => {
 
       {selectedItem && (
         <PetModalDetail
-          selectedId={selectedItem.petMissingId}
+          missingPet={selectedItem}
           onClick={() => {
             nav(`/missingReport/${selectedItem.petMissingId}}`);
           }}
-          myMissing={userState.currentUser === selectedItem.id}
+          myMissing={userId === selectedItem.userId}
         />
       )}
     </div>

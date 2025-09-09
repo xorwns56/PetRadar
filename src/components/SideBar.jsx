@@ -5,97 +5,45 @@ import MissingAlertBox from "./MissingAlertBox";
 import { useSidebar } from "../hooks/SidebarContext";
 import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import { useAuth } from '../contexts/AuthContext';
 
 const SideBar = () => {
   const nav = useNavigate();
-  const { isActive, toggleSidebar } = useSidebar();
+  const { api } = useAuth();
+  const { isActive, toggleSidebar, alerts, setAlerts } = useSidebar();
 
-  /*
-  const userState = useUserState();
-  const userDispatch = useUserDispatch();
-  const missingState = useMissingState();
-  const reportState = useReportState();
-  const userInfo = userState.users.find(
-    (user) => user.id === userState.currentUser
-  );
-  */
-  const onAlertClose = (alert) => {
-      /*
-    userDispatch({
-      type: "REMOVE_ALERT",
-      data: {
-        id: userInfo.id,
-        postId: alert.postId,
-        postType: alert.postType,
-      },
-    });
-*/
+  const onAlertClose = async (id) => {
+    try {
+      await api.delete(`/api/notification/${id}`);
+      setAlerts(prev => prev.filter(alert => alert.id !== id));
+    } catch (error) {
+      console.error("Failed to delete notification:", error);
+    }
   };
 
-  useEffect(() => {
-      /*
-    let newAlert = [];
-    if (userInfo) {
-      const lastAlertDate = userInfo.lastAlertDate ?? userInfo.createDate ?? 0;
-      const missingAlert = missingState
-        .filter(
-          (item) => lastAlertDate < item.createDate && item.id !== userInfo.id
-        )
-        .map((item) => ({
-          id: item.id,
-          postId: item.petMissingId,
-          postType: "missing",
-          createDate: item.createDate,
-        }));
-      const reportAlert = reportState
-        .filter(
-          (item) =>
-            lastAlertDate < item.createDate &&
-            item.petMissingUser === userInfo.id
-        )
-        .map((item) => ({
-          id: item.id,
-          postId: item.petReportId,
-          postType: "report",
-          createDate: item.createDate,
-        }));
-      newAlert = [...missingAlert, ...reportAlert].toSorted(
-        (prev, next) => next.createDate - prev.createDate
-      );
-      userDispatch({
-        type: "ADD_ALERT",
-        data: {
-          id: userInfo.id,
-          alerts: newAlert,
-        },
-      });
-    }
-    */
-  }, []); //userState.currentUser, missingState, reportState
   return (
     <div className={`SideBar ${isActive ? "active" : ""}`}>
       <div className="close-btn" onClick={toggleSidebar}>
         <Button text={"X"} type={"Circle"} />
       </div>
-{/*       {userInfo && */}
-{/*         (userInfo.alerts || []).map((alert) => */}
-{/*           alert.postType === "missing" ? ( */}
-{/*             <MissingAlertBox */}
-{/*               key={`${alert.postType}_${alert.postId}`} */}
-{/*               {...alert} */}
-{/*               onAlertClick={() => nav("/missingList")} */}
-{/*               onAlertClose={() => onAlertClose(alert)} */}
-{/*             /> */}
-{/*           ) : ( */}
-{/*             <ReportAlertBox */}
-{/*               key={`${alert.postType}_${alert.postId}`} */}
-{/*               {...alert} */}
-{/*               currentUser={userState.currentUser} */}
-{/*               onAlertClick={() => nav("/myPage")} */}
-{/*               onAlertClose={() => onAlertClose(alert)} */}
-{/*             /> */}
-{/*           ) */}
-{/*         )} */}
+      {alerts.map((alert) =>
+          alert.postType === "missing" ? (
+            <MissingAlertBox
+              key={`${alert.postType}_${alert.id}`}
+              {...alert}
+              onAlertClick={() => nav("/missingList")}
+              onAlertClose={() => onAlertClose(alert.id)}
+            />
+          ) : (
+            <ReportAlertBox
+              key={`${alert.postType}_${alert.id}`}
+              {...alert}
+              currentUser={alert.receiverId}
+              onAlertClick={() => nav("/myPage")}
+              onAlertClose={() => onAlertClose(alert.id)}
+            />
+          )
+        )}
     </div>
   );
 };

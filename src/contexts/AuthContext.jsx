@@ -74,7 +74,10 @@ export const AuthProvider = ({ children }) => {
     useEffect(() => {
         const token = sessionStorage.getItem("accessToken");
         if(!token){
-            setSocket(null);
+            if(socket){
+                socket.deactivate();
+                setSocket(null);
+            }
             return;
         }
         if(socket) return;
