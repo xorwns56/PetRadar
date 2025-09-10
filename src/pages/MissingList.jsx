@@ -14,53 +14,38 @@ const MissingList = () => {
   const nav = useNavigate();
   const { api, userId } = useAuth();
   const [sortType, setSortType] = useState("latest");
-  const onChangeSortType = (e) => {
-    setSortType(e.target.value);
-  };
+  const [searchInput, setSearchInput] = useState("");
   const [missingList, setMissingList] = useState([]);
+
+  const fetchMissingList = async () => {
+      try {
+        const response = await api.get("/api/missing", {
+          params: {
+            searchInput: searchInput,
+            sortType: sortType,
+          }
+        });
+        setMissingList(response.data);
+      } catch (error) {
+        console.error("Failed to fetch missing list:", error);
+      }
+    };
+
   useEffect(() => {
-      const fetchMissingList = async () => {
-        try {
-          const response = await api.get("/api/missing");
-          setMissingList(response.data);
-        } catch (error) {
-          console.error("Failed to fetch missing list:", error);
-        }
-      };
       fetchMissingList();
     }, []);
-
-
-  const getSortedList = () => {
-    return missingList.toSorted((prev, next) => {
-      if (sortType === "oldest") {
-        return prev.id - next.id;
-      } else {
-        return next.id - prev.id;
-      }
-    });
-  };
-  const sortedList = getSortedList();
-
-  const [searchInput, setSearchInput] = useState("");
-  const [searchBtn, setSearchBtn] = useState("");
 
   const onChangeInput = (e) => {
     setSearchInput(e.target.value);
   };
-  const onClickChange = () => {
-    setSearchBtn(searchInput);
-  };
 
-  const getFilterTitle = () => {
-    if (searchInput === "") {
-      return sortedList;
-    }
-    return sortedList.filter((item) =>
-      item.title?.toLowerCase().includes(searchBtn.toLowerCase())
-    );
+  const onChangeSortType = (e) => {
+      setSortType(e.target.value);
+    };
+
+  const onClick = () => {
+      fetchMissingList();
   };
-  const getFilterTitleData = getFilterTitle();
 
   return (
     <div className="MissingList">
@@ -78,18 +63,12 @@ const MissingList = () => {
           <input
             value={searchInput}
             onChange={onChangeInput}
-            // onKeyDown={(e) => {
-            //   if (e.key === "Enter") {
-            //     onClickChange();
-            //   }
-            // }}
             placeholder="검색할 제목을 입력하세요."
           />
-          <Button text={"조회"} type={"Square"} onClick={onClickChange} />
+          <Button text={"조회"} type={"Square"} onClick={onClick} />
         </div>
-        {/* "MissingItems */}
         <div className="MissingItems">
-          {getFilterTitleData.map((item) => (
+          {missingList.map((item) => (
             <MissingItem
               key={item.id}
               missingDTO={item}
