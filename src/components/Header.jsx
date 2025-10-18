@@ -1,16 +1,14 @@
 import "../style/Header.css";
 import { useLocation, useNavigate } from "react-router-dom";
 import { useSidebar } from "../hooks/SidebarContext";
-import { useUserState } from "../contexts/UserContext";
+import { useEffect, useState } from "react";
+import { useAuth } from '../contexts/AuthContext';
 
 const Header = ({ leftChild }) => {
-  const { toggleSidebar } = useSidebar();
+  const { toggleSidebar, alerts } = useSidebar();
   const location = useLocation();
   const nav = useNavigate();
-  const userState = useUserState();
-  const userInfo = userState.users.find(
-    (user) => user.id === userState.currentUser
-  );
+  const { isAuthenticated } = useAuth();
   return (
     <header className="Header">
       <div className="header_left">
@@ -37,15 +35,15 @@ const Header = ({ leftChild }) => {
       <div className="header_right">
         <p
           onClick={() => {
-            nav(userState.currentUser ? "/myPage" : "/login");
+            nav(isAuthenticated ? "/myPage" : "/login");
           }}
         >
-          {userState.currentUser ? "마이페이지" : "로그인/회원가입"}
+          {isAuthenticated ? "마이페이지" : "로그인/회원가입"}
         </p>
-        {userState.currentUser && (
+        {isAuthenticated && (
           <p className="Msg-bell" onClick={toggleSidebar}>
-            {userInfo && userInfo.alerts && (
-              <span className="Msg-cnt">{userInfo.alerts.length}</span>
+            {alerts && (
+              <span className="Msg-cnt">{alerts.length}</span>
             )}
           </p>
         )}

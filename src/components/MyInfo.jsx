@@ -1,12 +1,24 @@
 import "../style/MyInfo.css";
-import { useState } from "react";
-const MyInfo = ({ id, pw, hp, onUpdate, onDelete, onLogOut }) => {
+import { useState, useEffect } from "react";
+const MyInfo = ({ userInfo, onUpdate, onDelete, onLogOut }) => {
   const [editMode, setEditMode] = useState(false);
   const [pwHide, setPwHide] = useState(false);
   const [input, setInput] = useState({
-    pw,
-    hp,
+    pw : "",
+    hp : ""
   });
+  useEffect(() => {
+      initInput();
+    }, [userInfo]);
+
+  const initInput = ()=>{
+      setInput({
+          pw: "",
+          hp: userInfo.hp,
+      });
+  }
+
+
   const [focus, setFocus] = useState({
     pw: false,
     hp: false,
@@ -41,13 +53,26 @@ const MyInfo = ({ id, pw, hp, onUpdate, onDelete, onLogOut }) => {
             <tr>
               <th>아이디</th>
               <td>
-                <span>{id}</span>
+                <span>{userInfo.id}</span>
               </td>
             </tr>
             {editMode ? (
               <>
                 <tr>
-                  <th>비밀번호</th>
+                  <th>연락처</th>
+                  <td>
+                      <input
+                          type="text"
+                          name="hp"
+                          onChange={onChangeInput}
+                          onFocus={onFocus}
+                          onBlur={onBlur}
+                          value={input.hp}
+                      />
+                  </td>
+                </tr>
+                <tr>
+                  <th>새 비밀번호</th>
                   <td>
                     <input
                       type={pwHide ? "password" : "text"}
@@ -59,25 +84,12 @@ const MyInfo = ({ id, pw, hp, onUpdate, onDelete, onLogOut }) => {
                     />
                   </td>
                 </tr>
-                <tr>
-                  <th>연락처</th>
-                  <td>
-                    <input
-                      type="text"
-                      name="hp"
-                      onChange={onChangeInput}
-                      onFocus={onFocus}
-                      onBlur={onBlur}
-                      value={input.hp}
-                    />
-                  </td>
-                </tr>
               </>
             ) : (
               <tr>
                 <th>연락처</th>
                 <td>
-                  <span>{hp}</span>
+                  <span>{userInfo.hp}</span>
                 </td>
               </tr>
             )}
@@ -89,9 +101,14 @@ const MyInfo = ({ id, pw, hp, onUpdate, onDelete, onLogOut }) => {
               <button  onClick={onDelete}>회원 탈퇴</button>
               <div className="h_btn">
                 <button
-                  onClick={() => {
-                    onUpdate(input.pw, input.hp);
-                    setEditMode(false);
+                  onClick={async () => {
+                    try {
+                        await onUpdate(input.pw, input.hp);
+                        setEditMode(false);
+                    }catch(error) {
+                        alert(error.response.data);
+                        initInput();
+                    }
                   }}
                 >
                   확인

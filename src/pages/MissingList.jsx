@@ -1,62 +1,56 @@
 import "../style/MissingList.css";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Button from "../components/Button";
 import Header from "../components/Header";
 import MissingItem from "../components/MissingItem";
-
 import PetModalDetail from "../components/PetModalDetail";
 import { useNavigate } from "react-router-dom";
 import { useModal } from "../hooks/ModalContext";
-import { useMissingState } from "../contexts/MissingContext";
-import { useUserState } from "../contexts/UserContext";
+import { useAuth } from '../contexts/AuthContext';
 
 const MissingList = () => {
   const [selectedItem, setSelectedItem] = useState(null);
-  const userState = useUserState();
   const { toggleModal } = useModal();
   const nav = useNavigate();
+  const { api, userId } = useAuth();
   const [sortType, setSortType] = useState("latest");
-  const onChangeSortType = (e) => {
-    setSortType(e.target.value);
-  };
-  const missingState = useMissingState();
-  const getSortedData = () => {
-    console.log("a");
-    return missingState.toSorted((prev, next) => {
-      if (sortType === "oldest") {
-        return prev.createDate - next.createDate;
-      } else {
-        return next.createDate - prev.createDate;
-      }
-    });
-  };
-  const sortedData = getSortedData();
-
   const [searchInput, setSearchInput] = useState("");
-  const [searchBtn, setSearchBtn] = useState("");
+  const [missingList, setMissingList] = useState([]);
+
+  const fetchMissingList = async () => {
+      try {
+        const response = await api.get("/api/missing", {
+          params: {
+            searchInput: searchInput,
+            sortType: sortType,
+          }
+        });
+        setMissingList(response.data);
+      } catch (error) {
+        console.error("Failed to fetch missing list:", error);
+      }
+    };
+
+  useEffect(() => {
+      fetchMissingList();
+    }, []);
 
   const onChangeInput = (e) => {
     setSearchInput(e.target.value);
   };
-  const onClickChange = () => {
-    setSearchBtn(searchInput);
-  };
 
-  const getFilterTitle = () => {
-    if (searchInput === "") {
-      return sortedData;
-    }
+  const onChangeSortType = (e) => {
+      setSortType(e.target.value);
+    };
 
-    return sortedData.filter((item) =>
-      item.title?.toLowerCase().includes(searchBtn.toLowerCase())
-    );
+  const onClick = () => {
+      fetchMissingList();
   };
-  const getFilterTitleData = getFilterTitle();
 
   return (
     <div className="MissingList">
       <Header leftChild={true} />
-      <div className="MissingList-conatiner inner">
+      <div className="MissingList-container inner">
         <div className="PageTitle">
           <h3>실종 동물 목록</h3>
         </div>
@@ -69,29 +63,23 @@ const MissingList = () => {
           <input
             value={searchInput}
             onChange={onChangeInput}
-            // onKeyDown={(e) => {
-            //   if (e.key === "Enter") {
-            //     onClickChange();
-            //   }
-            // }}
             placeholder="검색할 제목을 입력하세요."
           />
-          <Button text={"조회"} type={"Square"} onClick={onClickChange} />
+          <Button text={"조회"} type={"Square"} onClick={onClick} />
         </div>
-        {/* "MissingItems */}
         <div className="MissingItems">
-          {getFilterTitleData.map((item) => (
+          {missingList.map((item) => (
             <MissingItem
-              key={item.petMissingId}
-              {...item}
+              key={item.id}
+              missingDTO={item}
               toggleModal={() => {
                 setSelectedItem(item);
                 toggleModal();
               }}
               onClick={() => {
-                nav(`/missingReport/${item.petMissingId}`);
+                nav(`/missingReport/${item.id}`);
               }}
-              myMissing={userState.currentUser === item.id}
+              myMissing={userId === item.userId}
             />
           ))}
         </div>
@@ -108,11 +96,11 @@ const MissingList = () => {
 
       {selectedItem && (
         <PetModalDetail
-          selectedId={selectedItem.petMissingId}
+          missingPet={selectedItem}
           onClick={() => {
             nav(`/missingReport/${selectedItem.petMissingId}}`);
           }}
-          myMissing={userState.currentUser === selectedItem.id}
+          myMissing={userId === selectedItem.userId}
         />
       )}
     </div>

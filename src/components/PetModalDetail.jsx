@@ -1,16 +1,9 @@
 import "../style/ModalDetail.css";
 import { useModal } from "../hooks/ModalContext";
-import { getMissingImage } from "../utils/get-missingPet-image";
-import { useMissingState } from "../contexts/MissingContext";
 import Button from "./Button";
 
-const ModalDetail = ({ selectedId, onClick, myMissing }) => {
+const ModalDetail = ({ missingPet, onClick, myMissing }) => {
   const { isActive, toggleModal } = useModal();
-  const missingList = useMissingState();
-
-  const missingPet = missingList.find(
-    (item) => String(item.petMissingId) === String(selectedId)
-  );
 
   const imageSrc = missingPet.petImage || "/image-default.png";
 

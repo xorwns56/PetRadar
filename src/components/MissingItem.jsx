@@ -1,16 +1,9 @@
 import "../style/MissingItem.css";
 import { getMissingImage } from "../utils/get-missingPet-image";
-import { useMissingState } from "../contexts/MissingContext";
 import Button from "./Button";
 
-const MissingItem = ({ petMissingId, onClick, toggleModal, myMissing }) => {
-  const missingList = useMissingState();
-
-  const missingPet = missingList.find(
-    (item) => String(item.petMissingId) === String(petMissingId)
-  );
-
-  const imageSrc = missingPet.petImage || "/image-default.png";
+const MissingItem = ({ missingDTO, onClick, toggleModal, myMissing }) => {
+  const imageSrc = missingDTO.petImage || "/image-default.png";
 
   const genderSymbol = {
     M: "♂",
@@ -36,13 +29,13 @@ const MissingItem = ({ petMissingId, onClick, toggleModal, myMissing }) => {
       </div>
       <div className="contents" onClick={toggleModal}>
         <div className="contents-t1">
-          <p className="petType">{petTypeChange[missingPet.petType] || "-"}</p>
-          <p>{genderSymbol[missingPet.petGender] || "-"}</p>
-          <p>{missingPet.petName}</p>
+          <p className="petType">{petTypeChange[missingDTO.petType] || "-"}</p>
+          <p>{genderSymbol[missingDTO.petGender] || "-"}</p>
+          <p>{missingDTO.petName}</p>
         </div>
-        <p className="contents-t2">{missingPet.title}</p>
-        <p>{missingPet.petAge}(년생)</p>
-        <p>실종일자 : {missingPet.petMissingDate}</p>
+        <p className="contents-t2">{missingDTO.title}</p>
+        <p>{missingDTO.petAge}(년생)</p>
+        <p>실종일자 : {missingDTO.petMissingDate}</p>
       </div>
       <div className="ReportMove-btn">
         {!myMissing && (

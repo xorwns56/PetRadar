@@ -1,18 +1,16 @@
 import { useEffect, useRef, useState } from "react";
 import { useModal } from "../hooks/ModalContext";
-import { useMissingState } from "../contexts/MissingContext";
 import PetModalDetail from "../components/PetModalDetail";
 import { useNavigate } from "react-router-dom";
-import { useUserState } from "../contexts/UserContext";
+import { useAuth } from '../contexts/AuthContext';
 import "../style/MissingMap.css";
 
-const MissingMap = () => {
+const MissingMap = ({missingList}) => {
   const mapRef = useRef(null); // 카카오 지도 객체 참조
   const markerMapRef = useRef(new Map()); // 마커(오버레이) 객체 저장용
   const containerRef = useRef(null); // 지도 컨테이너 DOM 참조
-  const missingList = useMissingState(); // 실종 동물 리스트 상태
   const nav = useNavigate();
-  const userState = useUserState();
+  const { userId } = useAuth();
   const { isActive, toggleModal } = useModal(); // 모달 상태 및 토글 함수
   const [selectedPet, setSelectedPet] = useState(null); // 선택된 동물 정보
   const [mapLoaded, setMapLoaded] = useState(false); // 지도 로드 완료 여부
@@ -56,7 +54,7 @@ const MissingMap = () => {
 
     // 실종 동물 리스트 순회하며 마커 생성
     missingList.forEach((pet) => {
-      const { petMissingId: id, petMissingPoint, petImage } = pet;
+      const { petMissingPoint, petImage } = pet;
       // 좌표 정보가 없으면 마커 생성하지 않음
       if (
         !petMissingPoint ||
@@ -99,9 +97,7 @@ const MissingMap = () => {
         }
 
         setSelectedPet(pet); // 선택된 동물 정보 저장
-        setTimeout(() => {
-          toggleModal(); // 모달 열기
-        }, 200);
+        toggleModal();
       });
 
       // 커스텀 오버레이(마커) 생성
@@ -112,7 +108,7 @@ const MissingMap = () => {
       });
 
       overlay.setMap(map); // 지도에 오버레이 표시
-      markerMapRef.current.set(id, overlay); // 마커 맵에 저장
+      markerMapRef.current.set(pet.id, overlay); // 마커 맵에 저장
     });
   }, [mapLoaded, missingList, toggleModal]);
 
@@ -127,9 +123,9 @@ const MissingMap = () => {
       {/* 모달이 활성화되고 동물이 선택된 경우 상세 모달 표시 */}
       {isActive && selectedPet && (
         <PetModalDetail
-          selectedId={selectedPet.petMissingId}
-          onClick={() => nav(`/missingReport/${selectedPet.petMissingId}`)}
-          myMissing={userState.currentUser === selectedPet.id}
+          missingPet={selectedPet}
+          onClick={() => nav(`/missingReport/${selectedPet.id}`)}
+          myMissing={userId === selectedPet.userId}
         />
       )}
     </>

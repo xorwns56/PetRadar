@@ -1,10 +1,12 @@
 import '../style/Register.css';
 import RegisterForm from '../components/RegisterForm';
-import { useUserDispatch, useUserState } from '../contexts/UserContext';
 import { Link, useNavigate } from 'react-router-dom';
 import { useEffect } from 'react';
+import { useAuth } from '../contexts/AuthContext';
 const Register = () => {
   const nav = useNavigate();
+  const { api } = useAuth();
+  /*
   const userState = useUserState();
   const userDispatch = useUserDispatch();
   useEffect(() => {
@@ -12,22 +14,27 @@ const Register = () => {
       nav('/', { replace: true });
     }
   }, [userState.currentUser, nav]);
-  const isExist = (id) => {
-    return userState.users.some((user) => user.id === id);
+  */
+
+  const isExist = async (id) => {
+    try {
+      const response = await api.get("/api/auth/check-exist", { params : {id} });
+      return response.data;
+    } catch (error) {
+      console.error("isExist : ", error);
+      return true;
+    }
   };
-  const onCreate = (id, pw, hp) => {
-    userDispatch({
-      type: 'CREATE',
-      data: {
-        id,
-        pw,
-        hp,
-      },
-    });
+
+  const onRegister = async (id, pw, hp) => {
+    try {
+      await api.post("/api/auth/register", { id, pw, hp });
+      nav("/login", { replace: true });
+    } catch (error) {
+        console.error("onRegister : ", error);
+    }
   };
-  const onRegister = () => {
-    nav('/login', { replace: true });
-  };
+
   return (
     <div className="Register">
       <div className="Register-container">
@@ -37,7 +44,7 @@ const Register = () => {
           </Link>
         </div>
         <div className="Register-contents">
-          <RegisterForm isExist={isExist} onCreate={onCreate} onRegister={onRegister} />
+          <RegisterForm isExist={isExist} onRegister={onRegister} />
           <div className="login-img">
             <img src="/Menu-icon1.png" alt="login-img" />
           </div>
