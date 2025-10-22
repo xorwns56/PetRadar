@@ -1,5 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 
+const AppKey = "b737c6777956f74337fc9bc5a08e3b55";
+
 const LocationMap = ({ init, onSelect }) => {
   const [location, setLocation] = useState(null);
   const markerRef = useRef(null);
@@ -34,7 +36,7 @@ const LocationMap = ({ init, onSelect }) => {
 
   useEffect(() => {
     const script = document.createElement("script");
-    script.src = `//dapi.kakao.com/v2/maps/sdk.js?appkey=e26cd2b9a98785f9299bd0fe37542aab&libraries=services&autoload=false`;
+    script.src = `https://dapi.kakao.com/v2/maps/sdk.js?appkey=${AppKey}&libraries=services&autoload=false`;
     script.async = true;
 
     script.onload = () => {

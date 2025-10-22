@@ -1,6 +1,8 @@
 import { useEffect, useRef } from "react";
 import "../style/Map.css";
 
+const AppKey = "b737c6777956f74337fc9bc5a08e3b55";
+
 const Map = ({ shelters, onSelect, setCenterRef }) => {
   const mapRef = useRef(null);
   const mapInstance = useRef(null);
@@ -8,7 +10,7 @@ const Map = ({ shelters, onSelect, setCenterRef }) => {
 
   useEffect(() => {
     const script = document.createElement("script");
-    script.src = `//dapi.kakao.com/v2/maps/sdk.js?appkey=a62ab991b478d4cfb3a3e5b0c93a3148&libraries=services&autoload=false`;
+    script.src = `https://dapi.kakao.com/v2/maps/sdk.js?appkey=${AppKey}&libraries=services&autoload=false`;
     script.async = true;
 
     script.onload = () => {

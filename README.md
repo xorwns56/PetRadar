@@ -1,4 +1,4 @@
-![PetRadar Logo](./public/gitImg.png)
+![PetRadar Logo](frontend/public/gitImg.png)
 </br>
 
 <h3 align="center">"실종 동물을 가장 빠르게 찾는 위치 기반 플랫폼"</h3>

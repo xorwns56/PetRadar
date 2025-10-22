@@ -11,7 +11,7 @@ const ShelterInfo = ({ shelter, onClose }) => {
         <div className="Modal-contents">
           <div className="text-contents">
             <div className="ShelterInfoIMG">
-              <img src="../public/image-default.png" />
+              <img src="/image-default.png" />
             </div>
             <div className="contents-t1">
               <h3>{shelter.SHTER_NM}</h3>

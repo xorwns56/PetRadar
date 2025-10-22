@@ -5,6 +5,8 @@ import { useNavigate } from "react-router-dom";
 import { useAuth } from '../contexts/AuthContext';
 import "../style/MissingMap.css";
 
+const AppKey = "b737c6777956f74337fc9bc5a08e3b55";
+
 const MissingMap = ({missingList}) => {
   const mapRef = useRef(null); // 카카오 지도 객체 참조
   const markerMapRef = useRef(new Map()); // 마커(오버레이) 객체 저장용
@@ -18,8 +20,7 @@ const MissingMap = ({missingList}) => {
   useEffect(() => {
     // 카카오맵 스크립트 동적 로드
     const script = document.createElement("script");
-    script.src =
-      "//dapi.kakao.com/v2/maps/sdk.js?appkey=e26cd2b9a98785f9299bd0fe37542aab&libraries=services&autoload=false";
+    script.src = `https://dapi.kakao.com/v2/maps/sdk.js?appkey=${AppKey}&libraries=services&autoload=false`;
     script.async = true;
 
     script.onload = () => {
