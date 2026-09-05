@@ -3,7 +3,9 @@ services:
     image: mysql:8
     container_name: petradar-mysql
     ports:
-      - "3306:3306"
+      # 호스트 루프백에만 바인딩한다. 로컬에서 DB 클라이언트로 붙을 수는 있지만
+      # 서버의 공인 IP로는 접근할 수 없다
+      - "127.0.0.1:3306:3306"
     environment:
       MYSQL_ROOT_PASSWORD: 0000
       MYSQL_DATABASE: petradar_db
@@ -16,21 +18,39 @@ services:
       timeout: 5s
       retries: 10
 
+  elasticsearch:
+    image: elasticsearch:8.15.0
+    container_name: petradar-elasticsearch
+    environment:
+      - discovery.type=single-node       # 단일 노드로 실행
+      - xpack.security.enabled=false     # 내부 네트워크에서만 접근하므로 비활성화
+      - ES_JAVA_OPTS=-Xms512m -Xmx512m   # EC2 한 대에 함께 뜨므로 메모리를 제한한다
+    volumes:
+      - elasticsearch-data:/usr/share/elasticsearch/data
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:9200/_cluster/health || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 15
+
   backend:
     build: ./backend
     container_name: petradar-backend
-    ports:
-      - "8080:8080"
+    # 호스트에 포트를 열지 않는다. 외부 요청은 nginx(frontend)를 거쳐 들어오고,
+    # 내부 전용 경로는 도커 네트워크 안에서만 호출한다
     environment:
       # application.properties의 localhost 설정을 컨테이너 주소로 덮어쓴다
       SPRING_DATASOURCE_URL: jdbc:mysql://mysql:3306/petradar_db?serverTimezone=Asia/Seoul&characterEncoding=UTF-8
       SPRING_DATASOURCE_USERNAME: root
       SPRING_DATASOURCE_PASSWORD: 0000
+      SPRING_ELASTICSEARCH_URIS: http://elasticsearch:9200
       APP_IMAGE_UPLOAD_DIR: /app/uploads
     volumes:
       - uploads:/app/uploads
     depends_on:
       mysql:
+        condition: service_healthy
+      elasticsearch:
         condition: service_healthy
 
   frontend:
@@ -46,4 +66,5 @@ services:
 
 volumes:
   mysql-data:
+  elasticsearch-data:
   uploads:

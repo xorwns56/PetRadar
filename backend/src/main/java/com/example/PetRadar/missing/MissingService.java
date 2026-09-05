@@ -2,6 +2,7 @@ package com.example.PetRadar.missing;
 
 import com.example.PetRadar.image.ImageStorageService;
 import com.example.PetRadar.notification.NotificationService;
+import com.example.PetRadar.search.MissingSearchService;
 import com.example.PetRadar.user.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
@@ -19,6 +20,7 @@ public class MissingService {
     private final UserRepository userRepository;
     private final NotificationService notificationService;
     private final ImageStorageService imageStorageService;
+    private final MissingSearchService searchService;
 
     @Value("${app.image.base-url}")
     private String imageBaseUrl;
@@ -46,6 +48,7 @@ public class MissingService {
         // 이미지는 파일로 저장하고 DB에는 키만 남긴다
         missing.setPetImage(imageStorageService.store(image));
         missingRepository.save(missing);
+        searchService.index(missing);
         notificationService.createNotificationToAllUsers(userId,"missing", missing.getId());
     }
 
@@ -73,6 +76,7 @@ public class MissingService {
         existingMissing.setTitle(updatedMissing.getTitle());
         existingMissing.setContent(updatedMissing.getContent());
         missingRepository.save(existingMissing);
+        searchService.index(existingMissing);
     }
 
     public void deleteMissing(Long missingId, Long userId) {
@@ -84,5 +88,6 @@ public class MissingService {
         // 글이 지워지면 이미지 파일도 함께 정리한다
         imageStorageService.delete(missing.getPetImage());
         missingRepository.delete(missing);
+        searchService.delete(missingId);
     }
 }
