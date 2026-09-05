@@ -26,6 +26,9 @@ services:
       SPRING_DATASOURCE_URL: jdbc:mysql://mysql:3306/petradar_db?serverTimezone=Asia/Seoul&characterEncoding=UTF-8
       SPRING_DATASOURCE_USERNAME: root
       SPRING_DATASOURCE_PASSWORD: 0000
+      APP_IMAGE_UPLOAD_DIR: /app/uploads
+    volumes:
+      - uploads:/app/uploads
     depends_on:
       mysql:
         condition: service_healthy
@@ -35,8 +38,12 @@ services:
     container_name: petradar-frontend
     ports:
       - "80:80"
+    volumes:
+      # 백엔드가 저장한 이미지를 nginx가 직접 서빙한다 (읽기 전용)
+      - uploads:/usr/share/nginx/images:ro
     depends_on:
       - backend
 
 volumes:
   mysql-data:
+  uploads:

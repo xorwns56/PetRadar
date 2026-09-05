@@ -1,5 +1,6 @@
 package com.example.PetRadar.report;
 
+import com.example.PetRadar.image.ImageUrls;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -27,7 +28,10 @@ public class ReportDTO {
         private Double lng;
     }
 
-    public static ReportDTO from(Report report) {
+    /**
+     * @param imageBaseUrl DB에 저장된 이미지 키 앞에 붙일 경로 (app.image.base-url)
+     */
+    public static ReportDTO from(Report report, String imageBaseUrl) {
         Long userId = null;
         if(report.getUser() != null){
             userId = report.getUser().getId();
@@ -42,7 +46,7 @@ public class ReportDTO {
                 userId,
                 report.getPetReportPlace(),
                 point,
-                report.getPetImage(),
+                ImageUrls.of(report.getPetImage(), imageBaseUrl),
                 report.getTitle(),
                 report.getContent()
         );

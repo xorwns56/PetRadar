@@ -3,6 +3,7 @@ import Header from "../components/Header";
 import Button from "../components/Button";
 
 import LocationMap from "../components/LocationMap";
+import ImagePreview from "../components/ImagePreview";
 import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { useAuth } from "../contexts/AuthContext.jsx";
@@ -14,19 +15,25 @@ const MissingReport = () => {
   const [form, setForm] = useState({
     title: "",
     content: "",
-    petImage: "",
+    petImage: null,   // 파일 객체를 그대로 담는다
     petReportPlace: "",
     petReportPoint: null,
   });
   const onSubmitButtonClick = async () => {
       try {
-          const { petReportPoint, ...restOfForm } = form;
+          // 이미지는 파일 파트로 따로 보내므로 JSON 본문에서 분리한다
+          const { petReportPoint, petImage, ...restOfForm } = form;
           const requestBody = {
             ...restOfForm,
             latitude: petReportPoint ? petReportPoint.lat : null,
             longitude: petReportPoint ? petReportPoint.lng : null,
           };
-          const response = await api.post(`/api/report/missing/${params.petMissingId}`, requestBody);
+          // multipart: report(JSON) + image(File)
+          const formData = new FormData();
+          formData.append("report", new Blob([JSON.stringify(requestBody)], { type: "application/json" }));
+          if (petImage) formData.append("image", petImage);
+
+          await api.post(`/api/report/missing/${params.petMissingId}`, formData);
           nav("/missingList");
       } catch (error) {
           alert("제보 등록에 실패했습니다. 다시 시도해주세요.");
@@ -37,14 +44,11 @@ const MissingReport = () => {
     const { name, value, files } = e.target;
     if (name === "petImage") {
       if (!files[0]) return;
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        setForm((prev) => ({
-          ...prev,
-          [name]: reader.result,
-        }));
-      };
-      reader.readAsDataURL(files[0]);
+      // base64 변환 없이 파일 객체를 그대로 보관한다
+      setForm((prev) => ({
+        ...prev,
+        [name]: files[0],
+      }));
     } else {
       setForm((prev) => ({
         ...prev,
@@ -79,7 +83,7 @@ const MissingReport = () => {
               accept="image/*"
               onChange={handleChange}
             />
-            {/* <input name="petImage" value={form.title} onChange={handleChange} /> */}
+            <ImagePreview value={form.petImage} />
           </div>
           <div className="MissingReportForm">
             <h3>제목</h3>

@@ -28,7 +28,7 @@ public class Report {
     @Column(nullable = false, columnDefinition = "TEXT")
     private String content;
 
-    @Lob
+    // 이미지 파일의 키(파일명)만 저장한다. 전체 URL은 DTO 변환 시 base-url을 붙여 만든다
     private String petImage;
 
     private String petReportPlace;

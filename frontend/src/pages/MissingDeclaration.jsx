@@ -5,7 +5,9 @@ import Header from "../components/Header";
 import Button from "../components/Button";
 import { useNavigate } from "react-router-dom";
 import useFormFocus from "../hooks/useFormFocus";
+import { MISSING_FORM_FIELDS } from "../utils/missing-form-fields";
 import LocationMap from "../components/LocationMap";
+import ImagePreview from "../components/ImagePreview";
 import { useAuth } from '../contexts/AuthContext';
 
 const MissingDeclaration = () => {
@@ -45,42 +47,26 @@ const MissingDeclaration = () => {
     (_, i) => currentYear - i
   );
 
-  const formKeys = [
-    "petName",
-    "petType",
-    "petGender",
-    "petAge",
-    "petMissingDate",
-    "petMissingPoint",
-    "title",
-    "content",
-  ];
-
-  const formKeysLabel = {
-    petName: "반려동물 이름",
-    petType: "종류",
-    petGender: "성별",
-    petAge: "출생년도",
-    petMissingDate: "실종일자",
-    petMissingPoint: "실종위치",
-    title: "제목",
-    content: "내용",
-  };
-
-  const { handleRef, checkInput } = useFormFocus(form, formKeys, formKeysLabel);
+  const { handleRef, checkInput } = useFormFocus(form, MISSING_FORM_FIELDS);
 
   const onSubmitButtonClick = async () => {
     if (!checkInput()) {
       return;
     }
     try {
-        const { petMissingPoint, ...restOfForm } = form;
+        // 이미지는 파일 파트로 따로 보내므로 JSON 본문에서 분리한다
+        const { petMissingPoint, petImage, ...restOfForm } = form;
         const requestBody = {
           ...restOfForm,
           latitude: petMissingPoint?.lat || null,
           longitude: petMissingPoint?.lng || null,
         };
-        const response = await api.post("/api/missing", requestBody);
+        // multipart: missing(JSON) + image(File)
+        const formData = new FormData();
+        formData.append("missing", new Blob([JSON.stringify(requestBody)], { type: "application/json" }));
+        if (petImage) formData.append("image", petImage);
+
+        await api.post("/api/missing", formData);
         nav("/missingList");
       } catch (error) {
           alert("신고 제출에 실패했습니다. 다시 시도해주세요.");
@@ -89,27 +75,15 @@ const MissingDeclaration = () => {
 
   const handleChange = (e) => {
     const { name, value, files } = e.target;
-    if (name === "petType") {
-      setForm({ ...form, petBreed: "" });
-    }
-    if (name === "petImage" && files?.[0]) {
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        console.log(reader.result);
-        setForm((prev) => ({
-          ...prev,
-          [name]: reader.result,
-        }));
-      };
-      reader.readAsDataURL(files[0]);
-    }
+    if (name === "petImage" && !files?.[0]) return;
 
-    if (name !== "petImage") {
-      setForm((prev) => ({
-        ...prev,
-        [name]: value,
-      }));
-    }
+    setForm((prev) => ({
+      ...prev,
+      // 이미지는 base64 변환 없이 파일 객체를 그대로 보관한다
+      [name]: name === "petImage" ? files[0] : value,
+      // 종류가 바뀌면 품종 선택은 초기화한다
+      ...(name === "petType" ? { petBreed: "" } : {}),
+    }));
   };
 
   const onLocationSelect = (latlng) => {
@@ -241,6 +215,7 @@ const MissingDeclaration = () => {
               accept="image/*"
               onChange={handleChange}
             />
+            <ImagePreview value={form.petImage} />
           </div>
           <div className="MissingDeclarationForm">
             <h4>제목</h4>

@@ -1,15 +1,14 @@
 package com.example.PetRadar.missing;
 
+import com.example.PetRadar.image.ImageStorageService;
 import com.example.PetRadar.notification.NotificationService;
-import com.example.PetRadar.user.User;
 import com.example.PetRadar.user.UserRepository;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
-import java.nio.file.AccessDeniedException;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -19,32 +18,38 @@ public class MissingService {
     private final MissingRepository missingRepository;
     private final UserRepository userRepository;
     private final NotificationService notificationService;
+    private final ImageStorageService imageStorageService;
+
+    @Value("${app.image.base-url}")
+    private String imageBaseUrl;
 
     public List<MissingDTO> getMissingList(String searchInput, Sort sort) {
         return missingRepository.findByTitleContainingIgnoreCase(searchInput, sort).stream()
-                .map(MissingDTO::from)
+                .map(missing -> MissingDTO.from(missing, imageBaseUrl))
                 .collect(Collectors.toList());
     }
 
     public List<MissingDTO> getMissingList(Long userId, Sort sort){
         return missingRepository.findByUserIdWithUser(userId, sort).stream()
-                .map(MissingDTO::from)
+                .map(missing -> MissingDTO.from(missing, imageBaseUrl))
                 .collect(Collectors.toList());
     }
 
     public MissingDTO getMissingDetail(Long id) {
         Missing missing = missingRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("해당 ID의 게시글이 없습니다."));
-        return MissingDTO.from(missing);
+        return MissingDTO.from(missing, imageBaseUrl);
     }
 
-    public void createMissing(long userId, Missing missing) {
+    public void createMissing(long userId, Missing missing, MultipartFile image) {
         missing.setUser(userRepository.getReferenceById(userId));
+        // 이미지는 파일로 저장하고 DB에는 키만 남긴다
+        missing.setPetImage(imageStorageService.store(image));
         missingRepository.save(missing);
         notificationService.createNotificationToAllUsers(userId,"missing", missing.getId());
     }
 
-    public void updateMissing(Long id, Missing updatedMissing, long userId) {
+    public void updateMissing(Long id, Missing updatedMissing, long userId, MultipartFile image) {
         Missing existingMissing = missingRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Missing post not found."));
         if (!existingMissing.getUser().getId().equals(userId)) {
@@ -56,9 +61,15 @@ public class MissingService {
         existingMissing.setPetBreed(updatedMissing.getPetBreed());
         existingMissing.setPetAge(updatedMissing.getPetAge());
         existingMissing.setPetMissingDate(updatedMissing.getPetMissingDate());
+        existingMissing.setPetMissingPlace(updatedMissing.getPetMissingPlace());
         existingMissing.setLatitude(updatedMissing.getLatitude());
         existingMissing.setLongitude(updatedMissing.getLongitude());
-        existingMissing.setPetImage(updatedMissing.getPetImage());
+        // 새 이미지를 올린 경우에만 교체하고, 교체 시 이전 파일은 지운다
+        if (image != null && !image.isEmpty()) {
+            String previousKey = existingMissing.getPetImage();
+            existingMissing.setPetImage(imageStorageService.store(image));
+            imageStorageService.delete(previousKey);
+        }
         existingMissing.setTitle(updatedMissing.getTitle());
         existingMissing.setContent(updatedMissing.getContent());
         missingRepository.save(existingMissing);
@@ -70,6 +81,8 @@ public class MissingService {
         if (!missing.getUser().getId().equals(userId)) {
             throw new IllegalArgumentException("You are not authorized to delete this post.");
         }
+        // 글이 지워지면 이미지 파일도 함께 정리한다
+        imageStorageService.delete(missing.getPetImage());
         missingRepository.delete(missing);
     }
 }
