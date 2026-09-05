@@ -1,0 +1,66 @@
+/* 실종 신고 등록/수정 화면이 공유하는 폼 스타일 */
+.MissingForm {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  margin: 30px auto;
+  margin-bottom: 0;
+  border-radius: 50px 50px 0 0;
+  border: 2px solid var(--border-color);
+  width: 90%;
+  padding: 40px;
+  background-color: var(--bg-white-color);
+}
+
+.MissingForm .MissingForm-field {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.MissingForm .MissingForm-field h4,
+.MissingForm .MissingForm-field label {
+  font-size: var(--font-subtitle-lg-d);
+  font-weight: bold;
+}
+
+.MissingForm .MissingForm-field input,
+.MissingForm .MissingForm-field select {
+  width: 100%;
+  height: 50px;
+  border: 1px solid var(--border-color);
+  font-size: var(--font-small);
+  padding: 10px;
+  border-radius: 5px;
+  outline: none;
+  transition: border 0.3s;
+}
+
+.MissingForm .MissingForm-field input:focus,
+.MissingForm .MissingForm-field select:focus,
+.MissingForm .MissingForm-field textarea:focus {
+  border: 1px solid var(--main-color);
+}
+
+.MissingForm .MissingForm-field textarea {
+  height: 120px;
+  border: 1px solid var(--border-color);
+  font-size: var(--font-small);
+  padding: 10px;
+  resize: none;
+  overflow-y: auto;
+  outline: none;
+  transition: border 0.3s;
+  border-radius: 5px;
+}
+
+/* 버튼 영역
+   등록은 버튼 1개, 수정은 2개다. 자식이 둘 이상일 때만 가로로 나눠 갖게 해서
+   버튼이 하나인 화면의 레이아웃이 바뀌지 않도록 한다 */
+.MissingForm .MissingForm-actions:has(> * + *) {
+  display: flex;
+}
+
+.MissingForm .MissingForm-actions:has(> * + *) > * {
+  width: 50%;
+}
