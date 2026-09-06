@@ -1,0 +1,59 @@
+# main 브랜치에 push하면 backend/frontend 이미지를 빌드해 GHCR에 올린다.
+# 배포는 서버에서 직접 수행한다.
+#   cd ~/PetRadar && git pull && docker compose pull && docker compose up -d
+
+name: CI - Build and Push Docker Images
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'backend/**'
+      - 'frontend/**'
+      - '.github/workflows/ci.yaml'
+  workflow_dispatch:       # GitHub UI에서 수동 실행
+
+# 같은 브랜치에 연속 push 시 이전 실행을 취소한다
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build-and-push:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+
+    permissions:
+      contents: read
+      packages: write
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: docker/setup-buildx-action@v3
+
+      - uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      # EC2가 x86이므로 amd64만 빌드한다.
+      # 여러 아키텍처를 만들면 QEMU 에뮬레이션 때문에 빌드가 크게 느려진다.
+      # 이미지 이름은 대문자를 쓸 수 없어 저장소명(PetRadar)을 그대로 넣지 못한다
+      - name: Build and push backend
+        uses: docker/build-push-action@v6
+        with:
+          context: ./backend
+          platforms: linux/amd64
+          push: true
+          tags: ghcr.io/xorwns56/petradar/backend:latest
+
+      - name: Build and push frontend
+        uses: docker/build-push-action@v6
+        with:
+          context: ./frontend
+          platforms: linux/amd64
+          push: true
+          tags: ghcr.io/xorwns56/petradar/frontend:latest

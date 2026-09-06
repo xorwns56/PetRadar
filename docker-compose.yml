@@ -35,6 +35,10 @@ services:
       retries: 15
 
   backend:
+    # image와 build를 함께 둔다.
+    # 로컬: docker compose build 로 직접 빌드하며 이 이름으로 태그된다
+    # 서버: docker compose pull 로 GHCR에서 받아 쓴다 (소스 없이도 기동 가능)
+    image: ghcr.io/xorwns56/petradar/backend:latest
     build: ./backend
     container_name: petradar-backend
     # 호스트에 포트를 열지 않는다. 외부 요청은 nginx(frontend)를 거쳐 들어오고,
@@ -60,6 +64,7 @@ services:
         condition: service_healthy
 
   frontend:
+    image: ghcr.io/xorwns56/petradar/frontend:latest
     build: ./frontend
     container_name: petradar-frontend
     ports:
