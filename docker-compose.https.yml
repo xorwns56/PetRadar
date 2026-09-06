@@ -1,0 +1,31 @@
+# HTTPS 적용용 오버라이드. 인증서를 발급받은 뒤에 함께 사용한다.
+#   docker compose -f docker-compose.yml -f docker-compose.https.yml up -d
+#
+# 최초 발급 절차는 README 참고 (인증서가 없으면 nginx가 기동에 실패한다)
+
+services:
+  frontend:
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - uploads:/usr/share/nginx/images:ro
+      - ./frontend/nginx-https.conf:/etc/nginx/conf.d/https.conf:ro
+      - certbot-conf:/etc/letsencrypt:ro
+      - certbot-www:/var/www/certbot:ro
+
+  # 인증서 갱신 담당. Let's Encrypt 인증서는 90일이라 주기적으로 확인한다
+  # (만료가 임박하지 않으면 아무 것도 하지 않고 넘어간다)
+  certbot:
+    image: certbot/certbot
+    container_name: petradar-certbot
+    volumes:
+      - certbot-conf:/etc/letsencrypt
+      - certbot-www:/var/www/certbot
+    entrypoint: >
+      sh -c "trap exit TERM;
+      while :; do certbot renew --webroot -w /var/www/certbot; sleep 12h & wait $${!}; done"
+
+volumes:
+  certbot-conf:
+  certbot-www:
