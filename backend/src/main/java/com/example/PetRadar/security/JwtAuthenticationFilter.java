@@ -1,5 +1,6 @@
 package com.example.PetRadar.security;
 
+import com.example.PetRadar.auth.AuthService;
 import com.example.PetRadar.user.User;
 import com.example.PetRadar.user.UserDTO;
 import com.example.PetRadar.user.UserService;
@@ -35,6 +36,7 @@ import java.util.Optional;
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
     private final JwtTokenProvider jwtTokenProvider;
     private final UserService userService;
+    private final AuthService authService;
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
@@ -48,8 +50,10 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                     authenticate(accessToken, request);
                 } else {
                     String refreshToken = extractRefreshTokenFromCookie(request);
+                    // 서명·만료가 유효해도 서버가 마지막에 발급한 토큰이 아니면 거부한다
+                    // (로그아웃했거나 다른 기기에서 새로 로그인한 경우)
                     if (refreshToken != null && jwtTokenProvider.validateRefreshToken(refreshToken)
-                            && isIssuedByServer(refreshToken)) {
+                            && authService.isIssuedRefreshToken(refreshToken)) {
                         String userId = jwtTokenProvider.getUserIdFromRefreshToken(refreshToken);
                         String newAccessToken = jwtTokenProvider.createAccessToken(userId);
                         response.setHeader("Authorization", newAccessToken);
@@ -75,15 +79,6 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
      */
     private void unauthorized(HttpServletResponse response) {
         response.setStatus(HttpStatus.UNAUTHORIZED.value());
-    }
-
-    /**
-     * 서명과 만료가 유효해도, 서버가 마지막에 발급한 토큰과 다르면 거부한다.
-     * 로그아웃했거나 다른 기기에서 새로 로그인한 뒤의 옛 토큰이 여기서 걸린다.
-     */
-    private boolean isIssuedByServer(String refreshToken) {
-        Long userId = Long.parseLong(jwtTokenProvider.getUserIdFromRefreshToken(refreshToken));
-        return userService.isStoredRefreshToken(userId, refreshToken);
     }
 
     private String extractRefreshTokenFromCookie(HttpServletRequest request) {

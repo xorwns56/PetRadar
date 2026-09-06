@@ -1,26 +1,22 @@
 package com.example.PetRadar.auth;
 
 import com.example.PetRadar.security.JwtTokenProvider;
-import com.example.PetRadar.user.User;
 import com.example.PetRadar.user.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 import java.util.Map;
-import java.util.HashMap;
-import java.util.Optional;
 
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/auth")
 public class AuthController {
-    private final JwtTokenProvider jwtTokenProvider;
+    private final AuthService authService;
     private final UserService userService;
-    private final PasswordEncoder passwordEncoder;
+    private final JwtTokenProvider jwtTokenProvider;
 
     // HTTPS 환경에서만 쿠키를 전송할지 여부. HTTP로 서비스하는 동안 켜면 쿠키가 실리지 않으므로
     // TLS를 붙이는 시점에 .env에서 true로 바꾼다
@@ -44,35 +40,17 @@ public class AuthController {
 
     @PostMapping("/login")
     public ResponseEntity<Map<String, Object>> login(@RequestBody AuthDTO authDTO) {
-        Optional<User> userOptional = userService.findByLoginId(authDTO.getId());
-        // 사용자가 존재하지 않는 경우
-        if (userOptional.isEmpty()) {
-            Map<String, Object> errorResponse = new HashMap<>();
-            errorResponse.put("error", "Invalid username or password");
-            return ResponseEntity.status(401).body(errorResponse);
+        AuthService.Tokens tokens;
+        try {
+            tokens = authService.login(authDTO.getId(), authDTO.getPw());
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.status(401).body(Map.of("error", e.getMessage()));
         }
-        User user = userOptional.get();
-        // PasswordEncoder를 사용하여 비밀번호 비교
-        // 사용자가 입력한 평문 비밀번호와 DB의 암호화된 비밀번호를 비교
-        if (!passwordEncoder.matches(authDTO.getPw(), user.getPwHash())) {
-            Map<String, Object> errorResponse = new HashMap<>();
-            errorResponse.put("error", "Invalid username or password");
-            return ResponseEntity.status(401).body(errorResponse);
-        }
-        // 액세스 토큰 생성
-        String accessToken = jwtTokenProvider.createAccessToken(String.valueOf(user.getId()));
-        // 리프레시 토큰 생성
-        String refreshToken = jwtTokenProvider.createRefreshToken(String.valueOf(user.getId()));
-        // 서버에도 보관해 재발급 때 대조한다 (로그아웃으로 무효화하기 위함)
-        userService.saveRefreshToken(user.getId(), refreshToken);
-        // 리프레시 토큰을 HttpOnly 쿠키로 설정
-        ResponseCookie cookie = refreshTokenCookie(refreshToken, jwtTokenProvider.getRefreshTokenExpSec());
-        // 액세스 토큰은 JSON 응답으로, 리프레시 토큰은 쿠키 헤더에 담아 전송
-        Map<String, Object> response = new HashMap<>();
-        response.put("accessToken", accessToken);
+        // 액세스 토큰은 JSON 응답으로, 리프레시 토큰은 HttpOnly 쿠키로 전송
+        ResponseCookie cookie = refreshTokenCookie(tokens.refreshToken(), jwtTokenProvider.getRefreshTokenExpSec());
         return ResponseEntity.ok()
                 .header(HttpHeaders.SET_COOKIE, cookie.toString())
-                .body(response);
+                .body(Map.of("accessToken", tokens.accessToken()));
     }
 
     @PostMapping("/register")
@@ -94,9 +72,7 @@ public class AuthController {
      */
     @PostMapping("/logout")
     public ResponseEntity<Void> logout(@CookieValue(value = "refreshToken", required = false) String refreshToken) {
-        if (refreshToken != null && jwtTokenProvider.validateRefreshToken(refreshToken)) {
-            userService.clearRefreshToken(Long.parseLong(jwtTokenProvider.getUserIdFromRefreshToken(refreshToken)));
-        }
+        authService.logout(refreshToken);
         // 만료된 빈 쿠키로 덮어써 브라우저에서도 지운다
         // (속성이 로그인 때와 같아야 브라우저가 같은 쿠키로 인식해 덮어쓴다)
         ResponseCookie expired = refreshTokenCookie("", 0);
