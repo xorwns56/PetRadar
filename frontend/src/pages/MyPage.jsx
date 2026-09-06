@@ -26,7 +26,7 @@ const MyPage = () => {
 
   const onUpdate = async (pw, hp) => {
       try {
-          const response = await api.patch("/api/user/me", {
+          await api.patch("/api/user/me", {
               pw: pw,
               hp: hp
           });

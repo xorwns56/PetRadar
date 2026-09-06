@@ -31,6 +31,12 @@ public class User {
     @Column(name = "pw_hash", nullable = false)
     private String pwHash;
 
+    // 마지막으로 발급한 Refresh Token.
+    // 쿠키에만 두면 로그아웃해도 만료까지 토큰이 살아있어 서버가 막을 방법이 없다.
+    // 재발급 시 쿠키 값과 대조하고, 로그아웃 시 비워서 무효화한다
+    @Column(name = "refresh_token", length = 512)
+    private String refreshToken;
+
     @CreationTimestamp
     @Column(name = "created_at", updatable = false)
     private LocalDateTime createdAt;

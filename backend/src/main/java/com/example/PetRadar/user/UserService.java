@@ -72,4 +72,5 @@ public class UserService {
                 .orElseThrow(() -> new IllegalArgumentException("User not found."));
         userRepository.delete(user);
     }
+
 }

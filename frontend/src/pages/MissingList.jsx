@@ -17,14 +17,13 @@ const MissingList = () => {
   const [searchInput, setSearchInput] = useState("");
   const [missingList, setMissingList] = useState([]);
 
+  // 검색어가 있으면 Elasticsearch 전문 검색(/api/search)으로 관련도 순 결과를 받는다.
+  // 검색어 없이 목록만 볼 때는 정렬(최신순/오래된순)이 필요하므로 기존 목록 API를 쓴다
   const fetchMissingList = async () => {
       try {
-        const response = await api.get("/api/missing", {
-          params: {
-            searchInput: searchInput,
-            sortType: sortType,
-          }
-        });
+        const response = searchInput.trim()
+          ? await api.get("/api/search", { params: { searchInput } })
+          : await api.get("/api/missing", { params: { sortType } });
         setMissingList(response.data);
       } catch (error) {
         console.error("Failed to fetch missing list:", error);

@@ -1,0 +1,81 @@
+services:
+  mysql:
+    image: mysql:8
+    container_name: petradar-mysql
+    ports:
+      # 호스트 루프백에만 바인딩한다. 로컬에서 DB 클라이언트로 붙을 수는 있지만
+      # 서버의 공인 IP로는 접근할 수 없다
+      - "127.0.0.1:3306:3306"
+    environment:
+      # 실제 값은 .env에서 주입한다 (.env.example 참고)
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:?MYSQL_ROOT_PASSWORD를 .env에 설정해주세요}
+      MYSQL_DATABASE: petradar_db
+    volumes:
+      - mysql-data:/var/lib/mysql
+    # MySQL 초기화가 끝나야 백엔드가 접속할 수 있으므로 준비 상태를 확인한다
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+
+  elasticsearch:
+    image: elasticsearch:8.15.0
+    container_name: petradar-elasticsearch
+    environment:
+      - discovery.type=single-node       # 단일 노드로 실행
+      - xpack.security.enabled=false     # 내부 네트워크에서만 접근하므로 비활성화
+      - ES_JAVA_OPTS=-Xms512m -Xmx512m   # EC2 한 대에 함께 뜨므로 메모리를 제한한다
+    volumes:
+      - elasticsearch-data:/usr/share/elasticsearch/data
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:9200/_cluster/health || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 15
+
+  backend:
+    # image와 build를 함께 둔다.
+    # 로컬: docker compose build 로 직접 빌드하며 이 이름으로 태그된다
+    # 서버: docker compose pull 로 GHCR에서 받아 쓴다 (소스 없이도 기동 가능)
+    image: ghcr.io/xorwns56/petradar/backend:latest
+    build: ./backend
+    container_name: petradar-backend
+    # 호스트에 포트를 열지 않는다. 외부 요청은 nginx(frontend)를 거쳐 들어오고,
+    # 내부 전용 경로는 도커 네트워크 안에서만 호출한다
+    environment:
+      # application.properties의 localhost 설정을 컨테이너 주소로 덮어쓴다
+      SPRING_DATASOURCE_URL: jdbc:mysql://mysql:3306/petradar_db?serverTimezone=Asia/Seoul&characterEncoding=UTF-8
+      SPRING_DATASOURCE_USERNAME: root
+      SPRING_DATASOURCE_PASSWORD: ${MYSQL_ROOT_PASSWORD:?MYSQL_ROOT_PASSWORD를 .env에 설정해주세요}
+      SPRING_ELASTICSEARCH_URIS: http://elasticsearch:9200
+      APP_IMAGE_UPLOAD_DIR: /app/uploads
+      # 기동 시마다 키가 바뀌면 재배포할 때 전체 사용자가 로그아웃되므로 고정값을 주입한다
+      JWT_ACCESS_SECRET: ${JWT_ACCESS_SECRET:?JWT_ACCESS_SECRET을 .env에 설정해주세요}
+      JWT_REFRESH_SECRET: ${JWT_REFRESH_SECRET:?JWT_REFRESH_SECRET을 .env에 설정해주세요}
+      # HTTPS를 붙이면 .env에서 COOKIE_SECURE=true로 바꾼다
+      COOKIE_SECURE: ${COOKIE_SECURE:-false}
+    volumes:
+      - uploads:/app/uploads
+    depends_on:
+      mysql:
+        condition: service_healthy
+      elasticsearch:
+        condition: service_healthy
+
+  frontend:
+    image: ghcr.io/xorwns56/petradar/frontend:latest
+    build: ./frontend
+    container_name: petradar-frontend
+    ports:
+      - "80:80"
+    volumes:
+      # 백엔드가 저장한 이미지를 nginx가 직접 서빙한다 (읽기 전용)
+      - uploads:/usr/share/nginx/images:ro
+    depends_on:
+      - backend
+
+volumes:
+  mysql-data:
+  elasticsearch-data:
+  uploads:

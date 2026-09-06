@@ -1,5 +1,6 @@
 package com.example.PetRadar.missing;
 
+import com.example.PetRadar.image.ImageUrls;
 import lombok.*;
 
 @Getter
@@ -29,7 +30,10 @@ public class MissingDTO {
         private Double lng;
     }
 
-    public static MissingDTO from(Missing missing) {
+    /**
+     * @param imageBaseUrl DB에 저장된 이미지 키 앞에 붙일 경로 (app.image.base-url)
+     */
+    public static MissingDTO from(Missing missing, String imageBaseUrl) {
         PetMissingPoint point = null;
         if (missing.getLatitude() != null && missing.getLongitude() != null) {
             point = new PetMissingPoint(missing.getLatitude(), missing.getLongitude());
@@ -45,7 +49,7 @@ public class MissingDTO {
                 missing.getPetMissingDate(),
                 missing.getPetMissingPlace(),
                 point,
-                missing.getPetImage(),
+                ImageUrls.of(missing.getPetImage(), imageBaseUrl),
                 missing.getTitle(),
                 missing.getContent()
         );

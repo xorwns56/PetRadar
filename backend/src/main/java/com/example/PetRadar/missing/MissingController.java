@@ -9,6 +9,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 import java.util.Map;
@@ -43,15 +44,21 @@ public class MissingController {
         return ResponseEntity.ok(detail);
     }
 
+    // 이미지를 파일로 받으므로 multipart로 처리한다 (missing: JSON 파트, image: 파일 파트)
     @PostMapping
-    public ResponseEntity<Void> createMissing(@RequestBody Missing missing, @AuthenticationPrincipal UserDetails userDetails) {
-        missingService.createMissing(Long.parseLong(userDetails.getUsername()), missing);
+    public ResponseEntity<Void> createMissing(@RequestPart Missing missing,
+                                              @RequestPart(required = false) MultipartFile image,
+                                              @AuthenticationPrincipal UserDetails userDetails) {
+        missingService.createMissing(Long.parseLong(userDetails.getUsername()), missing, image);
         return ResponseEntity.ok().build();
     }
 
     @PatchMapping("/{id}")
-    public ResponseEntity<Void> updateMissing(@PathVariable Long id, @RequestBody Missing missing, @AuthenticationPrincipal UserDetails userDetails){
-        missingService.updateMissing(id, missing, Long.parseLong(userDetails.getUsername()));
+    public ResponseEntity<Void> updateMissing(@PathVariable Long id,
+                                              @RequestPart Missing missing,
+                                              @RequestPart(required = false) MultipartFile image,
+                                              @AuthenticationPrincipal UserDetails userDetails){
+        missingService.updateMissing(id, missing, Long.parseLong(userDetails.getUsername()), image);
         return ResponseEntity.ok().build();
     }
 

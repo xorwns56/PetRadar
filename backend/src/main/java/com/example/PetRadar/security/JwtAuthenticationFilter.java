@@ -1,5 +1,6 @@
 package com.example.PetRadar.security;
 
+import com.example.PetRadar.auth.AuthService;
 import com.example.PetRadar.user.User;
 import com.example.PetRadar.user.UserDTO;
 import com.example.PetRadar.user.UserService;
@@ -35,6 +36,7 @@ import java.util.Optional;
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
     private final JwtTokenProvider jwtTokenProvider;
     private final UserService userService;
+    private final AuthService authService;
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
@@ -48,22 +50,35 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                     authenticate(accessToken, request);
                 } else {
                     String refreshToken = extractRefreshTokenFromCookie(request);
-                    if (refreshToken != null && jwtTokenProvider.validateRefreshToken(refreshToken)) {
+                    // 서명·만료가 유효해도 서버가 마지막에 발급한 토큰이 아니면 거부한다
+                    // (로그아웃했거나 다른 기기에서 새로 로그인한 경우)
+                    if (refreshToken != null && jwtTokenProvider.validateRefreshToken(refreshToken)
+                            && authService.isIssuedRefreshToken(refreshToken)) {
                         String userId = jwtTokenProvider.getUserIdFromRefreshToken(refreshToken);
                         String newAccessToken = jwtTokenProvider.createAccessToken(userId);
                         response.setHeader("Authorization", newAccessToken);
                         authenticate(newAccessToken, request);
                     }else {
-                        response.sendError(HttpStatus.UNAUTHORIZED.value(), "Invalid refresh token");
+                        unauthorized(response);
                         return;
                     }
                 }
             }catch (Exception e) {
-                response.sendError(HttpStatus.UNAUTHORIZED.value(), "Authentication failed: " + e.getMessage());
+                unauthorized(response);
                 return;
             }
         }
         filterChain.doFilter(request, response);
+    }
+
+    /**
+     * 인증 실패 응답.
+     * sendError()를 쓰면 컨테이너가 /error로 에러 디스패치를 하는데, 그 경로가 404를 돌려주는 탓에
+     * 클라이언트에 401이 아닌 404가 전달됐다. 프론트는 401일 때만 로그아웃 처리를 하므로
+     * 상태 코드를 직접 지정해 에러 디스패치를 타지 않게 한다.
+     */
+    private void unauthorized(HttpServletResponse response) {
+        response.setStatus(HttpStatus.UNAUTHORIZED.value());
     }
 
     private String extractRefreshTokenFromCookie(HttpServletRequest request) {

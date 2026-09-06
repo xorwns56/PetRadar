@@ -55,7 +55,7 @@ public class Missing{
     @Column(columnDefinition = "DECIMAL(11, 8)")
     private Double longitude;
 
-    @Lob
+    // 이미지 파일의 키(파일명)만 저장한다. 전체 URL은 DTO 변환 시 base-url을 붙여 만든다
     private String petImage;
 
     @Column(nullable = false)
