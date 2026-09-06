@@ -49,6 +49,8 @@ services:
       # 기동 시마다 키가 바뀌면 재배포할 때 전체 사용자가 로그아웃되므로 고정값을 주입한다
       JWT_ACCESS_SECRET: ${JWT_ACCESS_SECRET:?JWT_ACCESS_SECRET을 .env에 설정해주세요}
       JWT_REFRESH_SECRET: ${JWT_REFRESH_SECRET:?JWT_REFRESH_SECRET을 .env에 설정해주세요}
+      # HTTPS를 붙이면 .env에서 COOKIE_SECURE=true로 바꾼다
+      COOKIE_SECURE: ${COOKIE_SECURE:-false}
     volumes:
       - uploads:/app/uploads
     depends_on:

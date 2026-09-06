@@ -48,22 +48,42 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                     authenticate(accessToken, request);
                 } else {
                     String refreshToken = extractRefreshTokenFromCookie(request);
-                    if (refreshToken != null && jwtTokenProvider.validateRefreshToken(refreshToken)) {
+                    if (refreshToken != null && jwtTokenProvider.validateRefreshToken(refreshToken)
+                            && isIssuedByServer(refreshToken)) {
                         String userId = jwtTokenProvider.getUserIdFromRefreshToken(refreshToken);
                         String newAccessToken = jwtTokenProvider.createAccessToken(userId);
                         response.setHeader("Authorization", newAccessToken);
                         authenticate(newAccessToken, request);
                     }else {
-                        response.sendError(HttpStatus.UNAUTHORIZED.value(), "Invalid refresh token");
+                        unauthorized(response);
                         return;
                     }
                 }
             }catch (Exception e) {
-                response.sendError(HttpStatus.UNAUTHORIZED.value(), "Authentication failed: " + e.getMessage());
+                unauthorized(response);
                 return;
             }
         }
         filterChain.doFilter(request, response);
+    }
+
+    /**
+     * 인증 실패 응답.
+     * sendError()를 쓰면 컨테이너가 /error로 에러 디스패치를 하는데, 그 경로가 404를 돌려주는 탓에
+     * 클라이언트에 401이 아닌 404가 전달됐다. 프론트는 401일 때만 로그아웃 처리를 하므로
+     * 상태 코드를 직접 지정해 에러 디스패치를 타지 않게 한다.
+     */
+    private void unauthorized(HttpServletResponse response) {
+        response.setStatus(HttpStatus.UNAUTHORIZED.value());
+    }
+
+    /**
+     * 서명과 만료가 유효해도, 서버가 마지막에 발급한 토큰과 다르면 거부한다.
+     * 로그아웃했거나 다른 기기에서 새로 로그인한 뒤의 옛 토큰이 여기서 걸린다.
+     */
+    private boolean isIssuedByServer(String refreshToken) {
+        Long userId = Long.parseLong(jwtTokenProvider.getUserIdFromRefreshToken(refreshToken));
+        return userService.isStoredRefreshToken(userId, refreshToken);
     }
 
     private String extractRefreshTokenFromCookie(HttpServletRequest request) {

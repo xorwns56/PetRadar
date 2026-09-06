@@ -72,4 +72,27 @@ public class UserService {
                 .orElseThrow(() -> new IllegalArgumentException("User not found."));
         userRepository.delete(user);
     }
+
+    // 로그인 시 발급한 Refresh Token을 저장한다 (사용자당 마지막 것 하나만 유지)
+    @Transactional
+    public void saveRefreshToken(Long userId, String refreshToken) {
+        userRepository.findById(userId).ifPresent(user -> user.setRefreshToken(refreshToken));
+    }
+
+    /**
+     * 쿠키로 들어온 Refresh Token이 서버가 마지막에 발급한 것과 같은지 확인한다.
+     * 로그아웃했거나 다른 기기에서 새로 로그인한 토큰은 여기서 걸러진다.
+     */
+    @Transactional(readOnly = true)
+    public boolean isStoredRefreshToken(Long userId, String refreshToken) {
+        return userRepository.findById(userId)
+                .map(user -> refreshToken.equals(user.getRefreshToken()))
+                .orElse(false);
+    }
+
+    // 로그아웃 - 저장된 토큰을 지워 재발급을 막는다
+    @Transactional
+    public void clearRefreshToken(Long userId) {
+        userRepository.findById(userId).ifPresent(user -> user.setRefreshToken(null));
+    }
 }
