@@ -7,7 +7,8 @@ services:
       # 서버의 공인 IP로는 접근할 수 없다
       - "127.0.0.1:3306:3306"
     environment:
-      MYSQL_ROOT_PASSWORD: 0000
+      # 실제 값은 .env에서 주입한다 (.env.example 참고)
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:?MYSQL_ROOT_PASSWORD를 .env에 설정해주세요}
       MYSQL_DATABASE: petradar_db
     volumes:
       - mysql-data:/var/lib/mysql
@@ -42,9 +43,12 @@ services:
       # application.properties의 localhost 설정을 컨테이너 주소로 덮어쓴다
       SPRING_DATASOURCE_URL: jdbc:mysql://mysql:3306/petradar_db?serverTimezone=Asia/Seoul&characterEncoding=UTF-8
       SPRING_DATASOURCE_USERNAME: root
-      SPRING_DATASOURCE_PASSWORD: 0000
+      SPRING_DATASOURCE_PASSWORD: ${MYSQL_ROOT_PASSWORD:?MYSQL_ROOT_PASSWORD를 .env에 설정해주세요}
       SPRING_ELASTICSEARCH_URIS: http://elasticsearch:9200
       APP_IMAGE_UPLOAD_DIR: /app/uploads
+      # 기동 시마다 키가 바뀌면 재배포할 때 전체 사용자가 로그아웃되므로 고정값을 주입한다
+      JWT_ACCESS_SECRET: ${JWT_ACCESS_SECRET:?JWT_ACCESS_SECRET을 .env에 설정해주세요}
+      JWT_REFRESH_SECRET: ${JWT_REFRESH_SECRET:?JWT_REFRESH_SECRET을 .env에 설정해주세요}
     volumes:
       - uploads:/app/uploads
     depends_on:
