@@ -15,6 +15,7 @@ import ShelterList from "./pages/ShelterList";
 import ShelterAnimalList from "./pages/ShelterAnimalList";
 import NotFound from "./pages/NotFound";
 import SideBar from "./components/SideBar";
+import DemoNotice from "./components/DemoNotice";
 
 import { SidebarProvider } from "./hooks/SidebarContext";
 import { ModalProvider } from "./hooks/ModalContext";
@@ -23,6 +24,8 @@ import { AuthProvider } from "./contexts/AuthContext"
 function App() {
   return (
     <>
+            {/* 실제 서비스가 아닌 데모임을 첫 진입 시 안내한다 */}
+            <DemoNotice />
             <BrowserRouter>
             <AuthProvider>
               <SidebarProvider>

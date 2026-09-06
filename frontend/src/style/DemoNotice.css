@@ -1,0 +1,37 @@
+/* 데모 안내 모달 — 기존 ModalDetail의 배경/컨테이너 패턴을 따른다 */
+.DemoNotice-backdrop {
+  position: fixed;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  background-color: var(--bg-rgb-color);
+  z-index: 100;
+}
+
+.DemoNotice {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  width: 350px;
+  background-color: var(--bg-white-color);
+  border-radius: 10px;
+  padding: 30px 20px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 20px;
+  text-align: center;
+}
+
+.DemoNotice h3 {
+  font-size: var(--font-title-lg-d);
+  color: var(--title-color);
+}
+
+.DemoNotice p {
+  font-size: var(--font-small);
+  color: var(--subtitle-color);
+  line-height: 1.6;
+}
