@@ -71,10 +71,11 @@ const MyPost = () => {
         <h3>나의 실종신고</h3>
       </div>
       <div className="post-content">
-        <div className="none-text">
-          <p>현재 실종신고가 존재하지 않습니다.</p>
-        </div>
-        {(
+        {myMissing.length === 0 ? (
+          <div className="none-text">
+            <p>현재 실종신고가 존재하지 않습니다.</p>
+          </div>
+        ) : (
           <>
             <div className="missing">
               {myMissing.map((item) => {
