@@ -106,3 +106,10 @@
   color: var(--title-color);
   text-align: center;
 }
+
+/* 안내 문장은 "로딩중"보다 길어서 좁은 화면에서 줄이 깨진다 */
+.load.load-message {
+  font-size: var(--font-subtitle-xl-d);
+  padding: 0 20px;
+  line-height: 1.5;
+}

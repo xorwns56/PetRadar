@@ -11,9 +11,21 @@ import Map from "../components/Map";
 import useShelterData from "../api/ShelterData";
 import Header from "../components/Header";
 
+// 로딩·에러·빈 결과가 같은 모양을 쓰도록 묶어둔다.
+// 예전에는 에러와 로딩이 맨 <div> 한 줄이라 헤더도 없이 글자만 떴다
+const ShelterNotice = ({ textRef, message, small }) => (
+  <div className="load-wrapper">
+    <div className="img-box">
+      <img src="/Menu-icon1.png" alt="dog-img" />
+    </div>
+    <span ref={textRef} className={small ? "load load-message" : "load"}>
+      {message}
+    </span>
+  </div>
+);
+
 const ShelterList = () => {
-  const { animals, error } = useShelterData();
-  const [dots, setDots] = useState("");
+  const { animals, error, loading } = useShelterData();
   const mapRef = useRef(null);
   const loadingRef = useRef(null);
 
@@ -45,6 +57,7 @@ const ShelterList = () => {
     .slice(0, 5); // 상위 5개만 유지
 
   useEffect(() => {
+    if (!loading) return; // 로딩이 끝나면 점 애니메이션도 멈춘다
     let count = 0;
     const interval = setInterval(() => {
       if (loadingRef.current) {
@@ -54,7 +67,7 @@ const ShelterList = () => {
       }
     }, 500);
     return () => clearInterval(interval);
-  }, []);
+  }, [loading]);
   const handleItemClick = (shelter) => {
     const name = encodeURIComponent(shelter.SHTER_NM);
     const addr = encodeURIComponent(
@@ -63,19 +76,12 @@ const ShelterList = () => {
     navigate(`/shelter/${name}/${addr}`);
   };
 
-  if (error) return <div>에러 발생</div>;
-  if (!Array.isArray(animals)) return <div>불러오는 중...</div>;
+  // 응답이 비어 있어도 로딩 화면에 갇히지 않도록 loading을 먼저 본다
+  if (loading) return <ShelterNotice textRef={loadingRef} message="로딩중" />;
+  if (error)
+    return <ShelterNotice message="보호소 정보를 불러오지 못했습니다." small />;
   if (!animals.length)
-    return (
-      <div className="load-wrapper">
-        <div className="img-box">
-          <img src="/Menu-icon1.png" alt="dog-img" />
-        </div>
-        <span ref={loadingRef} className="load">
-          로딩중
-        </span>
-      </div>
-    );
+    return <ShelterNotice message="표시할 보호소 정보가 없습니다." small />;
 
   return (
     <div className="ShelterList">
