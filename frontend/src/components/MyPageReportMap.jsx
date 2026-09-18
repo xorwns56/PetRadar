@@ -1,6 +1,5 @@
 import { useEffect, useRef } from "react";
-
-const AppKey = "b737c6777956f74337fc9bc5a08e3b55";
+import { loadKakaoMap } from "../lib/kakaoMap";
 
 const MyPageReportMap = ({ petReportPoint }) => {
   const mapRef = useRef(null);
@@ -28,19 +27,17 @@ const MyPageReportMap = ({ petReportPoint }) => {
 
   useEffect(() => {
     if (!petReportPoint) return;
-    if (!window.kakao || !window.kakao.maps) {
-      const script = document.createElement("script");
-      script.src = `https://dapi.kakao.com/v2/maps/sdk.js?appkey=${AppKey}&libraries=services&autoload=false`;
-      script.async = true;
-      script.onload = () => {
-        window.kakao.maps.load(() => {
-          initializeStaticMap();
-        });
-      };
-      document.head.appendChild(script);
-    } else {
-      initializeStaticMap();
-    }
+    // SDK가 도착하기 전에 언마운트되거나 좌표가 바뀌면 지난 요청의 결과는 버린다
+    let cancelled = false;
+    loadKakaoMap()
+      .then(() => {
+        if (cancelled) return;
+        initializeStaticMap();
+      })
+      .catch((error) => console.error(error));
+    return () => {
+      cancelled = true;
+    };
   }, [petReportPoint]);
   return <div ref={mapRef} style={{ width: "100%", height: "100%" }}></div>;
 };

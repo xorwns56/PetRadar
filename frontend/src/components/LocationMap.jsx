@@ -1,6 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-
-const AppKey = "b737c6777956f74337fc9bc5a08e3b55";
+import { loadKakaoMap } from "../lib/kakaoMap";
 
 // 현재 위치를 받지 못했을 때 쓰는 기본 좌표
 const FALLBACK_CENTER = { lat: 37.374659507684, lng: 126.73570005568 };
@@ -38,12 +37,11 @@ const LocationMap = ({ init, onSelect }) => {
   };
 
   useEffect(() => {
-    const script = document.createElement("script");
-    script.src = `https://dapi.kakao.com/v2/maps/sdk.js?appkey=${AppKey}&libraries=services&autoload=false`;
-    script.async = true;
-
-    script.onload = () => {
-      window.kakao.maps.load(() => {
+    // SDK가 도착하기 전에 언마운트되면 결과를 버린다
+    let cancelled = false;
+    loadKakaoMap()
+      .then(() => {
+        if (cancelled) return;
         const locationMapContainer = document.getElementById("locationMap");
 
         const options = {
@@ -86,9 +84,11 @@ const LocationMap = ({ init, onSelect }) => {
             handleMapClick(map, clickedLocation);
           }
         );
-      });
+      })
+      .catch((error) => console.error(error));
+    return () => {
+      cancelled = true;
     };
-    document.head.appendChild(script);
   }, []);
 
   useEffect(() => {

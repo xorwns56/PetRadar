@@ -3,9 +3,8 @@ import { useModal } from "../hooks/ModalContext";
 import PetModalDetail from "../components/PetModalDetail";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from '../contexts/AuthContext';
+import { loadKakaoMap } from "../lib/kakaoMap";
 import "../style/MissingMap.css";
-
-const AppKey = "b737c6777956f74337fc9bc5a08e3b55";
 
 const MissingMap = ({missingList}) => {
   const mapRef = useRef(null); // 카카오 지도 객체 참조
@@ -18,14 +17,11 @@ const MissingMap = ({missingList}) => {
   const [mapLoaded, setMapLoaded] = useState(false); // 지도 로드 완료 여부
 
   useEffect(() => {
-    // 카카오맵 스크립트 동적 로드
-    const script = document.createElement("script");
-    script.src = `https://dapi.kakao.com/v2/maps/sdk.js?appkey=${AppKey}&libraries=services&autoload=false`;
-    script.async = true;
-
-    script.onload = () => {
-      // 스크립트 로드 후 카카오맵 초기화
-      window.kakao.maps.load(() => {
+    // SDK가 도착하기 전에 언마운트되면 결과를 버린다
+    let cancelled = false;
+    loadKakaoMap()
+      .then(() => {
+        if (cancelled) return;
         const map = new window.kakao.maps.Map(containerRef.current, {
           center: new window.kakao.maps.LatLng(
             37.374659507684,
@@ -35,10 +31,11 @@ const MissingMap = ({missingList}) => {
         });
         mapRef.current = map; // 지도 객체 저장
         setMapLoaded(true); // 지도 로드 완료 상태 변경
-      });
+      })
+      .catch((error) => console.error(error));
+    return () => {
+      cancelled = true;
     };
-
-    document.head.appendChild(script); // 스크립트 태그 추가
   }, []);
 
   useEffect(() => {

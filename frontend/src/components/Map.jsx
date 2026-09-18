@@ -1,7 +1,6 @@
 import { useEffect, useRef } from "react";
+import { loadKakaoMap } from "../lib/kakaoMap";
 import "../style/Map.css";
-
-const AppKey = "b737c6777956f74337fc9bc5a08e3b55";
 
 const Map = ({ shelters, onSelect, setCenterRef }) => {
   const mapRef = useRef(null);
@@ -9,12 +8,11 @@ const Map = ({ shelters, onSelect, setCenterRef }) => {
   const geocoderInstance = useRef(null);
 
   useEffect(() => {
-    const script = document.createElement("script");
-    script.src = `https://dapi.kakao.com/v2/maps/sdk.js?appkey=${AppKey}&libraries=services&autoload=false`;
-    script.async = true;
-
-    script.onload = () => {
-      window.kakao.maps.load(() => {
+    // SDK가 도착하기 전에 언마운트되면 결과를 버린다
+    let cancelled = false;
+    loadKakaoMap()
+      .then(() => {
+        if (cancelled) return;
         const map = new window.kakao.maps.Map(mapRef.current, {
           center: new window.kakao.maps.LatLng(37.423233, 127.105261),
           level: 12,
@@ -65,8 +63,8 @@ const Map = ({ shelters, onSelect, setCenterRef }) => {
             }
           });
         });
-      });
-    };
+      })
+      .catch((error) => console.error("카카오맵 스크립트 로드 실패", error));
 
     if (setCenterRef) {
       setCenterRef.current = (shelter) => {
@@ -93,11 +91,9 @@ const Map = ({ shelters, onSelect, setCenterRef }) => {
       };
     }
 
-    script.onerror = () => {
-      console.error("카카오맵 스크립트 로드 실패");
+    return () => {
+      cancelled = true;
     };
-
-    document.head.appendChild(script);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
