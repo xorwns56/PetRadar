@@ -1,5 +1,4 @@
 import "../style/MissingItem.css";
-import { getMissingImage } from "../utils/get-missingPet-image";
 import Button from "./Button";
 
 const MissingItem = ({ missingDTO, onClick, toggleModal, myMissing }) => {

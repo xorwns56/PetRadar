@@ -1,9 +1,6 @@
 import "../style/MypageModalDetail.css";
 import { useModal } from "../hooks/ModalContext";
 
-import { getMissingImage } from "../utils/get-missingPet-image"; // 수정필요
-import { missingPet } from "../utils/missingPet"; // 수정필요
-
 import Button from "./Button";
 import MyPageReportMap from "./MyPageReportMap";
 
