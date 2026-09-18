@@ -4,6 +4,13 @@
     <meta charset="UTF-8" />
     <link rel="icon" type="image/svg+xml" href="/petRadarIcon.png" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <!-- Pretendard 공식 CDN. 예전에 쓰던 주소는 404가 되어 폰트가 받아지지 않았다.
+         dynamic-subset은 한글을 unicode-range로 쪼개 필요한 조각만 내려받는다.
+         CSS의 @import 대신 여기에 두어 요청이 사슬로 이어지지 않게 한다 -->
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard-dynamic-subset.css"
+    />
     <title>PetRadar</title>
   </head>
   <body>

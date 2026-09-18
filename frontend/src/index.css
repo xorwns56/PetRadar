@@ -1,30 +1,12 @@
-/* Pretendard Regular (400) */
-@font-face {
-  font-family: 'Pretendard';
-  src: url('https://fastly.jsdelivr.net/gh/projectnoonnu/noonfonts_2107@1.1/Pretendard-Regular.woff') format('woff');
-  font-weight: 400;
-  font-style: normal;
-}
+/* Pretendard는 index.html에서 공식 CDN으로 불러온다.
+   여기에 있던 @font-face 3개는 주소가 404였고, 등록하는 이름도 'Pretendard'인데
+   아래에서 'Pretendard-Regular'를 찾고 있어 한 번도 적용된 적이 없었다. */
 
-/* Pretendard Medium (500) */
-@font-face {
-  font-family: 'Pretendard';
-  src: url('https://fastly.jsdelivr.net/gh/projectnoonnu/noonfonts_2107@1.1/Pretendard-Medium.woff') format('woff');
-  font-weight: 500;
-  font-style: normal;
-}
-
-/* Pretendard Bold (700) */
-@font-face {
-  font-family: 'Pretendard';
-  src: url('https://fastly.jsdelivr.net/gh/projectnoonnu/noonfonts_2107@1.1/Pretendard-Bold.woff') format('woff');
-  font-weight: 700;
-  font-style: normal;
-}
-
-/* 기본 글꼴 지정 */
+/* 기본 글꼴 지정
+   input/button은 font를 상속하지 않으므로 선택자는 body * 그대로 둔다. */
 body * {
-  font-family: 'Pretendard-Regular';
+  font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, 'Malgun Gothic',
+    'Apple SD Gothic Neo', sans-serif;
 }
 
 /* 기본 구조 초기화 */
