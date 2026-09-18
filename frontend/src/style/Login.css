@@ -15,6 +15,9 @@
   left: 50%;
   transform: translate(-50%, -50%);
   text-align: center;
+  /* 장식 발바닥이 DOM상 뒤에 와서 카드를 덮고 있었다.
+     좁은 화면에서는 "회원가입 →" 링크가 가려 읽히지 않는다 */
+  z-index: 1;
 }
 
 .Login .Login-container .logo img {
@@ -67,6 +70,7 @@
 .Login .bg-icon {
   transform: rotate(30deg);
   opacity: 0.5;
+  z-index: 0; /* 항상 카드 뒤에 깔린다 */
 }
 
 @keyframes blink {

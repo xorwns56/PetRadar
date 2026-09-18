@@ -15,6 +15,8 @@
   width: clamp(300px, 92vw, 380px);
   transform: translate(-50%, -50%);
   text-align: center;
+  /* 장식 발바닥이 DOM상 뒤에 와서 카드를 덮고 있었다 (Login.css와 같은 문제) */
+  z-index: 1;
 }
 
 .Register .Register-container .logo img {
@@ -49,6 +51,7 @@
 .Register .bg-icon {
   transform: rotate(30deg);
   opacity: 0.5;
+  z-index: 0; /* 항상 카드 뒤에 깔린다 */
 }
 
 @keyframes blink {
