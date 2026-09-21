@@ -42,7 +42,8 @@ public class ReportService {
         return new PageImpl<>(reportDTOList, pageable, reportPage.getTotalElements());
     }
 
-    public void createReport(Long userId, Long missingId, Report report, MultipartFile image) {
+    public void createReport(Long userId, Long missingId, ReportRequest request, MultipartFile image) {
+        Report report = request.toEntity();
         if(userId != null) report.setUser(userRepository.getReferenceById(userId));
         Missing missing = missingRepository.findById(missingId)
                 .orElseThrow(() -> new IllegalArgumentException("Missing post not found with ID: " + missingId));

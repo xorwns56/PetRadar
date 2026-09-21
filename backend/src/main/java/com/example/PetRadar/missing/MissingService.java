@@ -43,7 +43,8 @@ public class MissingService {
         return MissingDTO.from(missing, imageBaseUrl);
     }
 
-    public void createMissing(long userId, Missing missing, MultipartFile image) {
+    public void createMissing(long userId, MissingRequest request, MultipartFile image) {
+        Missing missing = request.toEntity();
         missing.setUser(userRepository.getReferenceById(userId));
         // 이미지는 파일로 저장하고 DB에는 키만 남긴다
         missing.setPetImage(imageStorageService.store(image));
@@ -52,29 +53,19 @@ public class MissingService {
         notificationService.createNotificationToAllUsers(userId,"missing", missing.getId());
     }
 
-    public void updateMissing(Long id, Missing updatedMissing, long userId, MultipartFile image) {
+    public void updateMissing(Long id, MissingRequest request, long userId, MultipartFile image) {
         Missing existingMissing = missingRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Missing post not found."));
         if (!existingMissing.getUser().getId().equals(userId)) {
             throw new IllegalArgumentException("You are not authorized to update this post.");
         }
-        existingMissing.setPetName(updatedMissing.getPetName());
-        existingMissing.setPetType(updatedMissing.getPetType());
-        existingMissing.setPetGender(updatedMissing.getPetGender());
-        existingMissing.setPetBreed(updatedMissing.getPetBreed());
-        existingMissing.setPetAge(updatedMissing.getPetAge());
-        existingMissing.setPetMissingDate(updatedMissing.getPetMissingDate());
-        existingMissing.setPetMissingPlace(updatedMissing.getPetMissingPlace());
-        existingMissing.setLatitude(updatedMissing.getLatitude());
-        existingMissing.setLongitude(updatedMissing.getLongitude());
+        request.applyTo(existingMissing);
         // 새 이미지를 올린 경우에만 교체하고, 교체 시 이전 파일은 지운다
         if (image != null && !image.isEmpty()) {
             String previousKey = existingMissing.getPetImage();
             existingMissing.setPetImage(imageStorageService.store(image));
             imageStorageService.delete(previousKey);
         }
-        existingMissing.setTitle(updatedMissing.getTitle());
-        existingMissing.setContent(updatedMissing.getContent());
         missingRepository.save(existingMissing);
         searchService.index(existingMissing);
     }

@@ -1,5 +1,6 @@
 package com.example.PetRadar.report;
 
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -29,7 +30,7 @@ public class ReportController {
     @PostMapping("/missing/{missingId}")
     public ResponseEntity<Void> createReport(@PathVariable Long missingId,
                                              @AuthenticationPrincipal UserDetails userDetails,
-                                             @RequestPart Report report,
+                                             @Valid @RequestPart ReportRequest report,
                                              @RequestPart(required = false) MultipartFile image) {
         reportService.createReport(userDetails != null ? Long.parseLong(userDetails.getUsername()) : null, missingId, report, image);
         return ResponseEntity.ok().build();

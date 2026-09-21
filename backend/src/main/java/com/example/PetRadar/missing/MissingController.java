@@ -1,5 +1,6 @@
 package com.example.PetRadar.missing;
 
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -46,7 +47,7 @@ public class MissingController {
 
     // 이미지를 파일로 받으므로 multipart로 처리한다 (missing: JSON 파트, image: 파일 파트)
     @PostMapping
-    public ResponseEntity<Void> createMissing(@RequestPart Missing missing,
+    public ResponseEntity<Void> createMissing(@Valid @RequestPart MissingRequest missing,
                                               @RequestPart(required = false) MultipartFile image,
                                               @AuthenticationPrincipal UserDetails userDetails) {
         missingService.createMissing(Long.parseLong(userDetails.getUsername()), missing, image);
@@ -55,7 +56,7 @@ public class MissingController {
 
     @PatchMapping("/{id}")
     public ResponseEntity<Void> updateMissing(@PathVariable Long id,
-                                              @RequestPart Missing missing,
+                                              @Valid @RequestPart MissingRequest missing,
                                               @RequestPart(required = false) MultipartFile image,
                                               @AuthenticationPrincipal UserDetails userDetails){
         missingService.updateMissing(id, missing, Long.parseLong(userDetails.getUsername()), image);
