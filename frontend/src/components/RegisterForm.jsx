@@ -1,160 +1,135 @@
-import "../style/RegisterForm.css";
 import { useState } from "react";
+import Button from "./Button";
+import FloatingField, { FieldIconButton } from "./FloatingField";
+
+const ID_REGEX = /^[a-z0-9]*$/;
+const PW_REGEX = /^(?=.*[a-zA-Z])(?=.*\d)(?=.*[^\w\s]).{8,}$/;
+const HP_REGEX = /^01[0-9]{1}-\d{3,4}-\d{4}$/;
+
 const RegisterForm = ({ isExist, onRegister }) => {
+  const [input, setInput] = useState({ id: "", pw: "", hp: "" });
+  const [errMsg, setErrMsg] = useState({ id: "", pw: "", hp: "" });
+  const [formError, setFormError] = useState("");
+  const [pwHide, setPwHide] = useState(true);
+  const [submitting, setSubmitting] = useState(false);
+
   const formCheck = async (name) => {
     const newErrMsg = {};
-    const idRegex = /^[a-z0-9]*$/;
+
     if (!input.id) {
       newErrMsg.id = "아이디를 입력해주세요.";
+    } else if (!ID_REGEX.test(input.id)) {
+      // 형식부터 보고 통과할 때만 중복 확인을 요청한다
+      newErrMsg.id = "ID는 영문 소문자와 숫자만 입력 가능합니다.";
     } else if (await isExist(input.id)) {
       newErrMsg.id = "사용할 수 없는 아이디입니다. 다른 아이디를 입력해주세요.";
-    } else if (!idRegex.test(input.id)) {
-      newErrMsg.id = "ID는 영문 소문자와 숫자만 입력 가능합니다.";
     }
-    const pwRegex = /^(?=.*[a-zA-Z])(?=.*\d)(?=.*[^\w\s]).{8,}$/;
+
     if (!input.pw) {
       newErrMsg.pw = "비밀번호를 입력해주세요.";
-    } else if (!pwRegex.test(input.pw)) {
+    } else if (!PW_REGEX.test(input.pw)) {
       newErrMsg.pw =
         "비밀번호는 영문, 숫자, 특수문자를 포함한 8자 이상이어야 합니다.";
     }
-    const hpRegex = /^01[0-9]{1}-\d{3,4}-\d{4}$/;
+
     if (!input.hp) {
       newErrMsg.hp = "연락처를 입력해주세요.";
-    } else if (!hpRegex.test(input.hp)) {
+    } else if (!HP_REGEX.test(input.hp)) {
       newErrMsg.hp = "올바른 연락처 형식을 입력해 주세요. (예: 010-1234-5678)";
     }
-    setErrMsg(name ? { ...errMsg, [name]: newErrMsg[name] } : newErrMsg);
-    return JSON.stringify(newErrMsg) === "{}";
-  };
-  const onSubmit = async (event) => {
-    event.preventDefault();
-    if (!await formCheck()) return;
-    onRegister(input.id, input.pw, input.hp);
-  };
-  const [focus, setFocus] = useState({
-    id: false,
-    pw: false,
-    hp: false,
-  });
-  const [input, setInput] = useState({
-    id: "",
-    pw: "",
-    hp: "",
-  });
-  const [errMsg, setErrMsg] = useState({
-    id: "",
-    pw: "",
-    hp: "",
-  });
-  const [pwHide, setPwHide] = useState(true);
-  const onChangeInput = (event) => {
-    setInput({
-      ...input,
-      [event.target.name]: event.target.value,
-    });
-  };
-  const onFocus = (event) => {
-    setFocus({
-      ...focus,
-      [event.target.name]: true,
-    });
+
+    setErrMsg(
+      name ? { ...errMsg, [name]: newErrMsg[name] ?? "" } : { id: "", pw: "", hp: "", ...newErrMsg }
+    );
+    return Object.keys(newErrMsg).length === 0;
   };
 
-  const onBlur = (event) => {
-    formCheck(event.target.name);
-    setFocus({
-      ...focus,
-      [event.target.name]: false,
-    });
+  const onSubmit = async (event) => {
+    event.preventDefault();
+    setFormError("");
+    setSubmitting(true);
+    try {
+      if (!(await formCheck())) return;
+      // 실패하면 onRegister가 false를 돌려준다.
+      // 예전에는 여기서 아무 일도 일어나지 않아 사용자가 이유를 알 수 없었다
+      if ((await onRegister(input.id, input.pw, input.hp)) === false) {
+        setFormError("회원가입에 실패했어요. 잠시 후 다시 시도해주세요.");
+      }
+    } finally {
+      setSubmitting(false);
+    }
   };
+
+  const onChangeInput = (event) => {
+    setInput({ ...input, [event.target.name]: event.target.value });
+    if (formError) setFormError("");
+  };
+
+  const onBlur = (event) => formCheck(event.target.name);
+
+  const hasBlocking =
+    !input.id || !input.pw || !input.hp || errMsg.id || errMsg.pw || errMsg.hp;
+
   return (
-    <div className="RegisterForm">
-      <form onSubmit={onSubmit} autoComplete="off">
-        <div
-          className={`input_item id ${focus.id ? "focus" : ""} ${
-            input.id ? "on" : ""
-          } ${errMsg.id ? "err" : ""}`}
-        >
-          <input
-            type="text"
-            name="id"
-            id="register_id"
-            onChange={onChangeInput}
-            onFocus={onFocus}
-            onBlur={onBlur}
-            value={input.id}
-          />
-          <label htmlFor="register_id">아이디</label>
-        </div>
-        <div
-          className={`input_item pw ${focus.pw ? "focus" : ""} ${
-            input.pw ? "on" : ""
-          } ${errMsg.pw ? "err" : ""}`}
-        >
-          <input
-            type={pwHide ? "password" : "text"}
-            name="pw"
-            id="register_pw"
-            onChange={onChangeInput}
-            onFocus={onFocus}
-            onBlur={onBlur}
-            value={input.pw}
-          />
-          <label htmlFor="register_pw">비밀번호</label>
-          <button
-            type="button"
-            className={`btn_view ${input.pw ? "" : "hide"}`}
-            tabIndex={-1}
-            onClick={() => {
-              setPwHide(!pwHide);
-            }}
-          >
-            <img src={`/${pwHide ? "close" : "open"}EyeIcon.png`} />
-          </button>
-        </div>
-        <div
-          className={`input_item hp ${focus.hp ? "focus" : ""} ${
-            input.hp ? "on" : ""
-          } ${errMsg.hp ? "err" : ""}`}
-        >
-          <input
-            type="text"
-            name="hp"
-            id="register_hp"
-            onChange={onChangeInput}
-            onFocus={onFocus}
-            onBlur={onBlur}
-            value={input.hp}
-          />
-          <label htmlFor="register_hp">연락처{" (예 : 010-1234-5678)"}</label>
-        </div>
-        <div className={`error_message ${errMsg.id ? "" : "hide"}`}>
-          {errMsg.id}
-        </div>
-        <div className={`error_message ${errMsg.pw ? "" : "hide"}`}>
-          {errMsg.pw}
-        </div>
-        <div className={`error_message ${errMsg.hp ? "" : "hide"}`}>
-          {errMsg.hp}
-        </div>
-        <button
-          type="submit"
-          className={`btn_login ${
-            !input.id ||
-            !input.pw ||
-            !input.hp ||
-            errMsg.id ||
-            errMsg.pw ||
-            errMsg.hp
-              ? ""
-              : "on"
-          }`}
-        >
-          회원가입
-        </button>
-      </form>
-    </div>
+    <form onSubmit={onSubmit} autoComplete="off" className="flex flex-col gap-3">
+      <FloatingField
+        id="register_id"
+        name="id"
+        type="text"
+        label="아이디"
+        value={input.id}
+        error={errMsg.id}
+        onChange={onChangeInput}
+        onBlur={onBlur}
+      />
+
+      <FloatingField
+        id="register_pw"
+        name="pw"
+        type={pwHide ? "password" : "text"}
+        label="비밀번호"
+        value={input.pw}
+        error={errMsg.pw}
+        onChange={onChangeInput}
+        onBlur={onBlur}
+        trailing={
+          input.pw && (
+            <FieldIconButton
+              label={pwHide ? "비밀번호 보기" : "비밀번호 가리기"}
+              icon={`/${pwHide ? "close" : "open"}EyeIcon.png`}
+              onClick={() => setPwHide(!pwHide)}
+            />
+          )
+        }
+      />
+
+      <FloatingField
+        id="register_hp"
+        name="hp"
+        type="tel"
+        label="연락처 (예: 010-1234-5678)"
+        value={input.hp}
+        error={errMsg.hp}
+        onChange={onChangeInput}
+        onBlur={onBlur}
+      />
+
+      {formError && (
+        <p className="px-1 text-xs leading-relaxed font-semibold break-keep text-danger">
+          {formError}
+        </p>
+      )}
+
+      <Button
+        htmlType="submit"
+        size="lg"
+        className="mt-2 w-full"
+        disabled={submitting || Boolean(hasBlocking)}
+      >
+        {submitting ? "처리 중…" : "회원가입"}
+      </Button>
+    </form>
   );
 };
+
 export default RegisterForm;

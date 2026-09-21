@@ -1,38 +1,34 @@
-import "../style/MypageModalDetail.css";
 import { useModal } from "../hooks/ModalContext";
-
-import Button from "./Button";
+import Dialog from "./Dialog";
 import MyPageReportMap from "./MyPageReportMap";
 
-const MypageModalDetail = ({
-  title,
-  content,
-  petReportPoint,
-  petReportPlace,
-}) => {
+/* 목격 제보 상세. 사진 자리에 제보된 위치 지도를 얹는다 */
+const MypageModalDetail = ({ title, content, petReportPoint }) => {
   const { isActive, toggleModal } = useModal();
 
+  if (!isActive) return null;
+
   return (
-    <div className={`MypageModalDetail ${isActive ? "active" : ""}`}>
-      <div className="Modal-container">
-        <div className="Modal-contents">
-          <div className="Map-box">
+    <Dialog
+      onClose={toggleModal}
+      title={title}
+      media={
+        <div className="aspect-[16/10] w-full bg-brand-soft">
+          {petReportPoint ? (
             <MyPageReportMap petReportPoint={petReportPoint} />
-          </div>
-          <div className="text-contents">
-            <div className="contents-t1">
-              <p className="petType">{title}</p>
-            </div>
-            <div className="contents-t2">
-              <p>{content}</p>
-            </div>
-          </div>
+          ) : (
+            <p className="flex h-full items-center justify-center text-sm text-ink-muted">
+              위치 정보가 없는 제보예요.
+            </p>
+          )}
         </div>
-        <div className="Modal-btn" onClick={toggleModal}>
-          <Button text={"X"} type={"Circle"} />
-        </div>
-      </div>
-    </div>
+      }
+    >
+      <p className="text-sm leading-relaxed break-keep whitespace-pre-line text-ink-muted">
+        {content}
+      </p>
+    </Dialog>
   );
 };
+
 export default MypageModalDetail;

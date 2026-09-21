@@ -1,76 +1,59 @@
 import { Link, useNavigate } from "react-router-dom";
-import "../style/Login.css";
+import AuthLayout from "../components/layout/AuthLayout";
 import LoginForm from "../components/LoginForm";
-import { useEffect } from "react";
-import { useAuth } from '../contexts/AuthContext';
+import { useAuth } from "../contexts/AuthContext";
+
 const Login = () => {
   const nav = useNavigate();
   const { login, api } = useAuth();
-  /*
-  useEffect(() => {
-    if (userState.currentUser) {
-      nav("/", { replace: true });
-    }
-  }, [userState.currentUser, nav]);
-  */
+
   const isExist = async (id) => {
-      try {
-        const response = await api.get("/api/auth/check-exist", { params : {id} });
-        return response.data;
-      } catch (error) {
-        console.error("isExist : ", error);
-        return false;
-      }
-    };
+    try {
+      const response = await api.get("/api/auth/check-exist", {
+        params: { id },
+      });
+      return response.data;
+    } catch (error) {
+      console.error("isExist : ", error);
+      return false;
+    }
+  };
+
   const onLogin = async (id, pw) => {
     try {
-      const response = await api.post("/api/auth/login", {
-        id,
-        pw,
-      });
+      const response = await api.post("/api/auth/login", { id, pw });
       if (response.status === 200) {
         login(response.data.accessToken);
         nav("/", { replace: true });
         return true;
       }
+      return false;
     } catch (error) {
-        alert("로그인 중 오류가 발생했습니다.");
-        console.error("Login error:", error);
-        return false;
+      // 자격 증명이 틀린 경우가 대부분이라 alert 대신 폼 안에서 알린다
+      console.error("Login error:", error);
+      return false;
     }
   };
 
   return (
-    <>
-      <div className="Login">
-        <div className="Login-container">
-          <div className="logo">
-            <Link to="/">
-              <img className="logo" src="/PetRadar-Logo-m.png" />
-            </Link>
-          </div>
-          <div className="Login-contents">
-            <LoginForm
-              isExist={isExist}
-              onLogin={onLogin}
-            />
-            <div className="register-btn">
-              <Link className="register" to="/register">
-                회원가입 →
-              </Link>
-            </div>
-            <div className="login-img">
-              <img src="/Menu-icon1.png" alt="login-img" />
-            </div>
-          </div>
-        </div>
-        <div className="bg-icons">
-          <img className="bg-icon bg-icon1" src="/bg-icon.png" alt="bg-icon1" />
-          <img className="bg-icon bg-icon2" src="/bg-icon.png" alt="bg-icon1" />
-          <img className="bg-icon bg-icon3" src="/bg-icon.png" alt="bg-icon1" />
-        </div>
-      </div>
-    </>
+    <AuthLayout
+      title="로그인"
+      description="실종 신고와 목격 제보를 하려면 로그인이 필요해요."
+      footer={
+        <p className="text-center text-sm text-ink-muted">
+          아직 계정이 없으신가요?{" "}
+          <Link
+            to="/register"
+            className="font-semibold text-brand-ink underline underline-offset-4 hover:text-brand"
+          >
+            회원가입
+          </Link>
+        </p>
+      }
+    >
+      <LoginForm isExist={isExist} onLogin={onLogin} />
+    </AuthLayout>
   );
 };
+
 export default Login;

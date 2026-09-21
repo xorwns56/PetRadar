@@ -1,43 +1,58 @@
-import "../style/MissingReport.css";
-import Header from "../components/Header";
-import Button from "../components/Button";
-
-import LocationMap from "../components/LocationMap";
-import ImagePreview from "../components/ImagePreview";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
+import Layout from "../components/layout/Layout";
+import PageHeading from "../components/layout/PageHeading";
+import Button from "../components/Button";
+import LocationMap from "../components/LocationMap";
+import ImageField from "../components/ImageField";
+import FormField, { controlClass, textareaClass } from "../components/FormField";
 import { useAuth } from "../contexts/AuthContext.jsx";
 
 const MissingReport = () => {
   const nav = useNavigate();
   const params = useParams();
   const { api } = useAuth();
+  const [submitting, setSubmitting] = useState(false);
+  const [error, setError] = useState("");
   const [form, setForm] = useState({
     title: "",
     content: "",
-    petImage: null,   // 파일 객체를 그대로 담는다
+    petImage: null, // 파일 객체를 그대로 담는다
     petReportPlace: "",
     petReportPoint: null,
   });
-  const onSubmitButtonClick = async () => {
-      try {
-          // 이미지는 파일 파트로 따로 보내므로 JSON 본문에서 분리한다
-          const { petReportPoint, petImage, ...restOfForm } = form;
-          const requestBody = {
-            ...restOfForm,
-            latitude: petReportPoint ? petReportPoint.lat : null,
-            longitude: petReportPoint ? petReportPoint.lng : null,
-          };
-          // multipart: report(JSON) + image(File)
-          const formData = new FormData();
-          formData.append("report", new Blob([JSON.stringify(requestBody)], { type: "application/json" }));
-          if (petImage) formData.append("image", petImage);
 
-          await api.post(`/api/report/missing/${params.petMissingId}`, formData);
-          nav("/missingList");
-      } catch (error) {
-          alert("제보 등록에 실패했습니다. 다시 시도해주세요.");
-      }
+  const onSubmitButtonClick = async () => {
+    if (!form.title || !form.content) {
+      setError("제목과 내용을 입력해주세요.");
+      return;
+    }
+    setError("");
+    setSubmitting(true);
+    try {
+      // 이미지는 파일 파트로 따로 보내므로 JSON 본문에서 분리한다
+      const { petReportPoint, petImage, ...restOfForm } = form;
+      const requestBody = {
+        ...restOfForm,
+        latitude: petReportPoint ? petReportPoint.lat : null,
+        longitude: petReportPoint ? petReportPoint.lng : null,
+      };
+      // multipart: report(JSON) + image(File)
+      const formData = new FormData();
+      formData.append(
+        "report",
+        new Blob([JSON.stringify(requestBody)], { type: "application/json" })
+      );
+      if (petImage) formData.append("image", petImage);
+
+      await api.post(`/api/report/missing/${params.petMissingId}`, formData);
+      nav("/missingList");
+    } catch (err) {
+      console.error("Failed to submit report:", err);
+      setError("제보 등록에 실패했습니다. 다시 시도해주세요.");
+    } finally {
+      setSubmitting(false);
+    }
   };
 
   const handleChange = (e) => {
@@ -45,77 +60,85 @@ const MissingReport = () => {
     if (name === "petImage") {
       if (!files[0]) return;
       // base64 변환 없이 파일 객체를 그대로 보관한다
-      setForm((prev) => ({
-        ...prev,
-        [name]: files[0],
-      }));
+      setForm((prev) => ({ ...prev, [name]: files[0] }));
     } else {
-      setForm((prev) => ({
-        ...prev,
-        [name]: value,
-      }));
+      setForm((prev) => ({ ...prev, [name]: value }));
     }
   };
+
   const onLocationSelect = (latlng) => {
     setForm((prev) => ({
       ...prev,
-
-      petReportPoint: {
-        lat: latlng.lat,
-        lng: latlng.lng,
-      },
+      petReportPoint: { lat: latlng.lat, lng: latlng.lng },
     }));
   };
 
   return (
-    <div className="MissingReport">
-      <Header leftChild={true} />
-      <div className="MissingReport-container inner">
-        <div className="menu-title">
-          <h3>실종 동물 제보하기</h3>
-        </div>
-        <div className="MissingReportForms">
-          <div className="MissingReportForm">
-            <h3>사진</h3>
-            <input
-              type="file"
-              name="petImage"
-              accept="image/*"
-              onChange={handleChange}
-            />
-            <ImagePreview value={form.petImage} />
-          </div>
-          <div className="MissingReportForm">
-            <h3>제목</h3>
-            {/* <input type="text" /> */}
+    <Layout width="content">
+      <PageHeading
+        title="실종 동물 제보하기"
+        description="글쓴이에게 바로 알림이 갑니다. 작은 단서도 도움이 돼요."
+      />
 
-            <input name="title" value={form.title} onChange={handleChange} />
-          </div>
-          <div className="MissingReportForm">
-            <h3>내용</h3>
-            {/* <textarea type="text" placeholder="상세한 설명을 적어주세요." /> */}
+      {error && (
+        <p className="mb-4 rounded-xl border border-danger/30 bg-danger/5 p-3 text-sm font-semibold text-danger">
+          {error}
+        </p>
+      )}
+
+      <div className="rounded-2xl border border-line bg-surface p-6 shadow-card sm:p-8">
+        {/* 한 단으로 세운다 — 적는 순서가 곧 읽는 순서가 되게 */}
+        <div className="flex flex-col gap-5">
+          <FormField label="제목" htmlFor="report-title">
+            <input
+              id="report-title"
+              name="title"
+              value={form.title}
+              onChange={handleChange}
+              placeholder="어디서 보셨는지 한 줄로 적어주세요."
+              className={controlClass}
+            />
+          </FormField>
+
+          <FormField label="내용" htmlFor="report-content">
             <textarea
+              id="report-content"
               name="content"
               value={form.content}
               onChange={handleChange}
               placeholder="상세한 설명을 적어주세요."
+              className={`${textareaClass} min-h-40`}
             />
-          </div>
+          </FormField>
 
-          <div className="MissingReportForm">
-            <h3>발견 장소</h3>
-            <LocationMap onSelect={onLocationSelect} />
-          </div>
-          <div className="MissingReport-btn">
-            <Button
-              onClick={onSubmitButtonClick}
-              text={"신고하기"}
-              type={"Square_lg"}
-            ></Button>
-          </div>
+          <FormField label="발견 장소" hint="지도를 눌러 위치를 찍어주세요.">
+            <div className="h-64 overflow-hidden rounded-xl border border-line sm:h-72">
+              <LocationMap onSelect={onLocationSelect} />
+            </div>
+          </FormField>
+
+          <FormField label="사진" htmlFor="report-image">
+            <ImageField
+              id="report-image"
+              value={form.petImage}
+              onChange={handleChange}
+            />
+          </FormField>
+        </div>
+
+        <div className="mt-8 flex justify-end">
+          <Button
+            size="lg"
+            className="w-full sm:w-44"
+            disabled={submitting}
+            onClick={onSubmitButtonClick}
+          >
+            {submitting ? "등록 중…" : "제보하기"}
+          </Button>
         </div>
       </div>
-    </div>
+    </Layout>
   );
 };
+
 export default MissingReport;

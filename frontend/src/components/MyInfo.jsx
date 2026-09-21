@@ -1,130 +1,131 @@
-import "../style/MyInfo.css";
-import { useState, useEffect } from "react";
+import { useEffect, useState } from "react";
+import Button from "./Button";
+import FormField, { controlClass } from "./FormField";
+
 const MyInfo = ({ userInfo, onUpdate, onDelete, onLogOut }) => {
   const [editMode, setEditMode] = useState(false);
-  const [pwHide, setPwHide] = useState(false);
-  const [input, setInput] = useState({
-    pw : "",
-    hp : ""
-  });
+  const [input, setInput] = useState({ pw: "", hp: "" });
+  const [error, setError] = useState("");
+
   useEffect(() => {
-      initInput();
-    }, [userInfo]);
+    initInput();
+  }, [userInfo]);
 
-  const initInput = ()=>{
-      setInput({
-          pw: "",
-          hp: userInfo.hp,
-      });
-  }
+  const initInput = () => {
+    setInput({ pw: "", hp: userInfo.hp ?? "" });
+    setError("");
+  };
 
-
-  const [focus, setFocus] = useState({
-    pw: false,
-    hp: false,
-  });
   const onChangeInput = (event) => {
-    setInput({
-      ...input,
-      [event.target.name]: event.target.value,
-    });
+    setInput({ ...input, [event.target.name]: event.target.value });
+    if (error) setError("");
   };
-  const onFocus = (event) => {
-    setFocus({
-      ...focus,
-      [event.target.name]: true,
-    });
+
+  const onConfirm = async () => {
+    try {
+      await onUpdate(input.pw, input.hp);
+      setEditMode(false);
+    } catch (err) {
+      // 서버가 내려준 사유를 alert 대신 카드 안에서 보여준다
+      setError(err?.response?.data || "수정에 실패했어요. 다시 시도해주세요.");
+      initInput();
+    }
   };
-  const onBlur = (event) => {
-    //formCheck(event.target.name);
-    setFocus({
-      ...focus,
-      [event.target.name]: false,
-    });
-  };
+
+  const row = "flex items-baseline gap-4";
+  const term = "w-16 shrink-0 text-sm text-ink-muted";
+  const desc = "truncate text-sm font-semibold text-ink";
+
   return (
-    <div className="MyInfo">
-        <div className="menu-title">
-          <h3>회원 정보</h3>
-        </div>
-      <div className="MyInfo-contents">
-        <table className="info">
-          <tbody>
-            <tr>
-              <th>아이디</th>
-              <td>
-                <span>{userInfo.id}</span>
-              </td>
-            </tr>
-            {editMode ? (
-              <>
-                <tr>
-                  <th>연락처</th>
-                  <td>
-                      <input
-                          type="text"
-                          name="hp"
-                          onChange={onChangeInput}
-                          onFocus={onFocus}
-                          onBlur={onBlur}
-                          value={input.hp}
-                      />
-                  </td>
-                </tr>
-                <tr>
-                  <th>새 비밀번호</th>
-                  <td>
-                    <input
-                      type={pwHide ? "password" : "text"}
-                      name="pw"
-                      onChange={onChangeInput}
-                      onFocus={onFocus}
-                      onBlur={onBlur}
-                      value={input.pw}
-                    />
-                  </td>
-                </tr>
-              </>
-            ) : (
-              <tr>
-                <th>연락처</th>
-                <td>
-                  <span>{userInfo.hp}</span>
-                </td>
-              </tr>
-            )}
-          </tbody>
-        </table>
-        <div className="v_btn">
-          {editMode ? (
-            <div className="DeleteAccount-btn">
-              <button  onClick={onDelete}>회원 탈퇴</button>
-              <div className="h_btn">
-                <button
-                  onClick={async () => {
-                    try {
-                        await onUpdate(input.pw, input.hp);
-                        setEditMode(false);
-                    }catch(error) {
-                        alert(error.response.data);
-                        initInput();
-                    }
-                  }}
-                >
-                  확인
-                </button>
-                <button onClick={() => setEditMode(false)}>취소</button>
-              </div>
-            </div>
-          ) : (
-            <div className="UserMenu-btn">
-              <button onClick={onLogOut}>로그아웃</button>
-              <button onClick={() => setEditMode(true)}>정보수정</button>
-            </div>
-          )}
-        </div>
+    <section className="rounded-2xl border border-line bg-surface p-5 shadow-card sm:p-6">
+      <div className="flex flex-wrap items-center justify-between gap-3">
+        <h2 className="text-base font-bold text-ink">회원 정보</h2>
+        {!editMode && (
+          <div className="flex gap-2">
+            <Button variant="secondary" size="sm" onClick={onLogOut}>
+              로그아웃
+            </Button>
+            <Button size="sm" onClick={() => setEditMode(true)}>
+              정보수정
+            </Button>
+          </div>
+        )}
       </div>
-    </div>
+
+      {/* 아이디는 못 고치는 항목이지만 편집 중에도 계속 보여야
+          어느 계정을 고치는 중인지 알 수 있다 */}
+      <dl className="mt-5 grid gap-3 sm:grid-cols-2">
+        <div className={row}>
+          <dt className={term}>아이디</dt>
+          <dd className={desc}>{userInfo.id}</dd>
+        </div>
+        {!editMode && (
+          <div className={row}>
+            <dt className={term}>연락처</dt>
+            <dd className={desc}>{userInfo.hp}</dd>
+          </div>
+        )}
+      </dl>
+
+      {editMode && (
+        <>
+          {/* 입력칸까지 카드 폭(최대 768px)을 다 쓰면 한 줄이 지나치게 길어진다 */}
+          <div className="mt-5 flex max-w-sm flex-col gap-4">
+            <FormField label="연락처" htmlFor="myinfo-hp">
+              <input
+                id="myinfo-hp"
+                type="tel"
+                name="hp"
+                value={input.hp}
+                onChange={onChangeInput}
+                className={controlClass}
+              />
+            </FormField>
+
+            <FormField
+              label="새 비밀번호"
+              htmlFor="myinfo-pw"
+              hint="바꾸지 않으려면 비워두세요."
+            >
+              <input
+                id="myinfo-pw"
+                type="password"
+                name="pw"
+                value={input.pw}
+                onChange={onChangeInput}
+                className={controlClass}
+              />
+            </FormField>
+
+            {error && (
+              <p className="text-xs leading-relaxed font-semibold break-keep text-danger">
+                {error}
+              </p>
+            )}
+
+            <div className="flex gap-2">
+              <Button onClick={onConfirm}>확인</Button>
+              <Button
+                variant="secondary"
+                onClick={() => {
+                  setEditMode(false);
+                  initInput();
+                }}
+              >
+                취소
+              </Button>
+            </div>
+          </div>
+
+          {/* 되돌릴 수 없는 동작이라 저장 버튼과 떼어 놓는다 */}
+          <div className="mt-8 border-t border-line pt-4">
+            <Button variant="danger" size="sm" onClick={onDelete}>
+              회원 탈퇴
+            </Button>
+          </div>
+        </>
+      )}
+    </section>
   );
 };
 

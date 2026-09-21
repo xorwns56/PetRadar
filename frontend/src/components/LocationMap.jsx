@@ -102,9 +102,8 @@ const LocationMap = ({ init, onSelect }) => {
     }
   }, [init, location]);
 
-  return (
-    <div id="locationMap" style={{ width: "100%", height: "350px" }}></div>
-  );
+  // 높이는 쓰는 쪽이 정한다. 인라인으로 고정해두면 화면에 맞춰 줄일 수 없다
+  return <div id="locationMap" className="size-full"></div>;
 };
 
 export default LocationMap;

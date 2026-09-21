@@ -113,10 +113,12 @@ const MissingMap = ({missingList}) => {
   return (
     <>
       {/* 카카오맵이 렌더링될 컨테이너 */}
+      {/* 높이는 부모(.map)가 정한다. 350px로 고정해두면 부모가 그보다 작을 때
+          지도 아래쪽이 잘려 그 영역의 마커를 볼 수 없다 */}
       <div
         id="missingMap"
         ref={containerRef}
-        style={{ width: "100%", height: "350px" }}
+        style={{ width: "100%", height: "100%" }}
       ></div>
       {/* 모달이 활성화되고 동물이 선택된 경우 상세 모달 표시 */}
       {isActive && selectedPet && (

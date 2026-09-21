@@ -1,5 +1,4 @@
 import { useEffect, useState } from "react";
-import "../style/ImagePreview.css";
 
 /**
  * 선택한 이미지를 미리 보여준다.
@@ -23,7 +22,13 @@ const ImagePreview = ({ value }) => {
   const src = objectUrl || (typeof value === "string" && value ? value : null);
   if (!src) return null;
 
-  return <img className="ImagePreview" src={src} alt="선택한 이미지 미리보기" />;
+  return (
+    <img
+      src={src}
+      alt="선택한 이미지 미리보기"
+      className="aspect-[4/3] w-full rounded-xl border border-line bg-brand-soft object-cover"
+    />
+  );
 };
 
 export default ImagePreview;

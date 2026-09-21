@@ -1,143 +1,109 @@
 import { useState } from "react";
-import "../style/LoginForm.css";
+import Button from "./Button";
+import FloatingField, { FieldIconButton } from "./FloatingField";
+
 const LoginForm = ({ isExist, onLogin }) => {
+  const [input, setInput] = useState({ id: "", pw: "" });
+  const [pwHide, setPwHide] = useState(true);
+  const [errMsg, setErrMsg] = useState("");
+  const [submitting, setSubmitting] = useState(false);
+
+  const onChangeInput = (event) => {
+    setInput({ ...input, [event.target.name]: event.target.value });
+    // 값을 고치기 시작하면 지난 오류 문구는 치운다
+    if (errMsg) setErrMsg("");
+  };
+
+  const onDeleteInput = (name) => setInput({ ...input, [name]: "" });
+
   const onSubmit = async (event) => {
     event.preventDefault();
     if (!input.id) {
       setErrMsg("아이디를 입력해주세요.");
       return;
     }
-    if (!await isExist(input.id)) {
-      setErrMsg("없는 회원입니다.");
-      return;
-    }
-
     if (!input.pw) {
       setErrMsg("비밀번호를 입력해주세요.");
       return;
     }
-    if(!await onLogin(input.id, input.pw)){
-        setErrMsg(
-            "아이디 또는 비밀번호가 잘못 되었습니다. 아이디와 비밀번호를 정확히 입력해 주세요."
-        );
+
+    setSubmitting(true);
+    try {
+      if (!(await isExist(input.id))) {
+        setErrMsg("없는 회원입니다.");
         return;
+      }
+      if (!(await onLogin(input.id, input.pw))) {
+        setErrMsg(
+          "아이디 또는 비밀번호가 잘못 되었습니다. 아이디와 비밀번호를 정확히 입력해 주세요."
+        );
+      }
+    } finally {
+      setSubmitting(false);
     }
-  };
-  const [focus, setFocus] = useState({
-    id: false,
-    pw: false,
-  });
-  const [input, setInput] = useState({
-    id: "",
-    pw: "",
-  });
-  const [pwHide, setPwHide] = useState(true);
-  const [errMsg, setErrMsg] = useState("");
-  const onChangeInput = (event) => {
-    setInput({
-      ...input,
-      [event.target.name]: event.target.value,
-    });
-  };
-  const onDeleteInput = (name) => {
-    setInput({
-      ...input,
-      [name]: "",
-    });
-  };
-  const onFocus = (event) => {
-    setFocus({
-      ...focus,
-      [event.target.name]: true,
-    });
-  };
-  const onBlur = (event) => {
-    setFocus({
-      ...focus,
-      [event.target.name]: false,
-    });
   };
 
   return (
-    <div className="LoginForm">
-      <form onSubmit={onSubmit} autoComplete="off">
-        <div
-          className={`input_item id ${focus.id ? "focus" : ""} ${
-            input.id ? "on" : ""
-          }`}
-        >
-          <input
-            type="text"
-            name="id"
-            id="login_id"
-            onChange={onChangeInput}
-            onFocus={onFocus}
-            onBlur={onBlur}
-            value={input.id}
-          />
-          <label htmlFor="login_id">아이디</label>
-          <div className="loginIcon-box">
-            <button
-              type="button"
-              tabIndex={-1}
-              className={`btn_delete ${input.id ? "" : "hide"}`}
-              onClick={() => {
-                onDeleteInput("id");
-              }}
-            >
-              <img src="/deleteIcon.png" />
-            </button>
-          </div>
-        </div>
-        <div
-          className={`input_item pw ${focus.pw ? "focus" : ""} ${
-            input.pw ? "on" : ""
-          }`}
-        >
-          <input
-            type={pwHide ? "password" : "text"}
-            name="pw"
-            id="user_pw"
-            onChange={onChangeInput}
-            onFocus={onFocus}
-            onBlur={onBlur}
-            value={input.pw}
-          />
-          <label htmlFor="user_pw">비밀번호</label>
-          <div className="loginIcon-box">
-            {/* view button */}
-            <button
-              type="button"
-              tabIndex={-1}
-              className={`btn_view ${input.pw ? "" : "hide"}`}
-              onClick={() => {
-                setPwHide(!pwHide);
-              }}
-            >
-              <img src={`/${pwHide ? "close" : "open"}EyeIcon.png`} />
-            </button>
-            {/* delete button */}
-            <button
-              type="button"
-              tabIndex={-1}
-              className={`btn_delete ${input.pw ? "" : "hide"}`}
-              onClick={() => {
-                onDeleteInput("pw");
-              }}
-            >
-              <img src="/deleteIcon.png" />
-            </button>
-          </div>
-        </div>
-        <div className={`error_message ${errMsg ? "" : "hide"}`}>{errMsg}</div>
-        <button
-          type="submit"
-          className={`btn_login ${input.id && input.pw ? "on" : ""}`}
-        >
-          로그인
-        </button>
-      </form>
-    </div>
+    <form onSubmit={onSubmit} autoComplete="off" className="flex flex-col gap-3">
+      <FloatingField
+        id="login_id"
+        name="id"
+        type="text"
+        label="아이디"
+        value={input.id}
+        onChange={onChangeInput}
+        trailing={
+          input.id && (
+            <FieldIconButton
+              label="아이디 지우기"
+              icon="/deleteIcon.png"
+              onClick={() => onDeleteInput("id")}
+            />
+          )
+        }
+      />
+
+      <FloatingField
+        id="user_pw"
+        name="pw"
+        type={pwHide ? "password" : "text"}
+        label="비밀번호"
+        value={input.pw}
+        onChange={onChangeInput}
+        trailing={
+          input.pw && (
+            <>
+              <FieldIconButton
+                label={pwHide ? "비밀번호 보기" : "비밀번호 가리기"}
+                icon={`/${pwHide ? "close" : "open"}EyeIcon.png`}
+                onClick={() => setPwHide(!pwHide)}
+              />
+              <FieldIconButton
+                label="비밀번호 지우기"
+                icon="/deleteIcon.png"
+                onClick={() => onDeleteInput("pw")}
+              />
+            </>
+          )
+        }
+      />
+
+      {errMsg && (
+        <p className="px-1 text-xs leading-relaxed font-semibold break-keep text-danger">
+          {errMsg}
+        </p>
+      )}
+
+      <Button
+        htmlType="submit"
+        size="lg"
+        className="mt-2 w-full"
+        disabled={submitting || !input.id || !input.pw}
+      >
+        {submitting ? "확인 중…" : "로그인"}
+      </Button>
+    </form>
   );
 };
+
 export default LoginForm;

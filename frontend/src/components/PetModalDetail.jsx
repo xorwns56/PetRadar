@@ -1,65 +1,54 @@
-import "../style/ModalDetail.css";
 import { useModal } from "../hooks/ModalContext";
 import Button from "./Button";
+import Dialog, { DialogField } from "./Dialog";
+import { petTypeLabel, petGenderLabel } from "../utils/pet-label";
 
-const ModalDetail = ({ missingPet, onClick, myMissing }) => {
+/* 실종 동물 상세 모달 */
+const PetModalDetail = ({ missingPet, onClick, myMissing }) => {
   const { isActive, toggleModal } = useModal();
 
-  const imageSrc = missingPet.petImage || "/image-default.png";
-
-  const genderSymbol = {
-    M: "♂",
-    F: "♀",
-  };
-  const petTypeChange = {
-    dog: "강아지",
-    cat: "고양이",
-    etc: "기타 동물",
-  };
+  if (!isActive) return null;
 
   return (
-    <div className={`ModalDetail ${isActive ? "active" : ""}`}>
-      <div className="Modal-container">
-        <div className={`Modal-contents${!myMissing ? "-pet" : ""}`}>
-          <div className="img-box">
-            <img src={imageSrc} alt="missingPet img" />
-          </div>
-          <div className="text-contents">
-            <div className="contents-t1">
-              <h3 className="petType">
-                {petTypeChange[missingPet.petType] || "-"}
-              </h3>
-              <h3>{genderSymbol[missingPet.petGender] || "-"}</h3>
-              <h3>{missingPet.petName}</h3>
-            </div>
-            <div>
-              <h3>나이</h3>
-              <p>{missingPet.petAge}(년생)</p>
-            </div>
-            <div>
-              <h3>실종날짜 </h3>
-              <p>{missingPet.petMissingDate}</p>
-            </div>
-            <div className="contents-t4">
-              <h3>제목</h3>
-              <p>{missingPet.title}</p>
-            </div>
-            <div className="contents-t4">
-              <h3>내용</h3>
-              <p>{missingPet.content}</p>
-            </div>
-          </div>
-          <div className="Report-btn">
-            {!myMissing && (
-              <Button text={"제보하기"} type={"Square_D"} onClick={onClick} />
-            )}
-          </div>
+    <Dialog
+      onClose={toggleModal}
+      image={missingPet.petImage}
+      badge={petTypeLabel(missingPet.petType)}
+      title={missingPet.petName}
+      footer={
+        !myMissing && (
+          <Button size="lg" className="w-full" onClick={onClick}>
+            제보하기
+          </Button>
+        )
+      }
+    >
+      {/* 성별·나이·실종일은 짧아서 줄마다 쌓기보다 한 줄에 놓는 편이 읽기 쉽다 */}
+      <dl className="grid grid-cols-3 gap-3 rounded-xl bg-page p-3 text-center">
+        <div>
+          <dt className="text-xs text-ink-muted">성별</dt>
+          <dd className="mt-1 text-sm font-semibold text-ink">
+            {petGenderLabel(missingPet.petGender)}
+          </dd>
         </div>
-        <div className="Modal-btn" onClick={toggleModal}>
-          <Button text={"X"} type={"Circle"} />
+        <div>
+          <dt className="text-xs text-ink-muted">나이</dt>
+          <dd className="mt-1 text-sm font-semibold text-ink">
+            {missingPet.petAge}년생
+          </dd>
         </div>
-      </div>
-    </div>
+        <div>
+          <dt className="text-xs text-ink-muted">실종일</dt>
+          <dd className="mt-1 text-sm font-semibold text-ink">
+            {missingPet.petMissingDate}
+          </dd>
+        </div>
+      </dl>
+
+      <DialogField label="제목" value={missingPet.title} />
+      <DialogField label="내용" value={missingPet.content} />
+    </Dialog>
   );
 };
-export default ModalDetail;
+
+export default PetModalDetail;

@@ -1,19 +1,19 @@
-import "../style/ShelterAnimalList.css";
 import { useState } from "react";
 import { useParams } from "react-router-dom";
-import { useModal } from "../hooks/ModalContext";
-import useShelterData from "../api/ShelterData";
+import Layout from "../components/layout/Layout";
+import PageHeading from "../components/layout/PageHeading";
+import StateNotice from "../components/layout/StateNotice";
 import ShelterAnimalItem from "../components/ShelterAnimalItem";
 import ShelterAnimalModalDetail from "../components/ShelterAnimalModalDetail";
-import Header from "../components/Header";
+import useShelterData from "../api/ShelterData";
+import { useModal } from "../hooks/ModalContext";
 
 const ShelterAnimalList = () => {
-  const { animals } = useShelterData();
+  const { animals, error, loading } = useShelterData();
   const { name, addr } = useParams();
 
   const { isActive, toggleModal } = useModal();
   const [selectedAnimal, setSelectedAnimal] = useState(null);
-  const [isModalOpen, setIsModalOpen] = useState(false);
   const [sortOrder, setSortOrder] = useState("newest"); // 최신순 기본
 
   const decodedName = decodeURIComponent(name);
@@ -37,33 +37,66 @@ const ShelterAnimalList = () => {
     });
 
     return filtered.sort((a, b) => {
-      const dateA = parseDate(a.RECEPT_DE); // 실종일자 기준
+      const dateA = parseDate(a.RECEPT_DE); // 입소일자 기준
       const dateB = parseDate(b.RECEPT_DE);
       return sortOrder === "newest" ? dateB - dateA : dateA - dateB;
     });
   };
 
+  const items = loading || error ? [] : getFilteredData();
+
   return (
-    <div className="ShelterAnimalList">
-      <Header leftChild />
-      <div className="ShelterAnimalList-container inner">
-        <div className="PageTitle">
-          <h3>해당 보호소 유기동물</h3>
+    <Layout width="wide">
+      <PageHeading
+        title="해당 보호소 유기동물"
+        /* 어느 보호소를 보고 있는지 제목만으로는 알 수 없었다 */
+        description={`${decodedName} · ${decodedAddr}`}
+        actions={
+          <>
+            <label className="sr-only" htmlFor="animal-sort">
+              정렬 기준
+            </label>
+            <select
+              id="animal-sort"
+              value={sortOrder}
+              onChange={(e) => setSortOrder(e.target.value)}
+              className="h-11 w-28 rounded-xl border border-line bg-surface px-3 text-sm text-ink transition-colors focus:border-brand focus:outline-none"
+            >
+              <option value="newest">최신순</option>
+              <option value="oldest">오래된순</option>
+            </select>
+          </>
+        }
+      />
+
+      {loading && (
+        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+          {Array.from({ length: 6 }).map((_, i) => (
+            <div
+              key={i}
+              className="h-72 animate-pulse rounded-2xl border border-line bg-surface"
+            />
+          ))}
         </div>
-        <div className="SearchBar">
-          <select
-            value={sortOrder}
-            onChange={(e) => setSortOrder(e.target.value)}
-          >
-            <option value="newest">최신순</option>
-            <option value="oldest">오래된순</option>
-          </select>
-        </div>
-        <div className="ShelterAnimalItems">
-          {getFilteredData().map((item) => (
+      )}
+
+      {!loading && error && (
+        <StateNotice
+          message="보호소 정보를 불러오지 못했습니다."
+          actionText="다시 시도"
+          onAction={() => window.location.reload()}
+        />
+      )}
+
+      {!loading && !error && items.length === 0 && (
+        <StateNotice message="이 보호소에 등록된 유기동물이 없어요." />
+      )}
+
+      {items.length > 0 && (
+        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+          {items.map((item) => (
             <ShelterAnimalItem
               key={item.ABDM_IDNTFY_NO}
-              petId={item.ABDM_IDNTFY_NO}
               petAge={item.AGE_INFO}
               petColor={item.COLOR_NM}
               petType={item.SPECIES_NM}
@@ -71,24 +104,23 @@ const ShelterAnimalList = () => {
               imageUrl={item.IMAGE_COURS}
               onClick={() => {
                 setSelectedAnimal(item);
-
                 toggleModal();
               }}
             />
           ))}
         </div>
+      )}
 
-        {isActive && (
-          <ShelterAnimalModalDetail
-            animal={selectedAnimal}
-            onClose={() => {
-              toggleModal();
-              setSelectedAnimal(null);
-            }}
-          />
-        )}
-      </div>
-    </div>
+      {isActive && selectedAnimal && (
+        <ShelterAnimalModalDetail
+          animal={selectedAnimal}
+          onClose={() => {
+            toggleModal();
+            setSelectedAnimal(null);
+          }}
+        />
+      )}
+    </Layout>
   );
 };
 

@@ -1,6 +1,5 @@
 import { useEffect, useRef } from "react";
 import { loadKakaoMap } from "../lib/kakaoMap";
-import "../style/Map.css";
 
 const Map = ({ shelters, onSelect, setCenterRef }) => {
   const mapRef = useRef(null);
@@ -38,12 +37,15 @@ const Map = ({ shelters, onSelect, setCenterRef }) => {
 
               // <div> + <img> 형태로 마커 생성
               const markerWrapper = document.createElement("div");
-              markerWrapper.className = "custom-marker-wrapper";
+              // 지도가 직접 만드는 DOM이라 JSX가 아니지만, 클래스 문자열이
+              // 소스에 그대로 있으므로 Tailwind가 찾아낸다
+              markerWrapper.className =
+                "flex size-12 cursor-pointer items-center justify-center transition duration-300 hover:scale-150";
 
               const img = document.createElement("img");
               img.src = "/orangeMarker.png";
               img.alt = "marker";
-              img.className = "custom-marker-image";
+              img.className = "pointer-events-none size-full object-contain";
 
               markerWrapper.appendChild(img);
 
@@ -97,11 +99,9 @@ const Map = ({ shelters, onSelect, setCenterRef }) => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  return (
-    <div className="Map">
-      <div ref={mapRef} className="Map-box" />
-    </div>
-  );
+  // 높이는 쓰는 쪽이 정한다. 예전에는 Map.css가 350px로 못박아 두어
+  // 감싸는 상자가 그보다 낮으면 지도가 잘렸다
+  return <div ref={mapRef} className="size-full" />;
 };
 
 export default Map;

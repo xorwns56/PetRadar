@@ -1,3 +1,5 @@
+/* 카카오 지도가 직접 만들어 넣는 마커 DOM 전용.
+   JSX가 아니라 문서에 꽂히는 요소라 여기서 따로 꾸민다 */
 .custom-marker-outer-wrapper {
   position: relative;
   width: 60px;
@@ -35,7 +37,7 @@
   transform: translate(-50%, -50%);
   width: 100px;
   height: 100px;
-  background-color: var(--main-color);
+  background-color: var(--color-brand);
   border-radius: 50%;
   z-index: -1;
   opacity: 0.1;
