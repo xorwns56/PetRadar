@@ -82,7 +82,7 @@
 
 | 구분 | 기술 |
 |------|------|
-| **Frontend** | React, React Router, Vite |
+| **Frontend** | React, React Router, Vite, Tailwind CSS |
 | **Backend** | Spring Boot 3.5, Spring Security, Spring Data JPA |
 | **Database** | MySQL 8 |
 | **Search** | Elasticsearch 8.15 |
@@ -92,6 +92,73 @@
 | **Infra** | Docker Compose, nginx |
 | **CI/CD** | GitHub Actions → GHCR |
 | **Deployment** | AWS EC2 |
+
+</br>
+
+## 🐾 프로젝트 구조
+
+### 백엔드 — 도메인별 패키지
+
+레이어별(`controller/`, `service/`, `repository/`)이 아니라 **도메인별**로 나눕니다.
+한 폴더 안에 Entity · DTO · Repository · Service · Controller가 함께 있어,
+기능 하나를 고칠 때 폴더 하나만 열면 됩니다.
+
+```
+com.example.PetRadar
+  auth/          로그인·회원가입·로그아웃·중복확인
+  user/          회원 정보 (User가 refreshToken도 보관), OAuthAccount
+  missing/       실종 신고 글 (CRUD)
+  report/        목격 제보 글 (실종 글에 종속)
+  notification/  알림 저장 + STOMP 발송
+  search/        Elasticsearch 색인·검색·재색인
+  image/         업로드 파일 저장, URL 조립
+  security/      SecurityConfig, JWT 필터·프로바이더
+  websocket/     STOMP 엔드포인트 설정
+```
+
+도메인 폴더 안의 역할 분담 (`missing/` 기준)
+
+| 파일 | 역할 |
+|------|------|
+| `Missing.java` | JPA 엔티티 — DB 테이블의 모양 |
+| `MissingRequest.java` | **들어오는** 요청 본문 — 클라이언트가 정해도 되는 값만 |
+| `MissingDTO.java` | **나가는** 응답 — `from(엔티티, imageBaseUrl)`로 만든다 |
+| `MissingRepository / Service / Controller` | 조회·업무 규칙·엔드포인트 |
+
+요청과 응답 DTO를 나눈 이유는 **엔티티를 API 경계에 노출하지 않기 위해서**입니다.
+엔티티를 그대로 받으면 클라이언트가 `id`·`user`·`createdAt`까지 실어 보낼 수 있습니다.
+
+</br>
+
+### 프론트엔드 — 타입별 구조
+
+```
+src/
+  api/           서버와 말하는 곳 (URL은 이 폴더 밖에 없다)
+  components/
+    ui/          업무를 모르는 재사용 부품
+    layout/      화면 껍데기와 앱 전역 크롬
+    auth/ home/ missing/ notification/ shelter/ mypage/
+                 특정 도메인의 데이터 모양을 아는 컴포넌트
+  contexts/      앱에 하나만 존재해야 하는 상태 (Provider 있음)
+  hooks/         부를 때마다 각자의 상태를 갖는 재사용 로직
+  pages/         라우트 1:1
+  lib/           외부 세계와 붙는 어댑터 (카카오 지도 SDK 로더)
+  utils/         순수 함수·상수
+```
+
+폴더를 고르는 기준
+
+| 갈림길 | 기준 |
+|------|------|
+| `ui/` vs 도메인 폴더 | **업무를 아는가.** `Button`은 '실종'을 모르고, `MissingItem`은 `missingDTO`의 필드명을 안다 |
+| `contexts/` vs `hooks/` | **Provider가 있는가.** 전역에 하나뿐인 상태는 context, 부를 때마다 새로 생기는 로직은 hook |
+| `lib/` vs `utils/` | **부수효과가 있는가.** `loadKakaoMap()`은 문서에 `<script>`를 붙이고, `cn()`은 문자열만 다룬다 |
+| `api/` vs `hooks/` | **React를 아는가.** api는 `Promise<데이터>`를 돌려주는 순수 함수, 상태·로딩은 부르는 쪽 몫 |
+
+스타일은 Tailwind 유틸리티로 작성하고, 색·글꼴·그림자 토큰은 `index.css`의 `@theme`
+한 곳에 모읍니다. CSS 파일은 `components/missing/MissingMap.css` 하나만 남아 있는데,
+카카오 지도가 JSX 밖에서 문서에 직접 꽂는 마커 DOM이라 유틸리티로 다룰 수 없기 때문입니다.
 
 </br>
 
