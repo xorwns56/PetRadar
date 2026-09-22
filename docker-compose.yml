@@ -58,6 +58,10 @@ services:
       JWT_REFRESH_SECRET: ${JWT_REFRESH_SECRET:?JWT_REFRESH_SECRET을 .env에 설정해주세요}
       # HTTPS를 붙이면 .env에서 COOKIE_SECURE=true로 바꾼다
       COOKIE_SECURE: ${COOKIE_SECURE:-false}
+      # 공공데이터포털 인증키 (보호소·유기동물 조회).
+      # 아직 읽는 코드가 없어 기동을 막지 않는다. 보호소 프록시를 붙일 때
+      # 다른 시크릿처럼 :? 로 바꿔 빠뜨리면 기동이 멈추게 할 것
+      DATA_GO_KR_SERVICE_KEY: ${DATA_GO_KR_SERVICE_KEY:-}
     volumes:
       - uploads:/app/uploads
     depends_on:
