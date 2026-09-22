@@ -1,6 +1,6 @@
 import { useNavigate } from "react-router-dom";
 import Layout from "../components/layout/Layout";
-import Button from "../components/Button";
+import Button from "../components/ui/Button";
 
 const NotFound = () => {
   const nav = useNavigate();

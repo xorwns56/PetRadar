@@ -2,16 +2,15 @@ import { useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import Layout from "../components/layout/Layout";
 import PageHeading from "../components/layout/PageHeading";
-import Button from "../components/Button";
-import LocationMap from "../components/LocationMap";
-import ImageField from "../components/ImageField";
-import FormField, { controlClass, textareaClass } from "../components/FormField";
-import { useAuth } from "../contexts/AuthContext.jsx";
+import Button from "../components/ui/Button";
+import LocationMap from "../components/missing/LocationMap";
+import ImageField from "../components/ui/ImageField";
+import FormField, { controlClass, textareaClass } from "../components/ui/FormField";
+import { createReport } from "../api/report";
 
 const MissingReport = () => {
   const nav = useNavigate();
   const params = useParams();
-  const { api } = useAuth();
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState("");
   const [form, setForm] = useState({
@@ -45,7 +44,7 @@ const MissingReport = () => {
       );
       if (petImage) formData.append("image", petImage);
 
-      await api.post(`/api/report/missing/${params.petMissingId}`, formData);
+      await createReport(params.petMissingId, formData);
       nav("/missingList");
     } catch (err) {
       console.error("Failed to submit report:", err);

@@ -2,16 +2,15 @@ import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import Layout from "../components/layout/Layout";
 import PageHeading from "../components/layout/PageHeading";
-import Button from "../components/Button";
+import Button from "../components/ui/Button";
 import useFormFocus from "../hooks/useFormFocus";
 import useMissingForm from "../hooks/useMissingForm";
-import MissingForm, { MISSING_FORM_FIELDS } from "../components/MissingForm";
-import { useAuth } from "../contexts/AuthContext";
+import MissingForm, { MISSING_FORM_FIELDS } from "../components/missing/MissingForm";
+import { fetchMissingDetail, updateMissing } from "../api/missing";
 
 const MissingRevise = () => {
   const params = useParams();
   const nav = useNavigate();
-  const { api } = useAuth();
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState("");
 
@@ -19,16 +18,12 @@ const MissingRevise = () => {
     useMissingForm();
 
   useEffect(() => {
-    const fetchMissingDetail = async () => {
-      try {
-        const response = await api.get(`/api/missing/${params.petMissingId}`);
-        setForm({ ...response.data });
-      } catch (err) {
+    fetchMissingDetail(params.petMissingId)
+      .then((data) => setForm({ ...data }))
+      .catch((err) => {
         console.error("Failed to fetch missing detail:", err);
         setError("기존 신고 내용을 불러오지 못했어요.");
-      }
-    };
-    fetchMissingDetail();
+      });
   }, []);
 
   const { handleRef, checkInput } = useFormFocus(form, MISSING_FORM_FIELDS);
@@ -38,7 +33,7 @@ const MissingRevise = () => {
     setError("");
     setSubmitting(true);
     try {
-      await api.patch(`/api/missing/${params.petMissingId}`, buildFormData());
+      await updateMissing(params.petMissingId, buildFormData());
       nav("/myPage");
     } catch (err) {
       // 예전에는 콘솔에만 남아 사용자는 아무 일도 안 일어난 줄 알았다

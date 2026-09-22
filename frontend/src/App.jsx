@@ -13,11 +13,11 @@ import MissingList from "./pages/MissingList";
 import ShelterList from "./pages/ShelterList";
 import ShelterAnimalList from "./pages/ShelterAnimalList";
 import NotFound from "./pages/NotFound";
-import SideBar from "./components/SideBar";
-import DemoNotice from "./components/DemoNotice";
+import SideBar from "./components/layout/SideBar";
+import DemoNotice from "./components/layout/DemoNotice";
 
-import { SidebarProvider } from "./hooks/SidebarContext";
-import { ModalProvider } from "./hooks/ModalContext";
+import { SidebarProvider } from "./contexts/SidebarContext";
+import { ModalProvider } from "./contexts/ModalContext";
 import { AuthProvider } from "./contexts/AuthContext";
 
 function App() {

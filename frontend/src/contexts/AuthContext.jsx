@@ -1,9 +1,10 @@
-import React, { createContext, useState, useEffect, useContext, useMemo } from "react";
-import axios from "axios";
+import React, { createContext, useState, useEffect, useContext, useMemo, useCallback } from "react";
 import { jwtDecode } from "jwt-decode";
 import { useNavigate } from "react-router-dom";
 import SockJS from "sockjs-client/dist/sockjs";
 import { Client } from "@stomp/stompjs";
+import { onUnauthorized } from "../api/client";
+import { logout as logoutRequest } from "../api/auth";
 
 // AuthContext 생성
 const AuthContext = createContext();
@@ -26,18 +27,15 @@ export const AuthProvider = ({ children }) => {
     };
 
     // 로그아웃 함수
-    // 서버에 저장된 Refresh Token까지 지워야 실제로 무효화된다.
-    // (액세스 토큰만 지우면 쿠키의 Refresh Token으로 재발급이 된다)
-    // api 인스턴스가 아닌 순수 axios로 호출한다 — 401 인터셉터가 다시 logout을 부르는 것을 막기 위함
-    const logout = () => {
-        axios.post("/api/auth/logout", null, { withCredentials: true })
+    const logout = useCallback(() => {
+        logoutRequest()
             .catch(() => { /* 서버 정리에 실패해도 클라이언트 세션은 종료한다 */ })
             .finally(() => {
                 sessionStorage.removeItem("accessToken");
                 setIsAuthenticated(false);
                 navigate("/login");
             });
-    };
+    }, [navigate]);
 
     // userId 추출
     const userId = useMemo(() => {
@@ -52,30 +50,10 @@ export const AuthProvider = ({ children }) => {
         }
     }, [isAuthenticated]);
 
-    // axios API 인스턴스
-    const api = useMemo(() => {
-        const instance = axios.create({ withCredentials: true });
-
-        instance.interceptors.request.use((config) => {
-            const token = sessionStorage.getItem("accessToken");
-            if (token) config.headers.Authorization = `Bearer ${token}`;
-            return config;
-        });
-
-        instance.interceptors.response.use(
-            (response) => {
-                const newToken = response.headers.authorization;
-                if (newToken) sessionStorage.setItem("accessToken", newToken);
-                return response;
-            },
-            (error) => {
-                if (error.response?.status === 401) logout();
-                return Promise.reject(error);
-            }
-        );
-
-        return instance;
-    }, []);
+    // 토큰이 만료되면(401) 로그아웃시킨다.
+    // 인스턴스 자체와 나머지 인터셉터는 api/client.js에 있고, 여기서는
+    // "로그아웃이 무엇인지"를 아는 이 처리만 붙인다
+    useEffect(() => onUnauthorized(logout), [logout]);
 
     // 마운트 시 자동 소켓 연결 (새로고침 포함)
     useEffect(() => {
@@ -112,7 +90,7 @@ export const AuthProvider = ({ children }) => {
     }, [isAuthenticated]);
 
     return (
-        <AuthContext.Provider value={{ isAuthenticated, userId, login, logout, api, socket }}>
+        <AuthContext.Provider value={{ isAuthenticated, userId, login, logout, socket }}>
             {children}
         </AuthContext.Provider>
     );

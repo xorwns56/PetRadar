@@ -1,4 +1,4 @@
-import Button from "../Button";
+import Button from "../ui/Button";
 
 /* 로딩 실패·빈 결과를 같은 모양으로 보여준다.
    예전 ShelterList의 에러 화면은 헤더도 없이 글자만 떠서

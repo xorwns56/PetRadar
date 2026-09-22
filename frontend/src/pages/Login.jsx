@@ -1,18 +1,16 @@
 import { Link, useNavigate } from "react-router-dom";
 import AuthLayout from "../components/layout/AuthLayout";
-import LoginForm from "../components/LoginForm";
+import LoginForm from "../components/auth/LoginForm";
 import { useAuth } from "../contexts/AuthContext";
+import { checkIdExists, login as loginRequest } from "../api/auth";
 
 const Login = () => {
   const nav = useNavigate();
-  const { login, api } = useAuth();
+  const { login } = useAuth();
 
   const isExist = async (id) => {
     try {
-      const response = await api.get("/api/auth/check-exist", {
-        params: { id },
-      });
-      return response.data;
+      return await checkIdExists(id);
     } catch (error) {
       console.error("isExist : ", error);
       return false;
@@ -21,13 +19,10 @@ const Login = () => {
 
   const onLogin = async (id, pw) => {
     try {
-      const response = await api.post("/api/auth/login", { id, pw });
-      if (response.status === 200) {
-        login(response.data.accessToken);
-        nav("/", { replace: true });
-        return true;
-      }
-      return false;
+      const { accessToken } = await loginRequest(id, pw);
+      login(accessToken);
+      nav("/", { replace: true });
+      return true;
     } catch (error) {
       // 자격 증명이 틀린 경우가 대부분이라 alert 대신 폼 안에서 알린다
       console.error("Login error:", error);

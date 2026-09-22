@@ -1,30 +1,21 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import Layout from "../components/layout/Layout";
-import Button from "../components/Button";
-import MainMenu from "../components/MainMenu";
-import MissingMap from "../components/MissingMap";
-import { useAuth } from "../contexts/AuthContext";
+import Button from "../components/ui/Button";
+import MainMenu from "../components/home/MainMenu";
+import MissingMap from "../components/missing/MissingMap";
+import { fetchMissingList } from "../api/missing";
 
 const Home = () => {
   const nav = useNavigate();
   const [missingList, setMissingList] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
-  const { api } = useAuth();
 
   useEffect(() => {
-    // missing list 데이터 가져오기
-    const fetchMissingList = async () => {
-      try {
-        const response = await api.get("/api/missing");
-        setMissingList(response.data);
-      } catch (error) {
-        console.error("Failed to fetch missing list:", error);
-      } finally {
-        setIsLoading(false);
-      }
-    };
-    fetchMissingList();
+    fetchMissingList()
+      .then(setMissingList)
+      .catch((error) => console.error("Failed to fetch missing list:", error))
+      .finally(() => setIsLoading(false));
   }, []);
 
   return (

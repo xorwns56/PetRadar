@@ -3,10 +3,10 @@ import { useParams } from "react-router-dom";
 import Layout from "../components/layout/Layout";
 import PageHeading from "../components/layout/PageHeading";
 import StateNotice from "../components/layout/StateNotice";
-import ShelterAnimalItem from "../components/ShelterAnimalItem";
-import ShelterAnimalModalDetail from "../components/ShelterAnimalModalDetail";
-import useShelterData from "../api/ShelterData";
-import { useModal } from "../hooks/ModalContext";
+import ShelterAnimalItem from "../components/shelter/ShelterAnimalItem";
+import ShelterAnimalModalDetail from "../components/shelter/ShelterAnimalModalDetail";
+import useShelterData from "../hooks/useShelterData";
+import { useModal } from "../contexts/ModalContext";
 
 const ShelterAnimalList = () => {
   const { animals, error, loading } = useShelterData();

@@ -3,12 +3,12 @@ import { useNavigate } from "react-router-dom";
 import Layout from "../components/layout/Layout";
 import PageHeading from "../components/layout/PageHeading";
 import StateNotice from "../components/layout/StateNotice";
-import Button from "../components/Button";
-import Map from "../components/Map";
-import ShelterInfo from "../components/ShelterInfo";
-import ShelterModalDetail from "../components/ShelterModalDetail";
-import useShelterData from "../api/ShelterData";
-import { useModal } from "../hooks/ModalContext";
+import Button from "../components/ui/Button";
+import ShelterMap from "../components/shelter/ShelterMap";
+import ShelterInfo from "../components/shelter/ShelterInfo";
+import ShelterModalDetail from "../components/shelter/ShelterModalDetail";
+import useShelterData from "../hooks/useShelterData";
+import { useModal } from "../contexts/ModalContext";
 
 const ShelterList = () => {
   const { animals, error, loading } = useShelterData();
@@ -62,7 +62,7 @@ const ShelterList = () => {
               지도를 준비하고 있어요
             </p>
           ) : (
-            <Map
+            <ShelterMap
               shelters={uniqueShelters}
               onSelect={(shelter) => {
                 if (mapRef.current) mapRef.current(shelter);

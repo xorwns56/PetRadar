@@ -1,4 +1,4 @@
-import Header from "../Header";
+import Header from "./Header";
 import { cn } from "../../utils/cn";
 
 /* 화면마다 따로 쓰던 겉껍데기를 한곳에 모은다.

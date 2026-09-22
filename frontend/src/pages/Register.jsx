@@ -1,18 +1,14 @@
 import { Link, useNavigate } from "react-router-dom";
 import AuthLayout from "../components/layout/AuthLayout";
-import RegisterForm from "../components/RegisterForm";
-import { useAuth } from "../contexts/AuthContext";
+import RegisterForm from "../components/auth/RegisterForm";
+import { checkIdExists, register } from "../api/auth";
 
 const Register = () => {
   const nav = useNavigate();
-  const { api } = useAuth();
 
   const isExist = async (id) => {
     try {
-      const response = await api.get("/api/auth/check-exist", {
-        params: { id },
-      });
-      return response.data;
+      return await checkIdExists(id);
     } catch (error) {
       console.error("isExist : ", error);
       return true;
@@ -22,7 +18,7 @@ const Register = () => {
   // 성공 여부를 돌려줘야 폼이 실패를 화면에 띄울 수 있다
   const onRegister = async (id, pw, hp) => {
     try {
-      await api.post("/api/auth/register", { id, pw, hp });
+      await register(id, pw, hp);
       nav("/login", { replace: true });
       return true;
     } catch (error) {

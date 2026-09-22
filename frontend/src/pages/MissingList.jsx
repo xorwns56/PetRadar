@@ -2,17 +2,18 @@ import { useCallback, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import Layout from "../components/layout/Layout";
 import PageHeading from "../components/layout/PageHeading";
-import Button from "../components/Button";
-import MissingItem from "../components/MissingItem";
-import PetModalDetail from "../components/PetModalDetail";
-import { useModal } from "../hooks/ModalContext";
+import Button from "../components/ui/Button";
+import MissingItem from "../components/missing/MissingItem";
+import PetModalDetail from "../components/missing/PetModalDetail";
+import { useModal } from "../contexts/ModalContext";
 import { useAuth } from "../contexts/AuthContext";
+import { fetchMissingList } from "../api/missing";
 
 const MissingList = () => {
   const [selectedItem, setSelectedItem] = useState(null);
   const { toggleModal } = useModal();
   const nav = useNavigate();
-  const { api, userId } = useAuth();
+  const { userId } = useAuth();
 
   const [sortType, setSortType] = useState("latest");
   const [searchInput, setSearchInput] = useState("");
@@ -21,25 +22,20 @@ const MissingList = () => {
   const [missingList, setMissingList] = useState([]);
   const [status, setStatus] = useState("loading"); // loading | ready | error
 
-  // 검색어가 있으면 Elasticsearch 전문 검색(/api/search)으로 관련도 순 결과를 받는다.
-  // 검색어 없이 목록만 볼 때는 정렬(최신순/오래된순)이 필요하므로 기존 목록 API를 쓴다
-  const fetchMissingList = useCallback(async () => {
+  const load = useCallback(async () => {
     setStatus("loading");
     try {
-      const response = keyword.trim()
-        ? await api.get("/api/search", { params: { searchInput: keyword } })
-        : await api.get("/api/missing", { params: { sortType } });
-      setMissingList(response.data);
+      setMissingList(await fetchMissingList({ searchInput: keyword, sortType }));
       setStatus("ready");
     } catch (error) {
       console.error("Failed to fetch missing list:", error);
       setStatus("error");
     }
-  }, [api, keyword, sortType]);
+  }, [keyword, sortType]);
 
   useEffect(() => {
-    fetchMissingList();
-  }, [fetchMissingList]);
+    load();
+  }, [load]);
 
   const onSubmit = (e) => {
     e.preventDefault();
@@ -122,7 +118,7 @@ const MissingList = () => {
       {status === "error" && (
         <div className="rounded-2xl border border-line bg-surface py-16 text-center shadow-card">
           <p className="text-sm text-ink-muted">목록을 불러오지 못했어요.</p>
-          <Button variant="secondary" className="mt-4" onClick={fetchMissingList}>
+          <Button variant="secondary" className="mt-4" onClick={load}>
             다시 시도
           </Button>
         </div>

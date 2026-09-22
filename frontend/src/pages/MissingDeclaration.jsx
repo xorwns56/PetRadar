@@ -2,18 +2,19 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import Layout from "../components/layout/Layout";
 import PageHeading from "../components/layout/PageHeading";
-import Button from "../components/Button";
+import Button from "../components/ui/Button";
 import useFormFocus from "../hooks/useFormFocus";
 import useMissingForm from "../hooks/useMissingForm";
-import MissingForm, { MISSING_FORM_FIELDS } from "../components/MissingForm";
+import MissingForm, { MISSING_FORM_FIELDS } from "../components/missing/MissingForm";
 import { useAuth } from "../contexts/AuthContext";
+import { createMissing } from "../api/missing";
 
 const MissingDeclaration = () => {
   const nav = useNavigate();
   const [isLoading, setIsLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState("");
-  const { isAuthenticated, api } = useAuth();
+  const { isAuthenticated } = useAuth();
 
   useEffect(() => {
     if (!isAuthenticated) {
@@ -33,7 +34,7 @@ const MissingDeclaration = () => {
     setError("");
     setSubmitting(true);
     try {
-      await api.post("/api/missing", buildFormData());
+      await createMissing(buildFormData());
       nav("/missingList");
     } catch (err) {
       console.error("Failed to submit missing:", err);
