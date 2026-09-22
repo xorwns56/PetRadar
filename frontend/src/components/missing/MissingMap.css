@@ -1,11 +1,17 @@
 /* 카카오 지도가 직접 만들어 넣는 마커 DOM 전용.
    JSX가 아니라 문서에 꽂히는 요소라 여기서 따로 꾸민다 */
+
+/* z-index를 양수로 둬서 두 가지를 동시에 만족시킨다.
+   - 마커가 지도 타일 위에 온다 (-1이면 배율이 바뀌어 타일이 새로 그려질 때
+     그 아래로 숨어 마커가 통째로 사라졌다)
+   - 동시에 쌓임 맥락이 만들어져, 아래 ::after가 이 안에서만 뒤로 가고
+     바깥(타일)까지 밀려나지 않는다 */
 .custom-marker-outer-wrapper {
   position: relative;
-  width: 60px;
-  height: 60px;
+  width: 48px;
+  height: 48px;
   cursor: pointer;
-  z-index: -1;
+  z-index: 1;
 }
 
 .custom-marker-wrappers {
@@ -15,6 +21,7 @@
   overflow: hidden;
   border: 2px solid white;
   display: block;
+  transition: transform 0.2s;
 }
 
 .custom-marker-img-wrapper {
@@ -29,28 +36,71 @@
   display: block;
 }
 
+/* 레이더가 훑고 지나가듯 고리가 퍼졌다 사라진다.
+   예전에는 흐릿한 주황 원을 깔아 뒀는데, 가만히 있는 얼룩이라
+   눈에 띄지도 않으면서 지도 글씨만 가렸다.
+   퍼지는 고리는 면적을 거의 차지하지 않으면서 움직임으로 시선을 끈다 */
 .custom-marker-outer-wrapper::after {
   content: '';
   position: absolute;
-  left: 50%;
-  top: 50%;
-  transform: translate(-50%, -50%);
-  width: 100px;
-  height: 100px;
-  background-color: var(--color-brand);
+  inset: 0;
   border-radius: 50%;
+  border: 2px solid var(--color-brand);
   z-index: -1;
-  opacity: 0.1;
-  filter: blur(5px);
-  transition: 0.35s;
+  pointer-events: none;
+  /* 마커마다 시작 시점을 어긋나게 한다. 값은 JS가 넣는다 —
+     전부 같은 박자로 뛰면 화면이 깜빡이는 것처럼 보인다 */
+  animation: marker-ping 2.4s var(--ping-delay, 0s) ease-out infinite;
 }
 
+@keyframes marker-ping {
+  0% {
+    transform: scale(1);
+    opacity: 0.7;
+  }
+  70% {
+    transform: scale(2);
+    opacity: 0;
+  }
+  100% {
+    transform: scale(2);
+    opacity: 0;
+  }
+}
+
+/* 움직임을 줄이도록 설정한 사용자에게는 고리를 고정해 둔다 */
+@media (prefers-reduced-motion: reduce) {
+  .custom-marker-outer-wrapper::after {
+    animation: none;
+    opacity: 0.5;
+  }
+}
+
+/* 올리면 커지기만 한다 */
 .custom-marker-outer-wrapper:hover .custom-marker-wrappers {
   transform: scale(1.2);
 }
 
-.custom-marker-outer-wrapper:hover::after {
-  width: 180px;
-  height: 180px;
-  opacity: 0.2;
+/* 겹친 마커를 대신하는 묶음.
+   크기는 JS가 --cluster-size로 넣는다 — 많이 묶일수록 조금 커진다 */
+.custom-marker-cluster {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: var(--cluster-size, 48px);
+  height: var(--cluster-size, 48px);
+  border-radius: 50%;
+  background-color: var(--color-brand);
+  color: #fff;
+  font-weight: 700;
+  font-size: 15px;
+  cursor: pointer;
+  /* 지도 위에서 떠 보이도록 흰 테두리 + 그림자 */
+  box-shadow: 0 0 0 3px #fff, 0 4px 12px rgb(120 85 30 / 0.35);
+  transition: transform 0.2s;
+  z-index: 2;
+}
+
+.custom-marker-cluster:hover {
+  transform: scale(1.12);
 }

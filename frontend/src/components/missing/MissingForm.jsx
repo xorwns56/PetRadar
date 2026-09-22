@@ -162,11 +162,11 @@ const MissingForm = ({
           />
         </FormField>
 
-        <FormField label="실종장소" hint="지도를 눌러 위치를 찍어주세요.">
-          {/* 지도는 스스로 높이를 갖지 못하므로 여기서 정해 준다 */}
-          <div className="h-64 overflow-hidden rounded-xl border border-line sm:h-72">
-            <LocationMap init={mapInit} onSelect={onLocationSelect} />
-          </div>
+        <FormField
+          label="실종장소"
+          hint="장소를 검색하거나 지도를 직접 눌러 찍어주세요."
+        >
+          <LocationMap init={mapInit} onSelect={onLocationSelect} />
         </FormField>
 
         <FormField label="사진첨부" htmlFor="imageUpload">

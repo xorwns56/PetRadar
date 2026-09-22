@@ -1,5 +1,10 @@
 import { useEffect, useRef } from "react";
-import { loadKakaoMap } from "../../lib/kakaoMap";
+import {
+  DEFAULT_CENTER,
+  NATIONWIDE_LEVEL,
+  fitBoundsTo,
+  loadKakaoMap,
+} from "../../lib/kakaoMap";
 
 const ShelterMap = ({ shelters, onSelect, setCenterRef }) => {
   const mapRef = useRef(null);
@@ -12,9 +17,13 @@ const ShelterMap = ({ shelters, onSelect, setCenterRef }) => {
     loadKakaoMap()
       .then(() => {
         if (cancelled) return;
+        // 지오코딩이 끝나면 아래에서 마커 전체가 보이도록 범위를 다시 잡는다
         const map = new window.kakao.maps.Map(mapRef.current, {
-          center: new window.kakao.maps.LatLng(37.423233, 127.105261),
-          level: 12,
+          center: new window.kakao.maps.LatLng(
+            DEFAULT_CENTER.lat,
+            DEFAULT_CENTER.lng
+          ),
+          level: NATIONWIDE_LEVEL,
         });
         mapInstance.current = map;
 
@@ -23,13 +32,32 @@ const ShelterMap = ({ shelters, onSelect, setCenterRef }) => {
 
         if (!Array.isArray(shelters)) return;
 
+        // 주소→좌표 변환이 보호소마다 따로 끝나므로, 다 끝났을 때 한 번만
+        // 범위를 맞춘다. (공공데이터포털 표준데이터로 옮기면 좌표가 함께 오므로
+        // 이 지오코딩 자체가 없어진다)
+        const found = [];
+        let pending = shelters.length;
+        const settle = () => {
+          if (--pending === 0) fitBoundsTo(map, found);
+        };
+
         shelters.forEach((shelter) => {
           const address =
             shelter.REFINE_LOTNO_ADDR || shelter.REFINE_ROADNM_ADDR;
-          if (!address) return;
+          if (!address) {
+            settle();
+            return;
+          }
 
           geocoder.addressSearch(address, (result, status) => {
-            if (status === window.kakao.maps.services.Status.OK) {
+            if (status !== window.kakao.maps.services.Status.OK) {
+              // 주소 형식이 맞지 않으면 이 보호소는 지도에서 빠진다.
+              // 예전에는 여기서 아무 일도 하지 않아 조용히 사라졌다
+              console.warn("보호소 주소를 좌표로 바꾸지 못했습니다:", address);
+              settle();
+              return;
+            }
+            {
               const coords = new window.kakao.maps.LatLng(
                 result[0].y,
                 result[0].x
@@ -62,6 +90,8 @@ const ShelterMap = ({ shelters, onSelect, setCenterRef }) => {
               });
 
               overlay.setMap(map);
+              found.push({ lat: Number(result[0].y), lng: Number(result[0].x) });
+              settle();
             }
           });
         });

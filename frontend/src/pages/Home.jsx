@@ -9,13 +9,13 @@ import { fetchMissingList } from "../api/missing";
 const Home = () => {
   const nav = useNavigate();
   const [missingList, setMissingList] = useState([]);
-  const [isLoading, setIsLoading] = useState(true);
+  // 지도를 움직이면 바뀌는 값이라 지도가 알려준다
+  const [visibleCount, setVisibleCount] = useState(null);
 
   useEffect(() => {
     fetchMissingList()
       .then(setMissingList)
-      .catch((error) => console.error("Failed to fetch missing list:", error))
-      .finally(() => setIsLoading(false));
+      .catch((error) => console.error("Failed to fetch missing list:", error));
   }, []);
 
   return (
@@ -92,23 +92,31 @@ const Home = () => {
         <div className="mb-4 flex flex-wrap items-end justify-between gap-3">
           <div>
             <h2 className="text-xl font-bold text-ink sm:text-2xl">
-              지금 찾고 있는 아이들
+              내 주변에서 찾고 있는 아이들
             </h2>
             <p className="mt-1 text-sm text-ink-muted">
-              지도의 사진을 누르면 자세한 내용을 볼 수 있어요.
+              지금 있는 곳을 중심으로 보여드려요. 사진을 누르면 자세한 내용을
+              볼 수 있어요.
             </p>
           </div>
-          {!isLoading && (
+          {/* 전체 건수가 아니라 지금 지도에 보이는 건수를 센다.
+              "내 주변"을 보여주는 지도 옆에서 전국 합계는 의미가 없다 */}
+          {visibleCount !== null && (
             <span className="inline-flex items-center rounded-full bg-brand-soft px-3 py-1 text-sm font-semibold text-brand-ink">
-              {missingList.length}건
+              {visibleCount > 0
+                ? `이 지역 ${visibleCount}건`
+                : "이 지역에는 없어요"}
             </span>
           )}
         </div>
 
         {/* 지도는 스스로 높이를 갖지 못하므로 여기서 정해 준다.
             화면 폭에 따라 단계로 키우되 비율이 아니라 고정 높이를 쓴다 */}
-        <div className="h-[340px] overflow-hidden rounded-2xl border border-line bg-surface shadow-card sm:h-[420px] lg:h-[480px]">
-          <MissingMap missingList={missingList} />
+        <div className="h-[280px] overflow-hidden rounded-2xl border border-line bg-surface shadow-card sm:h-[340px] lg:h-[380px]">
+          <MissingMap
+            missingList={missingList}
+            onVisibleCountChange={setVisibleCount}
+          />
         </div>
       </section>
     </Layout>

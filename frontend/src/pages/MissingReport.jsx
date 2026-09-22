@@ -110,10 +110,11 @@ const MissingReport = () => {
             />
           </FormField>
 
-          <FormField label="발견 장소" hint="지도를 눌러 위치를 찍어주세요.">
-            <div className="h-64 overflow-hidden rounded-xl border border-line sm:h-72">
-              <LocationMap onSelect={onLocationSelect} />
-            </div>
+          <FormField
+            label="발견 장소"
+            hint="장소를 검색하거나 지도를 직접 눌러 찍어주세요."
+          >
+            <LocationMap onSelect={onLocationSelect} />
           </FormField>
 
           <FormField label="사진" htmlFor="report-image">

@@ -12,6 +12,93 @@ const APP_KEY = "b737c6777956f74337fc9bc5a08e3b55";
 
 const SDK_URL = `https://dapi.kakao.com/v2/maps/sdk.js?appkey=${APP_KEY}&libraries=services&autoload=false`;
 
+/**
+ * 현재 위치를 못 받았을 때 지도가 서는 자리 (서울시청).
+ *
+ * 예전에는 지도 세 곳이 각각 다른 동네 좌표를 갖고 있었다(배곧 두 곳, 판교 한 곳).
+ * 특정 동네를 콕 집는 건 어차피 추측이라, 인구가 가장 많이 몰린 곳을 쓴다.
+ */
+export const DEFAULT_CENTER = { lat: 37.5665, lng: 126.978 };
+
+/** 마커가 하나도 없어 전국을 보여줄 때의 중심 (대한민국 중심부) */
+export const NATIONWIDE_CENTER = { lat: 36.5, lng: 127.85 };
+
+/** 전국이 한눈에 들어오는 줌 레벨. 숫자가 클수록 넓게 보인다.
+ *  13 이상으로 올리면 카카오 타일이 없는 영역까지 나와 회색 여백이 생긴다 */
+export const NATIONWIDE_LEVEL = 12;
+
+/**
+ * 장소를 "찍는" 지도의 배율 (신고·제보 폼).
+ * 화면에 약 2.5 × 1.2km — 아파트·학교·공원 이름이 또렷하게 읽힌다.
+ * 정확히 찍어야 하는 화면이라 가깝게 둔다.
+ */
+export const NEIGHBORHOOD_LEVEL = 5;
+
+/**
+ * 내 주변을 "둘러보는" 지도의 배율 (홈).
+ * 화면에 약 2.5 × 1.2km — 걸어서 오갈 만한 범위다.
+ * 더 넓히면 "내 주변"이라기엔 멀어지고, 겹치는 마커는 클러스터가 처리한다.
+ */
+export const OVERVIEW_LEVEL = 5;
+
+/** 정확한 지점으로 이동했을 때 (검색 결과 선택, 저장된 위치 불러오기) */
+export const PINPOINT_LEVEL = 3;
+
+/** 마커가 하나뿐일 때. 주변 지형이 같이 보일 만큼은 물려 둔다 */
+export const SINGLE_POINT_LEVEL = 5;
+
+/**
+ * 현재 위치를 받아온다.
+ * 권한 거부·조회 실패·HTTP 환경에서는 null을 돌려준다 — 부르는 쪽이
+ * 기본 좌표로 넘어갈 수 있도록 예외 대신 null로 알린다.
+ */
+export function getCurrentPosition({ timeout = 5000 } = {}) {
+  return new Promise((resolve) => {
+    if (!navigator.geolocation) return resolve(null);
+    navigator.geolocation.getCurrentPosition(
+      (pos) => resolve({ lat: pos.coords.latitude, lng: pos.coords.longitude }),
+      () => resolve(null),
+      { timeout }
+    );
+  });
+}
+
+/**
+ * 좌표 목록이 모두 보이도록 지도 범위를 맞춘다.
+ * 좌표가 없으면 기본 좌표로 넓게 돌아간다.
+ *
+ * @param map    kakao.maps.Map
+ * @param points [{ lat, lng }, ...]
+ */
+export function fitBoundsTo(map, points) {
+  const valid = (points || []).filter(
+    (p) => p && p.lat != null && p.lng != null
+  );
+
+  if (valid.length === 0) {
+    map.setCenter(
+      new window.kakao.maps.LatLng(NATIONWIDE_CENTER.lat, NATIONWIDE_CENTER.lng)
+    );
+    map.setLevel(NATIONWIDE_LEVEL);
+    return;
+  }
+
+  // 한 곳뿐이면 setBounds를 쓰지 않는다.
+  // 범위가 점 하나라 최대 배율까지 당겨 버리고, 그걸 setLevel로 되돌리면
+  // 재배치가 겹쳐 타일이 군데군데 비어 버린다
+  if (valid.length === 1) {
+    map.setCenter(new window.kakao.maps.LatLng(valid[0].lat, valid[0].lng));
+    map.setLevel(SINGLE_POINT_LEVEL);
+    return;
+  }
+
+  const bounds = new window.kakao.maps.LatLngBounds();
+  valid.forEach((p) =>
+    bounds.extend(new window.kakao.maps.LatLng(p.lat, p.lng))
+  );
+  map.setBounds(bounds);
+}
+
 let loadPromise = null;
 
 /**
