@@ -35,6 +35,9 @@ dependencies {
 	compileOnly 'org.projectlombok:lombok'
 	runtimeOnly 'com.mysql:mysql-connector-j'
 	annotationProcessor 'org.projectlombok:lombok'
+	// 클래스가 바뀌면 애플리케이션을 자동으로 다시 시작한다.
+	// developmentOnly 라 배포 jar에는 들어가지 않는다
+	developmentOnly 'org.springframework.boot:spring-boot-devtools'
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
 	testImplementation 'org.springframework.security:spring-security-test'
 	testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
@@ -45,6 +48,15 @@ dependencies {
 
 tasks.named('test') {
 	useJUnitPlatform()
+}
+
+// 컨테이너 안에서 도는 백엔드에 IDE 디버거를 붙이기 위한 포트.
+// docker-compose.dev.yml이 BOOTRUN_DEBUG=true를 줄 때만 열린다.
+// suspend=n 이라 디버거를 안 붙여도 애플리케이션은 그냥 뜬다
+tasks.named('bootRun') {
+	if (System.getenv('BOOTRUN_DEBUG') == 'true') {
+		jvmArgs '-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:5005'
+	}
 }
 
 bootJar {

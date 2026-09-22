@@ -1,0 +1,124 @@
+# =============================================================
+# 로컬 개발 환경
+#
+#   docker compose -f docker-compose.dev.yml up
+#   → http://localhost
+#
+# 운영(docker-compose.yml)과 다른 점
+#   - 이미지를 GHCR에서 받지 않고 여기서 빌드한다 (Dockerfile.dev)
+#   - 소스를 볼륨으로 마운트해 고치면 바로 반영된다
+#   - 프론트가 정적 파일이 아니라 Vite dev 서버라, nginx가 별도 컨테이너로
+#     떠서 그쪽으로 넘긴다. 운영에서는 frontend 이미지 자체가 nginx다
+#   - 데이터 볼륨을 운영과 분리한다 (-local). 로컬 DB를 지워도 안전하다
+#
+# /images, /api 라우팅 규칙(nginx-api-routes.conf)은 운영과 같은 파일을 쓴다.
+# =============================================================
+services:
+
+  mysql:
+    image: mysql:8
+    container_name: petradar-mysql-local
+    ports:
+      - "127.0.0.1:3306:3306"
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:-localdev}
+      MYSQL_DATABASE: petradar_db
+    volumes:
+      - mysql-local-data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+
+  elasticsearch:
+    image: elasticsearch:8.15.0
+    container_name: petradar-elasticsearch-local
+    ports:
+      # 색인 상태를 브라우저나 curl로 들여다볼 때 쓴다
+      - "127.0.0.1:9200:9200"
+    environment:
+      - discovery.type=single-node
+      - xpack.security.enabled=false
+      - ES_JAVA_OPTS=-Xms512m -Xmx512m
+    volumes:
+      - elasticsearch-local-data:/usr/share/elasticsearch/data
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:9200/_cluster/health || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 15
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile.dev
+    container_name: petradar-backend-local
+    ports:
+      # nginx를 거치지 않고 API를 직접 찔러볼 때 쓴다
+      - "127.0.0.1:8080:8080"
+      # IDE에서 Remote JVM Debug로 붙는다
+      - "127.0.0.1:5005:5005"
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:mysql://mysql:3306/petradar_db?serverTimezone=Asia/Seoul&characterEncoding=UTF-8
+      SPRING_DATASOURCE_USERNAME: root
+      SPRING_DATASOURCE_PASSWORD: ${MYSQL_ROOT_PASSWORD:-localdev}
+      SPRING_ELASTICSEARCH_URIS: http://elasticsearch:9200
+      APP_IMAGE_UPLOAD_DIR: /app/uploads
+      # 로컬 기본값을 둔다. .env가 있으면 그 값을 쓴다
+      JWT_ACCESS_SECRET: ${JWT_ACCESS_SECRET:-local-dev-access-secret-key-please-change-me}
+      JWT_REFRESH_SECRET: ${JWT_REFRESH_SECRET:-local-dev-refresh-secret-key-please-change}
+      # HTTP로 띄우므로 끈다. 켜면 쿠키가 안 실려 로그인이 풀린다
+      COOKIE_SECURE: "false"
+      DATA_GO_KR_SERVICE_KEY: ${DATA_GO_KR_SERVICE_KEY:-}
+      # build.gradle이 이 값을 보고 디버그 포트를 연다
+      BOOTRUN_DEBUG: "true"
+    volumes:
+      - ./backend/src:/app/src
+      - ./backend/build.gradle:/app/build.gradle
+      - uploads-local:/app/uploads
+      # 의존성을 매번 다시 받지 않도록 유지한다
+      - gradle-cache:/root/.gradle
+    depends_on:
+      mysql:
+        condition: service_healthy
+      elasticsearch:
+        condition: service_healthy
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile.dev
+    container_name: petradar-frontend-local
+    ports:
+      # nginx(:80)를 쓰는 게 기본이다. 이 포트는 nginx 없이 확인할 때의 비상구다
+      # (이쪽으로 접속하면 /images가 없어 업로드 이미지는 안 보인다)
+      - "127.0.0.1:5173:5173"
+    environment:
+      # vite.config.js가 이 값을 보고 HMR·파일감시를 컨테이너용으로 맞춘다
+      DOCKER_DEV: "true"
+    volumes:
+      - ./frontend:/app
+      # 컨테이너 안에서 설치한 의존성을 호스트 것으로 덮지 않도록 익명 볼륨으로 가려 둔다
+      - /app/node_modules
+
+  nginx:
+    image: nginx:alpine
+    container_name: petradar-nginx-local
+    ports:
+      - "80:80"
+    volumes:
+      - ./frontend/nginx-dev.conf:/etc/nginx/conf.d/default.conf:ro
+      # 운영과 같은 라우팅 규칙
+      - ./frontend/nginx-api-routes.conf:/etc/nginx/nginx-api-routes.conf:ro
+      # 백엔드가 저장한 이미지를 nginx가 직접 서빙한다 (읽기 전용)
+      - uploads-local:/usr/share/nginx/images:ro
+    depends_on:
+      - backend
+      - frontend
+
+volumes:
+  mysql-local-data:
+  elasticsearch-local-data:
+  uploads-local:
+  gradle-cache:

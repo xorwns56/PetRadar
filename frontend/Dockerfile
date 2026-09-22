@@ -12,4 +12,6 @@ COPY --from=builder /app/dist /usr/share/nginx/html
 COPY nginx.conf /etc/nginx/conf.d/default.conf
 # 80/443 양쪽에서 include 하는 공통 라우팅 규칙
 COPY nginx-routes.conf /etc/nginx/nginx-routes.conf
+# nginx-routes.conf가 include 한다. 개발용 nginx-dev.conf도 같은 파일을 쓴다
+COPY nginx-api-routes.conf /etc/nginx/nginx-api-routes.conf
 EXPOSE 80

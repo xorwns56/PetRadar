@@ -164,10 +164,38 @@ src/
 
 ## 🐾 로컬 실행 방법
 
-Docker Compose로 전체 스택(MySQL, Elasticsearch, 백엔드, nginx)을 함께 띄웁니다.
+### 개발
+
+소스를 고치면 바로 반영되는 개발용 스택입니다.
 
 ```bash
-cp .env.example .env    # 시크릿 값 입력 (JWT 키는 openssl rand -base64 48)
+cp .env.example .env                        # 최초 1회
+docker compose -f docker-compose.dev.yml up
+```
+
+접속: http://localhost
+
+| | 반영 방식 |
+|------|------|
+| 프론트엔드 | Vite HMR — 저장하면 새로고침 없이 바뀐 부분만 교체 |
+| 백엔드 | `gradle classes --continuous` 가 재컴파일하고 DevTools가 재시작 (약 0.5초) |
+
+운영과 다른 점은 `location /` 하나뿐입니다. 운영은 빌드된 정적 파일을 서빙하고,
+개발은 Vite dev 서버로 넘깁니다. `/api`·`/images` 라우팅은 같은 파일
+(`nginx-api-routes.conf`)을 씁니다.
+
+디버거는 `localhost:5005` 에 Remote JVM Debug 로 붙입니다.
+API를 직접 찔러보려면 `localhost:8080`, nginx 없이 프론트만 보려면 `localhost:5173`
+(이쪽은 `/images` 가 없어 업로드 이미지가 보이지 않습니다).
+
+카카오 지도를 로컬에서 쓰려면 카카오 개발자 콘솔의 Web 사이트 도메인에
+`http://localhost` 를 등록해야 합니다.
+
+### 배포 구성 확인
+
+실제 배포와 같은 이미지로 띄워 확인할 때 씁니다.
+
+```bash
 docker compose build    # 소스에서 이미지 빌드
 docker compose up -d
 ```
