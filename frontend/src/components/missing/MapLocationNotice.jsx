@@ -4,28 +4,39 @@ import Button from "../ui/Button";
  * 지도가 지금 어디를 기준으로 보여주고 있는지 알린다.
  *
  * 기본 좌표(서울시청)를 말없이 띄우면 사용자는 그게 자기 주변인 줄 안다.
- * 상태마다 할 말이 다르다 — 아직 안 정했으면 허용을 부탁하고,
- * 이미 허용했으면 기다려 달라고 하고, 거부됐으면 되돌릴 방법을 준다.
+ * 상태마다 할 말과 할 수 있는 일이 다르다 — 아직 안 정했으면 허용을 부탁하고,
+ * 차단됐으면 푸는 법을 알리고, 그냥 실패한 거면 다시 시도하게 한다.
  */
 const MapLocationNotice = ({ status, onRetry }) => {
   if (status === "granted") return null;
 
-  // 거부는 영구 상태다. 지도를 계속 가릴 이유가 없으니 위쪽에 작게 알린다
-  if (status === "denied") {
+  // 차단·실패는 영구 상태다. 지도를 계속 가릴 이유가 없으니 위쪽에 작게 알린다
+  if (status === "blocked" || status === "unavailable") {
     return (
       <div className="pointer-events-none absolute inset-x-0 top-0 z-10 flex justify-center p-3">
         <div className="pointer-events-auto flex max-w-full items-center gap-1.5 rounded-full bg-surface/95 px-3 py-1.5 text-xs shadow-card backdrop-blur-sm">
-          <span className="truncate text-ink-muted">
-            위치 권한이 없어 서울시청 기준으로 보여드려요
-          </span>
-          <Button
-            variant="ghost"
-            size="sm"
-            className="h-7 shrink-0 px-2"
-            onClick={onRetry}
-          >
-            내 위치로
-          </Button>
+          {status === "blocked" ? (
+            // 한 번 차단하면 사이트가 팝업을 다시 띄울 수 없다.
+            // 눌러도 아무 일이 없을 버튼 대신 무엇을 하면 되는지만 말한다.
+            // 사용자가 설정에서 허용하면 useGeolocation이 change로 받아 바로 반영한다
+            <span className="truncate text-ink-muted">
+              위치 권한을 허용하면 지금 계신 곳을 보여드려요
+            </span>
+          ) : (
+            <>
+              <span className="truncate text-ink-muted">
+                위치를 가져오지 못했어요
+              </span>
+              <Button
+                variant="ghost"
+                size="sm"
+                className="h-7 shrink-0 px-2"
+                onClick={onRetry}
+              >
+                다시 시도
+              </Button>
+            </>
+          )}
         </div>
       </div>
     );
