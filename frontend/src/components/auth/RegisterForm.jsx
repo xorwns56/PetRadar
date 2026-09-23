@@ -52,8 +52,13 @@ const RegisterForm = ({ isExist, onRegister }) => {
       if (!(await formCheck())) return;
       // 실패하면 onRegister가 false를 돌려준다.
       // 예전에는 여기서 아무 일도 일어나지 않아 사용자가 이유를 알 수 없었다
-      if ((await onRegister(input.id, input.pw, input.hp)) === false) {
-        setFormError("회원가입에 실패했어요. 잠시 후 다시 시도해주세요.");
+      const result = await onRegister(input.id, input.pw, input.hp);
+      if (result !== true) {
+        setFormError(
+          typeof result === "string"
+            ? result
+            : "회원가입에 실패했어요. 잠시 후 다시 시도해주세요."
+        );
       }
     } finally {
       setSubmitting(false);

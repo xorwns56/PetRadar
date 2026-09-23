@@ -8,6 +8,7 @@ import useMissingForm from "../hooks/useMissingForm";
 import MissingForm, { MISSING_FORM_FIELDS } from "../components/missing/MissingForm";
 import { useAuth } from "../contexts/AuthContext";
 import { createMissing } from "../api/missing";
+import { toMessage } from "../utils/error";
 
 const MissingDeclaration = () => {
   const nav = useNavigate();
@@ -38,7 +39,7 @@ const MissingDeclaration = () => {
       nav("/missingList");
     } catch (err) {
       console.error("Failed to submit missing:", err);
-      setError("신고 제출에 실패했습니다. 다시 시도해주세요.");
+      setError(toMessage(err, "신고 제출에 실패했습니다. 다시 시도해주세요."));
     } finally {
       setSubmitting(false);
     }

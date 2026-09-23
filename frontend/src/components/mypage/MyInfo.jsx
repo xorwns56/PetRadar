@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import Button from "../ui/Button";
 import FormField, { controlClass } from "../ui/FormField";
+import { toMessage } from "../../utils/error";
 
 const MyInfo = ({ userInfo, onUpdate, onDelete, onLogOut }) => {
   const [editMode, setEditMode] = useState(false);
@@ -9,11 +10,13 @@ const MyInfo = ({ userInfo, onUpdate, onDelete, onLogOut }) => {
 
   useEffect(() => {
     initInput();
+    setError("");
   }, [userInfo]);
 
+  // 입력칸만 되돌린다. 오류 문구까지 지우면 실패 직후 사유를 보여줄 수 없다 —
+  // onConfirm이 setError 바로 뒤에 이걸 부르기 때문이다
   const initInput = () => {
     setInput({ pw: "", hp: userInfo.hp ?? "" });
-    setError("");
   };
 
   const onChangeInput = (event) => {
@@ -27,7 +30,7 @@ const MyInfo = ({ userInfo, onUpdate, onDelete, onLogOut }) => {
       setEditMode(false);
     } catch (err) {
       // 서버가 내려준 사유를 alert 대신 카드 안에서 보여준다
-      setError(err?.response?.data || "수정에 실패했어요. 다시 시도해주세요.");
+      setError(toMessage(err, "수정에 실패했어요. 다시 시도해주세요."));
       initInput();
     }
   };

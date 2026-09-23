@@ -15,6 +15,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 import java.util.stream.Collectors;
+import com.example.PetRadar.global.error.NotFoundException;
 
 @Service
 @RequiredArgsConstructor
@@ -30,7 +31,7 @@ public class ReportService {
 
     public ReportDTO findReportById(Long reportId) {
         Report report = reportRepository.findById(reportId)
-                .orElseThrow(() -> new IllegalArgumentException("해당 ID의 게시글이 없습니다."));
+                .orElseThrow(() -> new NotFoundException("제보를 찾을 수 없습니다."));
         return ReportDTO.from(report, imageBaseUrl);
     }
 
@@ -46,7 +47,7 @@ public class ReportService {
         Report report = request.toEntity();
         if(userId != null) report.setUser(userRepository.getReferenceById(userId));
         Missing missing = missingRepository.findById(missingId)
-                .orElseThrow(() -> new IllegalArgumentException("Missing post not found with ID: " + missingId));
+                .orElseThrow(() -> new NotFoundException("제보할 실종 신고를 찾을 수 없습니다."));
         report.setMissing(missing);
         // 이미지는 파일로 저장하고 DB에는 키만 남긴다
         report.setPetImage(imageStorageService.store(image));

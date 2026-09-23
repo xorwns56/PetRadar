@@ -6,6 +6,7 @@ import MyInfo from "../components/mypage/MyInfo";
 import MyPost from "../components/mypage/MyPost";
 import { useAuth } from "../contexts/AuthContext.jsx";
 import { deleteMe, fetchMe, updateMe } from "../api/user";
+import { toMessage } from "../utils/error";
 
 const MyPage = () => {
   const nav = useNavigate();
@@ -35,7 +36,7 @@ const MyPage = () => {
         onLogOut();
       } catch (error) {
         console.error("Failed to delete user:", error);
-        alert("삭제에 실패했습니다.");
+        alert(toMessage(error, "탈퇴에 실패했습니다."));
       }
     }
   };

@@ -40,12 +40,9 @@ public class AuthController {
 
     @PostMapping("/login")
     public ResponseEntity<Map<String, Object>> login(@RequestBody AuthDTO authDTO) {
-        AuthService.Tokens tokens;
-        try {
-            tokens = authService.login(authDTO.getId(), authDTO.getPw());
-        } catch (IllegalArgumentException e) {
-            return ResponseEntity.status(401).body(Map.of("error", e.getMessage()));
-        }
+        // 로그인 실패는 UnauthorizedException으로 올라가 GlobalExceptionHandler가
+        // 401과 사유를 내려준다
+        AuthService.Tokens tokens = authService.login(authDTO.getId(), authDTO.getPw());
         // 액세스 토큰은 JSON 응답으로, 리프레시 토큰은 HttpOnly 쿠키로 전송
         ResponseCookie cookie = refreshTokenCookie(tokens.refreshToken(), jwtTokenProvider.getRefreshTokenExpSec());
         return ResponseEntity.ok()

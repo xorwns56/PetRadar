@@ -8,6 +8,8 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Optional;
 import java.util.regex.Pattern;
+import com.example.PetRadar.global.error.NotFoundException;
+import com.example.PetRadar.global.error.InvalidRequestException;
 
 @Service
 @RequiredArgsConstructor
@@ -20,16 +22,16 @@ public class UserService {
         final String PW_REGEX = "^(?=.*[a-zA-Z])(?=.*\\d)(?=.*[^\\w\\s]).{8,}$";
 
         if (authDTO.getHp() == null || authDTO.getHp().isBlank()) {
-            throw new IllegalArgumentException("휴대폰 번호를 입력해주세요.");
+            throw new InvalidRequestException("휴대폰 번호를 입력해주세요.");
         }
         if (!Pattern.matches(HP_REGEX, authDTO.getHp())) {
-            throw new IllegalArgumentException("유효한 휴대폰 번호 형식이 아닙니다.");
+            throw new InvalidRequestException("유효한 휴대폰 번호 형식이 아닙니다.");
         }
         if (authDTO.getPw() == null || authDTO.getPw().isEmpty()) {
-            throw new IllegalArgumentException("비밀번호를 입력해주세요.");
+            throw new InvalidRequestException("비밀번호를 입력해주세요.");
         }
         if (!Pattern.matches(PW_REGEX, authDTO.getPw())) {
-            throw new IllegalArgumentException("비밀번호는 8자 이상이며, 대문자, 소문자, 숫자, 특수문자를 각각 1개 이상 포함해야 합니다.");
+            throw new InvalidRequestException("비밀번호는 8자 이상이며, 대문자, 소문자, 숫자, 특수문자를 각각 1개 이상 포함해야 합니다.");
         }
     }
 
@@ -48,7 +50,7 @@ public class UserService {
     public UserDTO findById(Long id) {
         return userRepository.findById(id)
                 .map(user -> new UserDTO(user.getId(), user.getLoginId(), user.getHp()))
-                .orElseThrow(() -> new IllegalArgumentException("User not found with ID: " + id));
+                .orElseThrow(() -> new NotFoundException("사용자를 찾을 수 없습니다."));
     }
 
     @Transactional(readOnly = true)
@@ -59,7 +61,7 @@ public class UserService {
     @Transactional
     public void updateUser(Long userId, AuthDTO authDTO) {
         User user = userRepository.findById(userId)
-                .orElseThrow(() -> new IllegalArgumentException("User not found with id: " + userId));
+                .orElseThrow(() -> new NotFoundException("사용자를 찾을 수 없습니다."));
         validateUserRegistration(authDTO);
         user.setHp(authDTO.getHp());
         user.setPwHash(passwordEncoder.encode(authDTO.getPw()));
@@ -69,7 +71,7 @@ public class UserService {
     @Transactional
     public void deleteUser(Long userId) {
         User user = userRepository.findById(userId)
-                .orElseThrow(() -> new IllegalArgumentException("User not found."));
+                .orElseThrow(() -> new NotFoundException("사용자를 찾을 수 없습니다."));
         userRepository.delete(user);
     }
 

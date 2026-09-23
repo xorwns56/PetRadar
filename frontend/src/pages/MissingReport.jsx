@@ -7,6 +7,7 @@ import LocationMap from "../components/missing/LocationMap";
 import ImageField from "../components/ui/ImageField";
 import FormField, { controlClass, textareaClass } from "../components/ui/FormField";
 import { createReport } from "../api/report";
+import { toMessage } from "../utils/error";
 
 const MissingReport = () => {
   const nav = useNavigate();
@@ -48,7 +49,7 @@ const MissingReport = () => {
       nav("/missingList");
     } catch (err) {
       console.error("Failed to submit report:", err);
-      setError("제보 등록에 실패했습니다. 다시 시도해주세요.");
+      setError(toMessage(err, "제보 등록에 실패했습니다. 다시 시도해주세요."));
     } finally {
       setSubmitting(false);
     }

@@ -7,6 +7,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import com.example.PetRadar.global.error.UnauthorizedException;
 
 /**
  * 로그인·로그아웃·재발급 검증 등 인증 흐름을 담당한다.
@@ -28,14 +29,14 @@ public class AuthService {
      * 아이디와 비밀번호를 확인하고 토큰을 발급한다.
      * Refresh Token은 서버에도 보관해 로그아웃 시 무효화할 수 있게 한다.
      *
-     * @throws IllegalArgumentException 아이디가 없거나 비밀번호가 틀린 경우
+     * @throws UnauthorizedException 아이디가 없거나 비밀번호가 틀린 경우
      */
     @Transactional
     public Tokens login(String loginId, String password) {
         User user = userRepository.findByLoginId(loginId)
                 .filter(u -> passwordEncoder.matches(password, u.getPwHash()))
                 // 아이디가 없는 경우와 비밀번호가 틀린 경우를 구분하지 않는다 (계정 존재 여부 노출 방지)
-                .orElseThrow(() -> new IllegalArgumentException("Invalid username or password"));
+                .orElseThrow(() -> new UnauthorizedException("아이디 또는 비밀번호가 올바르지 않습니다."));
 
         String userId = String.valueOf(user.getId());
         String refreshToken = jwtTokenProvider.createRefreshToken(userId);

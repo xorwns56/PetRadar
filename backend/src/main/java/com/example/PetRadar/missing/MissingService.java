@@ -12,6 +12,8 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 import java.util.stream.Collectors;
+import com.example.PetRadar.global.error.NotFoundException;
+import com.example.PetRadar.global.error.ForbiddenException;
 
 @Service
 @RequiredArgsConstructor
@@ -39,7 +41,7 @@ public class MissingService {
 
     public MissingDTO getMissingDetail(Long id) {
         Missing missing = missingRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("해당 ID의 게시글이 없습니다."));
+                .orElseThrow(() -> new NotFoundException("실종 신고를 찾을 수 없습니다."));
         return MissingDTO.from(missing, imageBaseUrl);
     }
 
@@ -55,9 +57,9 @@ public class MissingService {
 
     public void updateMissing(Long id, MissingRequest request, long userId, MultipartFile image) {
         Missing existingMissing = missingRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("Missing post not found."));
+                .orElseThrow(() -> new NotFoundException("실종 신고를 찾을 수 없습니다."));
         if (!existingMissing.getUser().getId().equals(userId)) {
-            throw new IllegalArgumentException("You are not authorized to update this post.");
+            throw new ForbiddenException("본인이 등록한 신고만 수정할 수 있습니다.");
         }
         request.applyTo(existingMissing);
         // 새 이미지를 올린 경우에만 교체하고, 교체 시 이전 파일은 지운다
@@ -72,9 +74,9 @@ public class MissingService {
 
     public void deleteMissing(Long missingId, Long userId) {
         Missing missing = missingRepository.findById(missingId)
-                .orElseThrow(() -> new IllegalArgumentException("Missing report not found."));
+                .orElseThrow(() -> new NotFoundException("실종 신고를 찾을 수 없습니다."));
         if (!missing.getUser().getId().equals(userId)) {
-            throw new IllegalArgumentException("You are not authorized to delete this post.");
+            throw new ForbiddenException("본인이 등록한 신고만 삭제할 수 있습니다.");
         }
         // 글이 지워지면 이미지 파일도 함께 정리한다
         imageStorageService.delete(missing.getPetImage());

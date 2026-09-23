@@ -8,6 +8,8 @@ import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import java.util.List;
 import java.util.stream.Collectors;
+import com.example.PetRadar.global.error.NotFoundException;
+import com.example.PetRadar.global.error.ForbiddenException;
 
 @Service
 @RequiredArgsConstructor
@@ -23,7 +25,7 @@ public class NotificationService {
                     .orElse(null);
         }
         User receiver = userRepository.findById(receiverId)
-                .orElseThrow(() -> new IllegalArgumentException("Receiver not found with ID: " + receiverId));
+                .orElseThrow(() -> new NotFoundException("알림을 받을 사용자를 찾을 수 없습니다."));
         Notification notification = new Notification();
         notification.setSender(sender);
         notification.setReceiver(receiver);
@@ -50,9 +52,9 @@ public class NotificationService {
 
     public void deleteNotification(Long receiverId, Long notificationId) {
         Notification notification = notificationRepository.findById(notificationId)
-                .orElseThrow(() -> new IllegalArgumentException("Notification not found with ID: " + notificationId));
+                .orElseThrow(() -> new NotFoundException("알림을 찾을 수 없습니다."));
         if (!notification.getReceiver().getId().equals(receiverId)) {
-            throw new IllegalArgumentException("Notification does not belong to this user");
+            throw new ForbiddenException("본인에게 온 알림만 지울 수 있습니다.");
         }
         notificationRepository.delete(notification);
     }

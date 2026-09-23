@@ -7,6 +7,7 @@ import useFormFocus from "../hooks/useFormFocus";
 import useMissingForm from "../hooks/useMissingForm";
 import MissingForm, { MISSING_FORM_FIELDS } from "../components/missing/MissingForm";
 import { fetchMissingDetail, updateMissing } from "../api/missing";
+import { toMessage } from "../utils/error";
 
 const MissingRevise = () => {
   const params = useParams();
@@ -38,7 +39,7 @@ const MissingRevise = () => {
     } catch (err) {
       // 예전에는 콘솔에만 남아 사용자는 아무 일도 안 일어난 줄 알았다
       console.error("Failed to update :", err);
-      setError("수정에 실패했습니다. 다시 시도해주세요.");
+      setError(toMessage(err, "수정에 실패했습니다. 다시 시도해주세요."));
     } finally {
       setSubmitting(false);
     }

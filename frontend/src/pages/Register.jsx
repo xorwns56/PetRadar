@@ -2,6 +2,7 @@ import { Link, useNavigate } from "react-router-dom";
 import AuthLayout from "../components/layout/AuthLayout";
 import RegisterForm from "../components/auth/RegisterForm";
 import { checkIdExists, register } from "../api/auth";
+import { toMessage } from "../utils/error";
 
 const Register = () => {
   const nav = useNavigate();
@@ -23,7 +24,8 @@ const Register = () => {
       return true;
     } catch (error) {
       console.error("onRegister : ", error);
-      return false;
+      // 폼이 그대로 보여줄 수 있도록 사유를 돌려준다
+      return toMessage(error, false);
     }
   };
 

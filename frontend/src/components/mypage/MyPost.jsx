@@ -8,6 +8,7 @@ import Button from "../ui/Button";
 import { useModal } from "../../contexts/ModalContext";
 import { deleteMissing, fetchMyMissingList } from "../../api/missing";
 import { fetchReportsByMissing } from "../../api/report";
+import { toMessage } from "../../utils/error";
 
 const MyPost = () => {
   const nav = useNavigate();
@@ -65,7 +66,7 @@ const MyPost = () => {
       setPetMissingItem(updatedMissingList[0] ?? null);
     } catch (error) {
       console.error("Failed to delete missing item:", error);
-      alert("삭제에 실패했습니다.");
+      alert(toMessage(error, "삭제에 실패했습니다."));
     }
   };
 
