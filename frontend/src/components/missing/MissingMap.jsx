@@ -6,9 +6,10 @@ import PetModalDetail from "./PetModalDetail";
 import {
   DEFAULT_CENTER,
   OVERVIEW_LEVEL,
-  getCurrentPosition,
   loadKakaoMap,
 } from "../../lib/kakaoMap";
+import { useGeolocation } from "../../hooks/useGeolocation";
+import MapLocationNotice from "./MapLocationNotice";
 import { clusterByPixel } from "../../lib/mapCluster";
 import "./MissingMap.css";
 
@@ -21,6 +22,7 @@ const MissingMap = ({ missingList, onVisibleCountChange }) => {
   const { isActive, toggleModal } = useModal();
   const [selectedPet, setSelectedPet] = useState(null);
   const [mapLoaded, setMapLoaded] = useState(false);
+  const { position, status, request } = useGeolocation();
 
   /** 사진 마커 하나 */
   const createPetOverlay = useCallback(
@@ -146,18 +148,21 @@ const MissingMap = ({ missingList, onVisibleCountChange }) => {
         });
         mapRef.current = map;
         setMapLoaded(true);
-
-        // 위치 조회는 비동기라 우선 기본 좌표로 띄운 뒤 옮긴다
-        getCurrentPosition().then((here) => {
-          if (cancelled || !here) return;
-          map.setCenter(new window.kakao.maps.LatLng(here.lat, here.lng));
-        });
       })
       .catch((error) => console.error(error));
     return () => {
       cancelled = true;
     };
   }, []);
+
+  // 위치는 늦게 올 수 있다 — 권한 팝업을 한참 뒤에 허용하거나 "내 위치로"를
+  // 눌렀을 때. 도착하는 시점에 옮기므로 새로고침이 필요 없다
+  useEffect(() => {
+    if (!mapLoaded || !mapRef.current || !position) return;
+    mapRef.current.setCenter(
+      new window.kakao.maps.LatLng(position.lat, position.lng)
+    );
+  }, [mapLoaded, position]);
 
   // 배율·중심이 바뀌면 묶음이 달라지므로 다시 그린다
   useEffect(() => {
@@ -173,10 +178,12 @@ const MissingMap = ({ missingList, onVisibleCountChange }) => {
 
   return (
     <>
-      {/* 카카오맵이 렌더링될 컨테이너 */}
       {/* 높이는 부모가 정한다. 350px로 고정해두면 부모가 그보다 작을 때
           지도 아래쪽이 잘려 그 영역의 마커를 볼 수 없다 */}
-      <div id="missingMap" ref={containerRef} className="size-full"></div>
+      <div className="relative size-full">
+        <div id="missingMap" ref={containerRef} className="size-full"></div>
+        <MapLocationNotice status={status} onRetry={request} />
+      </div>
       {/* 모달이 활성화되고 동물이 선택된 경우 상세 모달 표시 */}
       {isActive && selectedPet && (
         <PetModalDetail

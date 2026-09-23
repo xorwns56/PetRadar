@@ -48,22 +48,6 @@ export const PINPOINT_LEVEL = 3;
 export const SINGLE_POINT_LEVEL = 5;
 
 /**
- * 현재 위치를 받아온다.
- * 권한 거부·조회 실패·HTTP 환경에서는 null을 돌려준다 — 부르는 쪽이
- * 기본 좌표로 넘어갈 수 있도록 예외 대신 null로 알린다.
- */
-export function getCurrentPosition({ timeout = 5000 } = {}) {
-  return new Promise((resolve) => {
-    if (!navigator.geolocation) return resolve(null);
-    navigator.geolocation.getCurrentPosition(
-      (pos) => resolve({ lat: pos.coords.latitude, lng: pos.coords.longitude }),
-      () => resolve(null),
-      { timeout }
-    );
-  });
-}
-
-/**
  * 좌표 목록이 모두 보이도록 지도 범위를 맞춘다.
  * 좌표가 없으면 기본 좌표로 넓게 돌아간다.
  *

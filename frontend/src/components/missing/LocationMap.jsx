@@ -3,9 +3,10 @@ import {
   DEFAULT_CENTER,
   NEIGHBORHOOD_LEVEL,
   PINPOINT_LEVEL,
-  getCurrentPosition,
   loadKakaoMap,
 } from "../../lib/kakaoMap";
+import { useGeolocation } from "../../hooks/useGeolocation";
+import MapLocationNotice from "./MapLocationNotice";
 import Button from "../ui/Button";
 
 const LocationMap = ({ init, onSelect }) => {
@@ -13,6 +14,8 @@ const LocationMap = ({ init, onSelect }) => {
   const markerRef = useRef(null);
   const isInit = useRef(false);
   const placesRef = useRef(null);
+
+  const { position, status, request } = useGeolocation();
 
   const [keyword, setKeyword] = useState("");
   const [results, setResults] = useState(null); // null=검색 전, []=결과 없음
@@ -61,18 +64,6 @@ const LocationMap = ({ init, onSelect }) => {
         // 장소 검색기. libraries=services에 이미 들어 있어 추가 로딩이 없다
         placesRef.current = new window.kakao.maps.services.Places();
 
-        // 현재 위치로 지도를 옮긴다. 위치 조회는 비동기라 우선 기본 좌표로 띄운 뒤 이동시킨다.
-        // 마커는 찍지 않는다 — 실종 장소는 지금 있는 곳과 다를 수 있으므로 사용자가 직접 고르게 한다.
-        // 수정 화면(init)은 저장된 위치를 보여줘야 하므로 건너뛴다.
-        if (!init) {
-          getCurrentPosition().then((here) => {
-            // 수정 화면은 init이 뒤늦게 도착한다. 그 사이 응답이 오더라도
-            // 저장된 위치가 이미 적용됐다면 덮어쓰지 않는다
-            if (cancelled || !here || isInit.current) return;
-            created.setCenter(new window.kakao.maps.LatLng(here.lat, here.lng));
-          });
-        }
-
         window.kakao.maps.event.addListener(created, "click", (mouseEvent) => {
           dropMarker(created, mouseEvent.latLng);
         });
@@ -82,6 +73,17 @@ const LocationMap = ({ init, onSelect }) => {
       cancelled = true;
     };
   }, []);
+
+  /* 현재 위치로 지도를 옮긴다. 마커는 찍지 않는다 —
+     실종 장소는 지금 있는 곳과 다를 수 있으므로 사용자가 직접 고르게 한다.
+     늦게 허용하거나 "내 위치로"를 눌러 뒤늦게 도착해도 그 시점에 반영된다. */
+  useEffect(() => {
+    if (!map || !position) return;
+    // 수정 화면(init)은 저장된 위치를 보여줘야 하고,
+    // 사용자가 이미 어딘가를 찍었다면 그 위치를 뺏지 않는다
+    if (isInit.current || markerRef.current) return;
+    map.setCenter(new window.kakao.maps.LatLng(position.lat, position.lng));
+  }, [map, position]);
 
   useEffect(() => {
     if (!isInit.current && init && map) {
@@ -167,10 +169,10 @@ const LocationMap = ({ init, onSelect }) => {
         ))}
 
       {/* 검색창은 상자 밖, 지도만 테두리 안 */}
-      <div
-        id="locationMap"
-        className="h-64 w-full overflow-hidden rounded-xl border border-line sm:h-72"
-      ></div>
+      <div className="relative h-64 w-full overflow-hidden rounded-xl border border-line sm:h-72">
+        <div id="locationMap" className="size-full"></div>
+        <MapLocationNotice status={status} onRetry={request} />
+      </div>
     </div>
   );
 };
