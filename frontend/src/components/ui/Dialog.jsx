@@ -6,7 +6,7 @@ import { useScrollEdges } from "../../hooks/useScrollEdges";
    예전 ModalDetail.css는 350x450 고정에 #root 기준 absolute였고,
    닫기 버튼을 카드 밖에 두려고 clamp()로 화면 폭에 따라 위치를 계산했다.
    여기서는 화면 기준으로 가운데 띄우고, 내용이 길면 안에서만 스크롤한다. */
-const Dialog = ({ onClose, image, media, badge, title, children, footer }) => {
+const Dialog = ({ onClose, image, media, withMedia = true, badge, title, children, footer }) => {
   const { ref: bodyRef, hasAbove, hasBelow } = useScrollEdges();
 
   useEffect(() => {
@@ -35,24 +35,32 @@ const Dialog = ({ onClose, image, media, badge, title, children, footer }) => {
         className="flex max-h-[88dvh] w-full max-w-md flex-col overflow-hidden rounded-2xl bg-surface shadow-2xl"
       >
         <div className="relative shrink-0">
-          {/* 사진 대신 지도처럼 다른 걸 얹고 싶으면 media로 넘긴다 */}
-          {media ?? (
-            <img
-              src={image || "/image-default.png"}
-              alt=""
-              onError={(e) => {
-                e.target.onerror = null;
-                e.target.src = "/image-default.png";
-              }}
-              className="aspect-[16/10] w-full bg-brand-soft object-cover"
-            />
-          )}
-          {/* 닫기는 항상 사진 위 오른쪽 같은 자리 */}
+          {/* 사진 대신 지도처럼 다른 걸 얹고 싶으면 media로 넘긴다.
+              보호소처럼 애초에 사진이 없는 대상은 withMedia={false}로 자리째 뺀다 —
+              "이미지 준비중" 자리가 화면의 절반을 먹어 정작 연락처가 아래로 밀렸다 */}
+          {withMedia &&
+            (media ?? (
+              <img
+                src={image || "/image-default.png"}
+                alt=""
+                onError={(e) => {
+                  e.target.onerror = null;
+                  e.target.src = "/image-default.png";
+                }}
+                className="aspect-[16/10] w-full bg-brand-soft object-cover"
+              />
+            ))}
+          {/* 닫기는 사진이 있으면 그 위, 없으면 카드 오른쪽 위 같은 자리 */}
           <button
             type="button"
             aria-label="닫기"
             onClick={onClose}
-            className="absolute top-3 right-3 inline-flex size-9 cursor-pointer items-center justify-center rounded-full bg-black/45 text-white backdrop-blur-sm transition-colors hover:bg-black/65 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white"
+            className={cn(
+              "absolute top-3 right-3 z-10 inline-flex size-9 cursor-pointer items-center justify-center rounded-full transition-colors focus-visible:outline-2 focus-visible:outline-offset-2",
+              withMedia
+                ? "bg-black/45 text-white backdrop-blur-sm hover:bg-black/65 focus-visible:outline-white"
+                : "text-ink-muted hover:bg-brand-soft hover:text-ink focus-visible:outline-brand"
+            )}
           >
             ✕
           </button>

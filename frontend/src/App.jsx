@@ -35,7 +35,7 @@ function App() {
                 <Route path="/missingList" element={<MissingList />} />
                 <Route path="/shelterList" element={<ShelterList />} />
                 <Route
-                  path="/shelter/:name/:addr"
+                  path="/shelter/:careRegNo"
                   element={<ShelterAnimalList />}
                 />
 

@@ -1,56 +1,55 @@
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { useParams } from "react-router-dom";
 import Layout from "../components/layout/Layout";
 import PageHeading from "../components/layout/PageHeading";
 import StateNotice from "../components/layout/StateNotice";
 import ShelterAnimalItem from "../components/shelter/ShelterAnimalItem";
 import ShelterAnimalModalDetail from "../components/shelter/ShelterAnimalModalDetail";
-import useShelterData from "../hooks/useShelterData";
+import { fetchShelterAnimals } from "../api/shelter";
+import { useShelterQuery } from "../hooks/useShelterData";
 import { useModal } from "../contexts/ModalContext";
 
+/**
+ * 한 보호소의 보호동물.
+ *
+ * 예전에는 보호소 이름과 주소를 URL에 싣고, 받아온 100건을 화면에서
+ * 이름·주소가 같은 것만 걸러 썼다. 그래서 그 100건 안에 우연히 들어온
+ * 몇 마리만 보였다. 지금은 보호소 등록번호로 서버에 직접 묻는다.
+ */
 const ShelterAnimalList = () => {
-  const { animals, error, loading } = useShelterData();
-  const { name, addr } = useParams();
+  const { careRegNo } = useParams();
+  const { isActive, openModal, closeModal } = useModal();
+  const [selected, setSelected] = useState(null);
+  const [sortOrder, setSortOrder] = useState("newest");
 
-  const { isActive, toggleModal } = useModal();
-  const [selectedAnimal, setSelectedAnimal] = useState(null);
-  const [sortOrder, setSortOrder] = useState("newest"); // 최신순 기본
+  const {
+    data: animals,
+    error,
+    loading,
+  } = useShelterQuery(() => fetchShelterAnimals(careRegNo), [careRegNo]);
 
-  const decodedName = decodeURIComponent(name);
-  const decodedAddr = decodeURIComponent(addr);
+  // 발견일은 "20260928" 형태라 문자열 비교로 그대로 정렬된다
+  const items = useMemo(
+    () =>
+      [...animals].sort((a, b) =>
+        sortOrder === "newest"
+          ? (b.foundDate ?? "").localeCompare(a.foundDate ?? "")
+          : (a.foundDate ?? "").localeCompare(b.foundDate ?? "")
+      ),
+    [animals, sortOrder]
+  );
 
-  // 날짜 문자열 파싱 함수
-  const parseDate = (str) => {
-    if (!str || str.length !== 8) return new Date(0);
-    const year = parseInt(str.slice(0, 4));
-    const month = parseInt(str.slice(4, 6)) - 1;
-    const day = parseInt(str.slice(6, 8));
-    return new Date(year, month, day);
-  };
-
-  // 필터 + 정렬
-  const getFilteredData = () => {
-    const filtered = animals.filter((a) => {
-      const sName = a.SHTER_NM?.trim();
-      const sAddr = a.REFINE_ROADNM_ADDR?.trim() || a.REFINE_LOTNO_ADDR?.trim();
-      return sName === decodedName && sAddr === decodedAddr;
-    });
-
-    return filtered.sort((a, b) => {
-      const dateA = parseDate(a.RECEPT_DE); // 입소일자 기준
-      const dateB = parseDate(b.RECEPT_DE);
-      return sortOrder === "newest" ? dateB - dateA : dateA - dateB;
-    });
-  };
-
-  const items = loading || error ? [] : getFilteredData();
+  const shelterName = animals[0]?.careName;
+  const shelterAddress = animals[0]?.careAddress;
 
   return (
     <Layout width="wide">
       <PageHeading
-        title="해당 보호소 유기동물"
+        title="보호소 유기동물"
         /* 어느 보호소를 보고 있는지 제목만으로는 알 수 없었다 */
-        description={`${decodedName} · ${decodedAddr}`}
+        description={
+          shelterName ? `${shelterName} · ${shelterAddress}` : "보호 중인 아이들이에요."
+        }
         actions={
           <>
             <label className="sr-only" htmlFor="animal-sort">
@@ -89,34 +88,30 @@ const ShelterAnimalList = () => {
       )}
 
       {!loading && !error && items.length === 0 && (
-        <StateNotice message="이 보호소에 등록된 유기동물이 없어요." />
+        <StateNotice message="이 보호소에 보호 중인 유기동물이 없어요." />
       )}
 
-      {items.length > 0 && (
+      {!loading && !error && items.length > 0 && (
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-          {items.map((item) => (
+          {items.map((animal) => (
             <ShelterAnimalItem
-              key={item.ABDM_IDNTFY_NO}
-              petAge={item.AGE_INFO}
-              petColor={item.COLOR_NM}
-              petType={item.SPECIES_NM}
-              petMissingDate={item.RECEPT_DE}
-              imageUrl={item.IMAGE_COURS}
+              key={animal.desertionNo}
+              animal={animal}
               onClick={() => {
-                setSelectedAnimal(item);
-                toggleModal();
+                setSelected(animal);
+                openModal();
               }}
             />
           ))}
         </div>
       )}
 
-      {isActive && selectedAnimal && (
+      {isActive && selected && (
         <ShelterAnimalModalDetail
-          animal={selectedAnimal}
+          animal={selected}
           onClose={() => {
-            toggleModal();
-            setSelectedAnimal(null);
+            closeModal();
+            setSelected(null);
           }}
         />
       )}
