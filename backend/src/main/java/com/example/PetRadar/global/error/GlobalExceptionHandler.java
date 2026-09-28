@@ -3,10 +3,16 @@ package com.example.PetRadar.global.error;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.converter.HttpMessageNotReadableException;
+import org.springframework.web.HttpRequestMethodNotSupportedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
+import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 import org.springframework.web.multipart.MaxUploadSizeExceededException;
+import org.springframework.web.multipart.support.MissingServletRequestPartException;
+import org.springframework.web.servlet.resource.NoResourceFoundException;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -66,6 +72,40 @@ public class GlobalExceptionHandler {
     public ResponseEntity<ErrorResponse> handleUploadSize(MaxUploadSizeExceededException e) {
         return ResponseEntity.status(HttpStatus.PAYLOAD_TOO_LARGE)
                 .body(new ErrorResponse("사진 용량이 너무 큽니다. 10MB 이하로 올려주세요."));
+    }
+
+    /**
+     * 아래 세 묶음은 "서버가 아니라 요청이 잘못된" 경우다.
+     * 여기서 받아주지 않으면 맨 아래 Exception 핸들러가 삼켜 전부 500으로 나가는데,
+     * 그러면 프론트는 재시도해야 할 장애와 고쳐야 할 요청을 구분할 수 없고
+     * 서버 로그에도 ERROR로 쌓여 진짜 장애가 묻힌다.
+     */
+    @ExceptionHandler(NoResourceFoundException.class)
+    public ResponseEntity<ErrorResponse> handleNoResource(NoResourceFoundException e) {
+        return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                .body(new ErrorResponse("요청한 경로를 찾을 수 없습니다."));
+    }
+
+    @ExceptionHandler(HttpRequestMethodNotSupportedException.class)
+    public ResponseEntity<ErrorResponse> handleMethodNotSupported(HttpRequestMethodNotSupportedException e) {
+        return ResponseEntity.status(HttpStatus.METHOD_NOT_ALLOWED)
+                .body(new ErrorResponse("지원하지 않는 요청 방식입니다."));
+    }
+
+    /**
+     * 본문·파라미터가 형식에 안 맞는 경우.
+     * 깨진 JSON, /api/missing/abc 처럼 타입이 안 맞는 경로변수,
+     * multipart 파트 누락이 여기로 온다.
+     */
+    @ExceptionHandler({
+            HttpMessageNotReadableException.class,
+            MethodArgumentTypeMismatchException.class,
+            MissingServletRequestParameterException.class,
+            MissingServletRequestPartException.class
+    })
+    public ResponseEntity<ErrorResponse> handleMalformedRequest(Exception e) {
+        return ResponseEntity.badRequest()
+                .body(new ErrorResponse("요청 형식이 올바르지 않습니다."));
     }
 
     /**
