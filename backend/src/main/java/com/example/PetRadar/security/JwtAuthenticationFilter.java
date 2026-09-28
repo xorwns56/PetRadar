@@ -37,6 +37,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     private final JwtTokenProvider jwtTokenProvider;
     private final UserService userService;
     private final AuthService authService;
+    private final SecurityErrorResponder responder;
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
@@ -77,8 +78,8 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
      * 클라이언트에 401이 아닌 404가 전달됐다. 프론트는 401일 때만 로그아웃 처리를 하므로
      * 상태 코드를 직접 지정해 에러 디스패치를 타지 않게 한다.
      */
-    private void unauthorized(HttpServletResponse response) {
-        response.setStatus(HttpStatus.UNAUTHORIZED.value());
+    private void unauthorized(HttpServletResponse response) throws IOException {
+        responder.write(response, HttpStatus.UNAUTHORIZED, "로그인이 만료되었습니다. 다시 로그인해주세요.");
     }
 
     private String extractRefreshTokenFromCookie(HttpServletRequest request) {
