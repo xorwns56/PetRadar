@@ -25,6 +25,8 @@ public class SecurityConfig {
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(authz -> authz
                         .requestMatchers(HttpMethod.POST, "/api/missing").authenticated()
+                        // 제보에도 작성자를 남긴다. 익명 제보는 받지 않는다
+                        .requestMatchers(HttpMethod.POST, "/api/report/missing/*").authenticated()
                         .anyRequest().permitAll()
                 )
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);

@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import Layout from "../components/layout/Layout";
 import PageHeading from "../components/layout/PageHeading";
@@ -7,6 +7,7 @@ import LocationMap from "../components/missing/LocationMap";
 import ImageField from "../components/ui/ImageField";
 import FormField, { controlClass, textareaClass } from "../components/ui/FormField";
 import { createReport } from "../api/report";
+import { useAuth } from "../contexts/AuthContext";
 import { toMessage } from "../utils/error";
 
 const MissingReport = () => {
@@ -21,6 +22,16 @@ const MissingReport = () => {
     petReportPlace: "",
     petReportPoint: null,
   });
+  const { isAuthenticated } = useAuth();
+
+  // 제보에도 작성자를 남기므로 서버가 인증을 요구한다.
+  // 다 적고 나서 막히지 않도록 들어올 때 돌려보낸다
+  useEffect(() => {
+    if (!isAuthenticated) {
+      alert("목격 제보에는 로그인이 필요합니다.");
+      nav("/login", { replace: true });
+    }
+  }, [isAuthenticated, nav]);
 
   const onSubmitButtonClick = async () => {
     if (!form.title || !form.content) {

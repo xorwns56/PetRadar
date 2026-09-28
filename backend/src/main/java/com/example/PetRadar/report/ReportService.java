@@ -45,7 +45,7 @@ public class ReportService {
 
     public void createReport(Long userId, Long missingId, ReportRequest request, MultipartFile image) {
         Report report = request.toEntity();
-        if(userId != null) report.setUser(userRepository.getReferenceById(userId));
+        report.setUser(userRepository.getReferenceById(userId));
         Missing missing = missingRepository.findById(missingId)
                 .orElseThrow(() -> new NotFoundException("제보할 실종 신고를 찾을 수 없습니다."));
         report.setMissing(missing);

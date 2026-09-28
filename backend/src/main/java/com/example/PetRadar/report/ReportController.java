@@ -32,7 +32,7 @@ public class ReportController {
                                              @AuthenticationPrincipal UserDetails userDetails,
                                              @Valid @RequestPart ReportRequest report,
                                              @RequestPart(required = false) MultipartFile image) {
-        reportService.createReport(userDetails != null ? Long.parseLong(userDetails.getUsername()) : null, missingId, report, image);
+        reportService.createReport(Long.parseLong(userDetails.getUsername()), missingId, report, image);
         return ResponseEntity.ok().build();
     }
 
