@@ -44,6 +44,14 @@ export const OVERVIEW_LEVEL = 5;
 /** 정확한 지점으로 이동했을 때 (검색 결과 선택, 저장된 위치 불러오기) */
 export const PINPOINT_LEVEL = 3;
 
+/**
+ * 도시 하나가 들어오는 배율 (보호소 지도의 시작점).
+ * 화면에 약 40km — 차로 한 시간 안에 닿는 범위다.
+ * 보호소는 실종 신고처럼 촘촘하지 않아(전국 263곳) 이만큼은 넓혀야
+ * 목록에 몇 곳이라도 잡힌다.
+ */
+export const CITY_LEVEL = 9;
+
 /** 마커가 하나뿐일 때. 주변 지형이 같이 보일 만큼은 물려 둔다 */
 export const SINGLE_POINT_LEVEL = 5;
 
