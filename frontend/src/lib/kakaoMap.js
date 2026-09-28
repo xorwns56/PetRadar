@@ -118,3 +118,30 @@ export function loadKakaoMap() {
 
   return loadPromise;
 }
+
+/**
+ * 좌표를 관할 지자체 이름으로 바꾼다 ("경기도 화성시").
+ *
+ * 보호동물의 발견 지점은 공공 API에 좌표가 없고 관할 지자체(orgNm)만 있다.
+ * 그래서 "내 주변 보호동물"을 좁히려면 거리가 아니라 이 이름으로 맞춰야 한다.
+ * 공공 API 표기와 같은 형태("시도 시군구")로 돌려준다.
+ *
+ * @returns {Promise<string|null>} 못 구하면 null
+ */
+export async function toRegionName(lat, lng) {
+  await loadKakaoMap();
+  return new Promise((resolve) => {
+    const geocoder = new window.kakao.maps.services.Geocoder();
+    geocoder.coord2RegionCode(lng, lat, (result, status) => {
+      if (status !== window.kakao.maps.services.Status.OK || !result.length) {
+        resolve(null);
+        return;
+      }
+      // 행정동(H)과 법정동(B)이 함께 오는데 시·군·구 이름은 어느 쪽이나 같다
+      const region = result.find((r) => r.region_type === "H") || result[0];
+      const sido = region.region_1depth_name;
+      const sigungu = region.region_2depth_name;
+      resolve(sigungu ? `${sido} ${sigungu}` : sido);
+    });
+  });
+}

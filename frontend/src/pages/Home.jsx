@@ -4,6 +4,7 @@ import Layout from "../components/layout/Layout";
 import Button from "../components/ui/Button";
 import MainMenu from "../components/home/MainMenu";
 import MissingMap from "../components/missing/MissingMap";
+import NearbyShelterAnimals from "../components/home/NearbyShelterAnimals";
 import { fetchMissingList } from "../api/missing";
 
 const Home = () => {
@@ -119,6 +120,11 @@ const Home = () => {
           />
         </div>
       </section>
+
+      {/* 지도에는 실종 지점만 찍고, 보호소 아이들은 사진 카드로 따로 둔다.
+          두 마커의 의미가 달라(사건이 난 곳 / 지금 보관 중인 곳)
+          한 지도에 섞으면 보호소 위치를 발견 위치로 오해한다 */}
+      <NearbyShelterAnimals />
     </Layout>
   );
 };
