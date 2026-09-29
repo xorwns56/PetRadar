@@ -19,10 +19,11 @@ const MyPage = () => {
       .catch((error) => console.error("Failed to fetch me:", error));
   }, []);
 
-  const onUpdate = async (pw, hp) => {
+  const onUpdate = async ({ hp, newPw, currentPw }) => {
     try {
-      await updateMe({ pw, hp });
-      setUserInfo((prevUserInfo) => ({ ...prevUserInfo, pw, hp }));
+      await updateMe({ hp, newPw, currentPw });
+      // 비밀번호는 화면에 두지 않는다. 바뀐 건 연락처뿐이다
+      setUserInfo((prevUserInfo) => ({ ...prevUserInfo, hp }));
     } catch (error) {
       console.error("Failed to update user:", error);
       throw error;

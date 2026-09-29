@@ -5,7 +5,7 @@ import { toMessage } from "../../utils/error";
 
 const MyInfo = ({ userInfo, onUpdate, onDelete, onLogOut }) => {
   const [editMode, setEditMode] = useState(false);
-  const [input, setInput] = useState({ pw: "", hp: "" });
+  const [input, setInput] = useState({ hp: "", newPw: "", currentPw: "" });
   const [error, setError] = useState("");
 
   useEffect(() => {
@@ -16,7 +16,7 @@ const MyInfo = ({ userInfo, onUpdate, onDelete, onLogOut }) => {
   // 입력칸만 되돌린다. 오류 문구까지 지우면 실패 직후 사유를 보여줄 수 없다 —
   // onConfirm이 setError 바로 뒤에 이걸 부르기 때문이다
   const initInput = () => {
-    setInput({ pw: "", hp: userInfo.hp ?? "" });
+    setInput({ hp: userInfo.hp ?? "", newPw: "", currentPw: "" });
   };
 
   const onChangeInput = (event) => {
@@ -24,9 +24,17 @@ const MyInfo = ({ userInfo, onUpdate, onDelete, onLogOut }) => {
     if (error) setError("");
   };
 
+  // 비밀번호를 바꿀 때만 현재 비밀번호를 묻는다.
+  // 연락처만 고치는 데 현재 비밀번호를 요구할 이유가 없다
+  const changingPassword = input.newPw.trim().length > 0;
+
   const onConfirm = async () => {
     try {
-      await onUpdate(input.pw, input.hp);
+      await onUpdate({
+        hp: input.hp,
+        newPw: input.newPw,
+        currentPw: changingPassword ? input.currentPw : "",
+      });
       setEditMode(false);
     } catch (err) {
       // 서버가 내려준 사유를 alert 대신 카드 안에서 보여준다
@@ -87,18 +95,40 @@ const MyInfo = ({ userInfo, onUpdate, onDelete, onLogOut }) => {
 
             <FormField
               label="새 비밀번호"
-              htmlFor="myinfo-pw"
+              htmlFor="myinfo-new-pw"
               hint="바꾸지 않으려면 비워두세요."
             >
               <input
-                id="myinfo-pw"
+                id="myinfo-new-pw"
                 type="password"
-                name="pw"
-                value={input.pw}
+                name="newPw"
+                autoComplete="new-password"
+                value={input.newPw}
                 onChange={onChangeInput}
                 className={controlClass}
               />
             </FormField>
+
+            {/* 새 비밀번호를 적기 전에는 띄우지 않는다.
+                연락처만 고치러 온 사람에게 빈 칸이 하나 더 보이면
+                그것도 채워야 하는 줄 안다 */}
+            {changingPassword && (
+              <FormField
+                label="현재 비밀번호"
+                htmlFor="myinfo-current-pw"
+                hint="본인 확인을 위해 필요해요."
+              >
+                <input
+                  id="myinfo-current-pw"
+                  type="password"
+                  name="currentPw"
+                  autoComplete="current-password"
+                  value={input.currentPw}
+                  onChange={onChangeInput}
+                  className={controlClass}
+                />
+              </FormField>
+            )}
 
             {error && (
               <p className="text-xs leading-relaxed font-semibold break-keep text-danger">

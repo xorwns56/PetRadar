@@ -23,11 +23,11 @@ public class UserController {
     }
 
     @PatchMapping("/me")
-    public ResponseEntity<Void> updateUser(@AuthenticationPrincipal UserDetails userDetails, @RequestBody AuthDTO authDTO) {
+    public ResponseEntity<Void> updateUser(@AuthenticationPrincipal UserDetails userDetails, @RequestBody UserUpdateRequest request) {
         // 값이 규칙에 안 맞으면 InvalidRequestException이 올라가
         // GlobalExceptionHandler가 400과 사유를 내려준다
         Long userId = Long.parseLong(userDetails.getUsername());
-        userService.updateUser(userId, authDTO);
+        userService.updateUser(userId, request);
         return ResponseEntity.ok().build();
     }
 
