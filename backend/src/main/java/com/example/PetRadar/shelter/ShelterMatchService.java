@@ -94,14 +94,7 @@ public class ShelterMatchService {
     }
 
     private int score(ShelterAnimalDTO animal, Missing missing) {
-        int score = 0;
-
-        // 보호소가 품종을 구체적으로 적은 경우에만 값이 있다
-        String breed = animal.getBreed();
-        if (breed != null && missing.getPetBreed() != null && !breed.contains("믹스")
-                && breed.replace(" ", "").contains(missing.getPetBreed().replace(" ", ""))) {
-            score += 3;
-        }
+        int score = breedScore(animal.getBreed(), missing.getPetBreed());
 
         Integer animalYear = birthYear(animal.getAge());
         Integer missingYear = birthYear(missing.getPetAge());
@@ -115,13 +108,38 @@ public class ShelterMatchService {
             score += 1;
         }
 
-        // 같은 지자체면 한 칸 위로. 시도만 같은 경우와 구분해 준다
-        if (animal.getOrgNm() != null && missing.getPetMissingPlace() != null
-                && animal.getOrgNm().equals(missing.getPetMissingPlace())) {
-            score += 1;
+        return score;
+    }
+
+    /**
+     * 품종 점수.
+     *
+     * 한쪽이 다른 쪽을 포함하면 맞다고 본다. 신고 폼은 큰 분류("푸들")를 쓰고
+     * 보호소는 세부 품종("토이 푸들")을 쓰는 일이 잦은데, 완전 일치로 보면
+     * 이런 짝이 전부 어긋난다. 보호소가 상위 이름만 적는 경우도 있어
+     * (106마리가 그냥 "푸들") 방향을 한쪽으로 고정할 수 없다.
+     *
+     * 믹스는 따로 센다. 보호 중인 개의 84%가 "믹스견"이라 품종이 사실상
+     * 정보가 없는 값인데, 그렇다고 0점을 주면 믹스견을 잃어버린 사람은
+     * 품종 신호를 영영 못 쓴다. 양쪽 다 믹스면 약한 점수만 준다.
+     */
+    private int breedScore(String shelterBreed, String missingBreed) {
+        if (shelterBreed == null || missingBreed == null) return 0;
+
+        boolean shelterMix = isMixed(shelterBreed);
+        boolean missingMix = isMixed(missingBreed);
+        if (shelterMix || missingMix) {
+            return shelterMix && missingMix ? 1 : 0;
         }
 
-        return score;
+        String a = shelterBreed.replace(" ", "");
+        String b = missingBreed.replace(" ", "");
+        return a.contains(b) || b.contains(a) ? 3 : 0;
+    }
+
+    /** 공공 데이터는 "믹스견"·"믹스묘"로, 신고 폼도 같은 말을 쓴다 */
+    private boolean isMixed(String breed) {
+        return breed.contains("믹스");
     }
 
     private Integer birthYear(String value) {
