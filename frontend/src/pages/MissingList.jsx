@@ -4,14 +4,10 @@ import Layout from "../components/layout/Layout";
 import PageHeading from "../components/layout/PageHeading";
 import Button from "../components/ui/Button";
 import MissingItem from "../components/missing/MissingItem";
-import PetModalDetail from "../components/missing/PetModalDetail";
-import { useModal } from "../contexts/ModalContext";
 import { useAuth } from "../contexts/AuthContext";
 import { fetchMissingList } from "../api/missing";
 
 const MissingList = () => {
-  const [selectedItem, setSelectedItem] = useState(null);
-  const { toggleModal } = useModal();
   const nav = useNavigate();
   const { userId } = useAuth();
 
@@ -153,10 +149,7 @@ const MissingList = () => {
             <MissingItem
               key={item.id}
               missingDTO={item}
-              toggleModal={() => {
-                setSelectedItem(item);
-                toggleModal();
-              }}
+              onOpen={() => nav(`/missing/${item.id}`)}
               onClick={() => nav(`/missingReport/${item.id}`)}
               myMissing={userId === item.userId}
             />
@@ -164,16 +157,6 @@ const MissingList = () => {
         </div>
       )}
 
-      {selectedItem && (
-        <PetModalDetail
-          missingPet={selectedItem}
-          /* 예전에는 petMissingId(목록 응답에 없는 필드)를 쓰고 끝에 }가
-             하나 더 붙어 있어, 모달에서 제보하기를 누르면
-             /missingReport/undefined} 로 갔다 */
-          onClick={() => nav(`/missingReport/${selectedItem.id}`)}
-          myMissing={userId === selectedItem.userId}
-        />
-      )}
     </Layout>
   );
 };

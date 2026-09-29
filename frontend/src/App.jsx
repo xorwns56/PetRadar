@@ -9,6 +9,7 @@ import MissingReport from "./pages/MissingReport";
 import MissingDeclaration from "./pages/MissingDeclaration";
 import MissingRevise from "./pages/MissingRevise";
 import MissingList from "./pages/MissingList";
+import MissingDetail from "./pages/MissingDetail";
 
 import ShelterList from "./pages/ShelterList";
 import ShelterAnimalList from "./pages/ShelterAnimalList";
@@ -33,6 +34,7 @@ function App() {
               <Routes>
                 <Route path="/" element={<Home />} />
                 <Route path="/missingList" element={<MissingList />} />
+                <Route path="/missing/:id" element={<MissingDetail />} />
                 <Route path="/shelterList" element={<ShelterList />} />
                 <Route
                   path="/shelter/:careRegNo"

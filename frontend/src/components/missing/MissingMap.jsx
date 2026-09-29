@@ -1,8 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { useModal } from "../../contexts/ModalContext";
-import { useAuth } from "../../contexts/AuthContext";
-import PetModalDetail from "./PetModalDetail";
 import {
   DEFAULT_CENTER,
   OVERVIEW_LEVEL,
@@ -18,9 +15,9 @@ const MissingMap = ({ missingList, onVisibleCountChange }) => {
   const overlaysRef = useRef([]); // 지금 지도에 올라가 있는 오버레이들
   const containerRef = useRef(null);
   const nav = useNavigate();
-  const { userId } = useAuth();
-  const { isActive, toggleModal } = useModal();
-  const [selectedPet, setSelectedPet] = useState(null);
+  // 마커는 지도가 만든 DOM이라 클릭 핸들러가 첫 렌더의 nav를 붙든다
+  const navRef = useRef(nav);
+  navRef.current = nav;
   const [mapLoaded, setMapLoaded] = useState(false);
   const { position, status, request } = useGeolocation();
 
@@ -47,10 +44,9 @@ const MissingMap = ({ missingList, onVisibleCountChange }) => {
       wrapper.appendChild(imgWrapper);
       outer.appendChild(wrapper);
 
-      wrapper.addEventListener("click", () => {
-        setSelectedPet(item.pet);
-        toggleModal();
-      });
+      // 상세는 별도 화면이다. 실종 글은 남에게 보내서 보게 하는 것이라
+      // 글마다 주소가 있어야 한다
+      wrapper.addEventListener("click", () => navRef.current(`/missing/${item.pet.id}`));
 
       return new window.kakao.maps.CustomOverlay({
         position: item.position,
@@ -58,7 +54,7 @@ const MissingMap = ({ missingList, onVisibleCountChange }) => {
         yAnchor: 1,
       });
     },
-    [toggleModal]
+    []
   );
 
   /** 겹쳐 있는 마커들을 대신하는 묶음 */
@@ -184,14 +180,6 @@ const MissingMap = ({ missingList, onVisibleCountChange }) => {
         <div id="missingMap" ref={containerRef} className="size-full"></div>
         <MapLocationNotice status={status} onRetry={request} />
       </div>
-      {/* 모달이 활성화되고 동물이 선택된 경우 상세 모달 표시 */}
-      {isActive && selectedPet && (
-        <PetModalDetail
-          missingPet={selectedPet}
-          onClick={() => nav(`/missingReport/${selectedPet.id}`)}
-          myMissing={userId === selectedPet.userId}
-        />
-      )}
     </>
   );
 };

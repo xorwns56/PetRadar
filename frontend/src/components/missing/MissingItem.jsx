@@ -5,14 +5,14 @@ import { petTypeLabel, petGenderSymbol } from "../../utils/pet-label";
    예전에는 사진 150px을 왼쪽에 두고 글을 오른쪽에 붙인 가로 줄이었다.
    실종 동물을 알아보는 단서는 결국 사진이라, 사진을 넓게 위로 올리고
    격자로 깔아 한 화면에 더 많이 보이게 했다. */
-const MissingItem = ({ missingDTO, onClick, toggleModal, myMissing }) => {
+const MissingItem = ({ missingDTO, onClick, onOpen, myMissing }) => {
   const imageSrc = missingDTO.petImage || "/image-default.png";
 
   return (
     <article className="group flex flex-col overflow-hidden rounded-2xl border border-line bg-surface shadow-card transition duration-200 hover:-translate-y-0.5 hover:shadow-card-hover">
       <button
         type="button"
-        onClick={toggleModal}
+        onClick={onOpen}
         aria-label={`${missingDTO.petName} 상세 보기`}
         className="block w-full cursor-pointer overflow-hidden bg-brand-soft focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-brand"
       >
@@ -30,7 +30,7 @@ const MissingItem = ({ missingDTO, onClick, toggleModal, myMissing }) => {
       <div className="flex flex-1 flex-col p-4">
         <button
           type="button"
-          onClick={toggleModal}
+          onClick={onOpen}
           className="cursor-pointer text-left focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand"
         >
           <div className="flex items-center gap-2">

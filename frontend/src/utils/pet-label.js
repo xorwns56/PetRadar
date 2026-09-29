@@ -1,4 +1,4 @@
-/* 코드값 → 화면 문구. MissingItem과 PetModalDetail이 같은 표를
+/* 코드값 → 화면 문구. 목록 카드와 상세 화면이 같은 표를
    각자 들고 있어 한쪽만 고치면 어긋났다 */
 export const PET_TYPE_LABEL = {
   dog: "강아지",

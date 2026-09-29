@@ -45,17 +45,17 @@ const ShelterMatches = ({ missingPet }) => {
   if (error) return null;
 
   return (
-    <section className="mt-6 border-t border-line pt-5">
-      <h3 className="text-sm font-bold text-ink">보호소에 있는 비슷한 아이</h3>
-      <p className="mt-1 text-xs leading-relaxed break-keep text-ink-muted">
+    <section className="mt-10 border-t border-line pt-6">
+      <h2 className="text-lg font-bold text-ink">보호소에 있는 비슷한 아이</h2>
+      <p className="mt-1 text-sm leading-relaxed break-keep text-ink-muted">
         {region
           ? `${region} 관할로 접수된 아이들 중, 실종일 이후 들어온 같은 종이에요.`
           : "실종일 이후 보호소에 들어온 같은 종이에요."}
       </p>
 
       {loading ? (
-        <div className="mt-3 grid grid-cols-3 gap-2">
-          {Array.from({ length: 3 }).map((_, i) => (
+        <div className="mt-4 grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-6">
+          {Array.from({ length: 6 }).map((_, i) => (
             <div
               key={i}
               className="aspect-square animate-pulse rounded-xl bg-page"
@@ -63,11 +63,11 @@ const ShelterMatches = ({ missingPet }) => {
           ))}
         </div>
       ) : matches.length === 0 ? (
-        <p className="mt-3 rounded-xl bg-page px-3 py-4 text-center text-xs text-ink-muted">
+        <p className="mt-4 rounded-xl bg-page px-3 py-6 text-center text-sm text-ink-muted">
           아직 비슷한 아이가 보호소에 없어요.
         </p>
       ) : (
-        <ul className="mt-3 grid grid-cols-3 gap-2">
+        <ul className="mt-4 grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-6">
           {matches.map((animal) => (
             <li key={animal.desertionNo}>
               {/* 공공 API가 개체별 상세 주소를 주지 않아 링크할 곳이 없다.
