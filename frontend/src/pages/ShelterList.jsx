@@ -6,6 +6,7 @@ import PageHeading from "../components/layout/PageHeading";
 import StateNotice from "../components/layout/StateNotice";
 import ShelterMap from "../components/shelter/ShelterMap";
 import ShelterInfo from "../components/shelter/ShelterInfo";
+import MapLocationNotice from "../components/missing/MapLocationNotice";
 import { fetchShelters } from "../api/shelter";
 import { useShelterQuery } from "../hooks/useShelterData";
 import { useGeolocation } from "../hooks/useGeolocation";
@@ -30,7 +31,7 @@ const ShelterList = () => {
 
   /* 위치를 기다리지 않고 먼저 받는다. 위치 응답을 기다리게 했더니 사용자가
      권한 팝업에 답하지 않거나 거부하면 목록이 영영 안 떴다 */
-  const { position } = useGeolocation();
+  const { position, status, request } = useGeolocation();
 
   const {
     data: shelters,
@@ -94,21 +95,27 @@ const ShelterList = () => {
       <div className="flex h-[78dvh] min-h-[560px] flex-col overflow-hidden rounded-2xl border border-line bg-surface shadow-card lg:h-[72dvh] lg:flex-row">
         {/* 좁은 화면에서는 지도를 줄여 목록 칸을 확보한다.
             지도 300px이면 목록에 항목이 한 개 반밖에 안 들어왔다 */}
-        <div className="h-[240px] shrink-0 lg:h-auto lg:min-h-0 lg:flex-1">
+        <div className="relative h-[240px] shrink-0 lg:h-auto lg:min-h-0 lg:flex-1">
           {loading ? (
             <p className="flex h-full animate-pulse items-center justify-center text-sm text-ink-muted">
               지도를 준비하고 있어요
             </p>
           ) : (
-            <ShelterMap
-              shelters={shelters}
-              center={position}
-              selectedId={selected?.careRegNo}
-              highlightedId={highlighted}
-              onSelect={open}
-              onHover={onHover}
-              onVisibleChange={onVisibleChange}
-            />
+            <>
+              <ShelterMap
+                shelters={shelters}
+                center={position}
+                selectedId={selected?.careRegNo}
+                highlightedId={highlighted}
+                onSelect={open}
+                onHover={onHover}
+                onVisibleChange={onVisibleChange}
+              />
+              {/* 위치를 못 받으면 전국이 보이는데, 그 이유를 말해주지 않으면
+                  사용자는 그냥 고장난 줄 안다. 상태마다 할 수 있는 일이 달라
+                  신고 폼 지도가 쓰던 안내를 그대로 쓴다 */}
+              <MapLocationNotice status={status} onRetry={request} />
+            </>
           )}
         </div>
 
