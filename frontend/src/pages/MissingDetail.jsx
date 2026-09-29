@@ -4,6 +4,7 @@ import Layout from "../components/layout/Layout";
 import StateNotice from "../components/layout/StateNotice";
 import Button from "../components/ui/Button";
 import ShelterMatches from "../components/missing/ShelterMatches";
+import StaticPointMap from "../components/ui/StaticPointMap";
 import { fetchMissingDetail } from "../api/missing";
 import { useAuth } from "../contexts/AuthContext";
 import { petTypeLabel, petGenderLabel } from "../utils/pet-label";
@@ -83,15 +84,35 @@ const MissingDetail = () => {
       {/* 넓은 화면에서는 사진과 정보를 나란히 둔다. 모달에서는 사진이
           위를 차지해 정작 읽을 내용이 접혀 있었다 */}
       <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)]">
-        <img
-          src={missing.petImage || "/image-default.png"}
-          alt=""
-          onError={(e) => {
-            e.target.onerror = null;
-            e.target.src = "/image-default.png";
-          }}
-          className="aspect-[4/3] w-full rounded-2xl border border-line bg-brand-soft object-cover"
-        />
+        {/* 사진과 실종 장소를 한 칸에 쌓는다. 지도를 오른쪽 글 사이에 끼우면
+            글이 길 때 왼쪽이 통째로 비어 보였다 */}
+        <div className="space-y-4">
+          <img
+            src={missing.petImage || "/image-default.png"}
+            alt=""
+            onError={(e) => {
+              e.target.onerror = null;
+              e.target.src = "/image-default.png";
+            }}
+            className="aspect-[4/3] w-full rounded-2xl border border-line bg-brand-soft object-cover"
+          />
+
+          {/* 실종 지점. 목격자가 "내가 지나온 길인가"를 가늠하는 데 쓴다.
+              주소 문자열은 신고 폼에 입력칸이 없어 늘 비어 있으므로 지도가 유일한 단서다 */}
+          {missing.petMissingPoint && (
+            <section>
+              <h2 className="text-sm font-bold text-ink">실종 장소</h2>
+              <div className="mt-2 h-48 overflow-hidden rounded-xl border border-line bg-brand-soft">
+                <StaticPointMap point={missing.petMissingPoint} level={5} />
+              </div>
+              {missing.petMissingPlace && (
+                <p className="mt-2 text-xs wrap-anywhere break-keep text-ink-muted">
+                  {missing.petMissingPlace}
+                </p>
+              )}
+            </section>
+          )}
+        </div>
 
         <div className="min-w-0">
           <div className="flex flex-wrap items-center gap-2">
@@ -131,12 +152,18 @@ const MissingDetail = () => {
             </p>
           )}
 
-          <h2 className="mt-5 text-lg font-bold break-keep text-ink">
+          <h2 className="mt-5 text-lg font-bold wrap-anywhere break-keep text-ink">
             {missing.title}
           </h2>
-          <p className="mt-2 text-sm leading-relaxed break-keep whitespace-pre-line text-ink-muted">
-            {missing.content}
-          </p>
+          {/* 내용이 길어도 이 높이까지만 차지하고 안에서 스크롤한다.
+              그대로 두면 본문이 페이지를 지배해 아래 보호소 후보가 멀어진다.
+              scroll-visible: macOS는 스크롤바를 숨겨서, 없으면 스크롤이
+              있는지조차 알 수 없다 */}
+          <div className="scroll-visible mt-2 max-h-72 overflow-y-auto">
+            <p className="text-sm leading-relaxed wrap-anywhere break-keep whitespace-pre-line text-ink-muted">
+              {missing.content}
+            </p>
+          </div>
 
           {isMine ? (
             <div className="mt-6 flex gap-2">
