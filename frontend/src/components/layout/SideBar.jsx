@@ -105,6 +105,7 @@ const SideBar = () => {
                   return (
                     <ShelterAlertBox
                       key={key}
+                      preview={alert.preview}
                       onAlertClick={() => nav(`/missing/${alert.postId}`)}
                       onAlertClose={close}
                     />

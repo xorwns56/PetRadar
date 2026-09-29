@@ -17,8 +17,17 @@ public class NotificationService {
     private final NotificationRepository notificationRepository;
     private final UserRepository userRepository;
     private final SimpMessagingTemplate simpMessagingTemplate;
+    private final ShelterPreviewProvider shelterPreviewProvider;
 
     public void createNotificationToUser(Long senderId, Long receiverId, String postType, Long postId) {
+        createNotificationToUser(senderId, receiverId, postType, postId, null);
+    }
+
+    /**
+     * @param targetRef 이 알림을 부른 대상(보호소 알림의 유기번호).
+     *                  화면이 "어떤 아이 때문인지"를 보여주려면 필요하다
+     */
+    public void createNotificationToUser(Long senderId, Long receiverId, String postType, Long postId, String targetRef) {
         User sender = null;
         if (senderId != null) {
             sender = userRepository.findById(senderId)
@@ -31,6 +40,7 @@ public class NotificationService {
         notification.setReceiver(receiver);
         notification.setPostType(postType);
         notification.setPostId(postId);
+        notification.setTargetRef(targetRef);
         notificationRepository.save(notification);
         simpMessagingTemplate.convertAndSendToUser(String.valueOf(receiverId), "/queue/notification", NotificationDTO.from(notification));
     }
@@ -44,10 +54,23 @@ public class NotificationService {
         }
     }
 
+    /**
+     * 보호소 알림에는 어떤 아이인지 요약을 붙여 내려준다.
+     * 실종자가 가장 빨리 판단하는 건 사진이라, 눌러 들어가지 않고도
+     * 아닌 것을 걸러낼 수 있어야 한다.
+     */
     public List<NotificationDTO> findByReceiverId(Long receiverId) {
         return notificationRepository.findByReceiverIdOrderByCreatedAtDesc(receiverId).stream()
-                .map(NotificationDTO::from)
+                .map(n -> NotificationDTO.from(n, previewOf(n)))
                 .collect(Collectors.toList());
+    }
+
+    private NotificationDTO.Preview previewOf(Notification notification) {
+        if (!"shelter".equals(notification.getPostType()) || notification.getTargetRef() == null) {
+            return null;
+        }
+        // 이미 나간 아이는 공공 목록에 없다. 그때는 요약 없이 기본 문구로 둔다
+        return shelterPreviewProvider.find(notification.getTargetRef()).orElse(null);
     }
 
     public void deleteNotification(Long receiverId, Long notificationId) {

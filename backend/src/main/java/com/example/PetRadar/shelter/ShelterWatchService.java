@@ -136,7 +136,7 @@ public class ShelterWatchService {
                         missing.getId(), animal.getDesertionNo())) continue;
 
                 notificationService.createNotificationToUser(
-                        null, receiverId, "shelter", missing.getId());
+                        null, receiverId, "shelter", missing.getId(), animal.getDesertionNo());
                 notifiedRepository.save(
                         new NotifiedShelterMatch(missing.getId(), animal.getDesertionNo()));
                 sentPerReceiver.merge(receiverId, 1, Integer::sum);
