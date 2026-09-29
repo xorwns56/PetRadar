@@ -112,8 +112,9 @@ public class ShelterService {
      * 모든 레코드에 채워져 있고, 유기동물은 발견된 지자체 관할로 접수되므로
      * 이것이 사실상 "발견 지역"이다.
      *
-     * 시군구까지 맞는 게 없으면 시도로 넓힌다 — 작은 지자체는 보호 중인 개체가
-     * 아예 없는 날이 있어, 그대로 빈 화면을 내면 고장난 것처럼 보인다.
+     * 시군구에 보여줄 만큼이 없으면 시도로 넓힌다. 예전에는 한 마리라도 있으면
+     * 거기서 멈춰서, 중구·종로구처럼 보호소가 없는 도심 자치구에서는 카드 네
+     * 자리에 한 장만 떴다.
      */
     public List<ShelterAnimalDTO> getAnimalsByRegion(String region, int limit) {
         List<ShelterAnimalDTO> animals = snapshot().animals();
@@ -122,7 +123,7 @@ public class ShelterService {
         List<ShelterAnimalDTO> exact = animals.stream()
                 .filter(a -> region.equals(a.getOrgNm()))
                 .toList();
-        if (!exact.isEmpty()) return latest(exact, limit);
+        if (exact.size() >= limit) return latest(exact, limit);
 
         String sido = region.split(" ")[0];
         List<ShelterAnimalDTO> inSido = animals.stream()

@@ -2,6 +2,7 @@ import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import ReportAlertBox from "../notification/ReportAlertBox";
 import MissingAlertBox from "../notification/MissingAlertBox";
+import ShelterAlertBox from "../notification/ShelterAlertBox";
 import { useSidebar } from "../../contexts/SidebarContext";
 import { deleteNotification } from "../../api/notification";
 import { cn } from "../../utils/cn";
@@ -85,24 +86,40 @@ const SideBar = () => {
             </p>
           ) : (
             <div className="flex flex-col gap-3">
-              {alerts.map((alert) =>
-                alert.postType === "missing" ? (
-                  <MissingAlertBox
-                    key={`${alert.postType}_${alert.id}`}
-                    {...alert}
-                    onAlertClick={() => nav("/missingList")}
-                    onAlertClose={() => onAlertClose(alert.id)}
-                  />
-                ) : (
+              {alerts.map((alert) => {
+                const key = `${alert.postType}_${alert.id}`;
+                const close = () => onAlertClose(alert.id);
+
+                if (alert.postType === "missing") {
+                  return (
+                    <MissingAlertBox
+                      key={key}
+                      {...alert}
+                      onAlertClick={() => nav("/missingList")}
+                      onAlertClose={close}
+                    />
+                  );
+                }
+                if (alert.postType === "shelter") {
+                  // postId가 내 실종 글이다. 거기 후보 목록이 붙어 있다
+                  return (
+                    <ShelterAlertBox
+                      key={key}
+                      onAlertClick={() => nav(`/missing/${alert.postId}`)}
+                      onAlertClose={close}
+                    />
+                  );
+                }
+                return (
                   <ReportAlertBox
-                    key={`${alert.postType}_${alert.id}`}
+                    key={key}
                     {...alert}
                     currentUser={alert.receiverId}
                     onAlertClick={() => nav("/myPage")}
-                    onAlertClose={() => onAlertClose(alert.id)}
+                    onAlertClose={close}
                   />
-                )
-              )}
+                );
+              })}
             </div>
           )}
         </div>

@@ -82,6 +82,33 @@ public class ShelterMatchService {
     }
 
     /**
+     * 주어진 개체 중 이 신고와 알릴 만큼 맞는 것만 점수 높은 순으로 고른다.
+     * 화면용 후보(findCandidates)와 달리 기준을 넘지 못하면 아예 빼낸다 —
+     * 밀어서 보내는 알림은 틀리면 헛된 기대를 주기 때문이다.
+     */
+    public List<ShelterAnimalDTO> rank(Missing missing, List<ShelterAnimalDTO> animals) {
+        String area = missing.getRegion();
+        /* 지역을 모르는 글에는 알리지 않는다.
+           화면의 후보 목록은 지역이 없으면 전국으로 넓히는데, 그건 사용자가
+           직접 들어와 훑는 자리라 넓어도 괜찮다. 밀어서 보내는 알림까지
+           전국으로 넓히면 "서울에서 잃어버린 개" 신고에 제주 유기견이 간다. */
+        if (area == null || area.isBlank()) return List.of();
+
+        String kind = KIND.get(missing.getPetType());
+        String missingDate = digitsOnly(missing.getPetMissingDate());
+        int threshold = ShelterWatchService.thresholdFor(missing);
+
+        return animals.stream()
+                .filter(a -> kind == null || kind.equals(a.getKindType()))
+                .filter(a -> inRegion(a.getOrgNm(), area))
+                .filter(a -> foundAfter(a.getFoundDate(), missingDate))
+                .filter(a -> score(a, missing, area) >= threshold)
+                .sorted(Comparator.comparingInt(
+                        (ShelterAnimalDTO a) -> score(a, missing, area)).reversed())
+                .toList();
+    }
+
+    /**
      * 시군구까지 같으면 가장 좋고, 아니면 시도까지만 같아도 남긴다.
      * 동물은 시군구 경계를 넘어 다니고, 접수 지자체가 발견 지점과 어긋나는 일도 있다.
      */
