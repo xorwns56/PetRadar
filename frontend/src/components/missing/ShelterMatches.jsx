@@ -14,9 +14,15 @@ import { formatPublicDate, formatSex } from "../../utils/shelter-label";
  * 알림으로 알려주려면 서버가 이전 상태와 비교해야 한다.
  */
 const ShelterMatches = ({ missingPet }) => {
-  // 실종 지점 좌표 → "서울특별시 중구". 좌표가 없으면 지역으로 좁히지 않는다
+  /* 지역은 신고할 때 저장해 둔 값을 쓴다.
+     그게 없는 예전 글만 좌표에서 다시 구한다 — 서버에는 지오코더가 없어
+     스케줄러도 저장된 값을 쓰므로, 화면과 알림이 같은 기준을 보게 된다 */
   const [region, setRegion] = useState(undefined);
   useEffect(() => {
+    if (missingPet.region) {
+      setRegion(missingPet.region);
+      return;
+    }
     const point = missingPet.petMissingPoint;
     if (!point?.lat || !point?.lng) {
       setRegion(null);
@@ -33,7 +39,7 @@ const ShelterMatches = ({ missingPet }) => {
     return () => {
       cancelled = true;
     };
-  }, [missingPet.petMissingPoint]);
+  }, [missingPet.region, missingPet.petMissingPoint]);
 
   const { data: matches, error, loading } = useShelterQuery(
     () => fetchShelterMatches({ missingId: missingPet.id, region }),

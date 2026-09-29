@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { toRegionName } from "../lib/kakaoMap";
 
 export const EMPTY_MISSING_FORM = {
   petName: "",
@@ -9,6 +10,8 @@ export const EMPTY_MISSING_FORM = {
   petMissingDate: "",
   petMissingPlace: "",
   petMissingPoint: null,
+  // 실종 지점의 관할 지자체. 보호동물과 맞춰볼 때 서버가 쓴다
+  region: "",
   petImage: "",
   title: "",
   content: "",
@@ -35,11 +38,21 @@ export const useMissingForm = (initial = EMPTY_MISSING_FORM) => {
     }));
   };
 
+  /* 지점을 찍을 때 관할 지자체까지 같이 구해 둔다.
+     서버에는 지오코더가 없는데, 보호동물과 맞춰보려면 지역이 필요하다 —
+     공공 API는 발견 지점의 좌표를 주지 않고 관할 지자체만 주기 때문이다.
+     실패해도 신고는 그대로 되고 매칭 범위만 넓어진다 */
   const onLocationSelect = (latlng) => {
     setForm((prev) => ({
       ...prev,
       petMissingPoint: { lat: latlng.lat, lng: latlng.lng },
     }));
+
+    toRegionName(latlng.lat, latlng.lng)
+      .then((region) => {
+        if (region) setForm((prev) => ({ ...prev, region }));
+      })
+      .catch(() => {});
   };
 
   /**

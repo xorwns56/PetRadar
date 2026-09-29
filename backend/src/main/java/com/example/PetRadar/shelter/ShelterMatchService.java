@@ -53,22 +53,27 @@ public class ShelterMatchService {
 
     /**
      * @param region 실종 지점의 관할 지자체 ("경기도 화성시").
-     *               좌표를 지역명으로 바꾸는 일은 카카오 SDK를 쓸 수 있는 화면이 한다.
-     *               비어 있으면 지역으로 좁히지 않는다
+     *               화면이 좌표에서 구해 보내면 그걸 쓰고, 없으면 글에 저장된 값을 쓴다.
+     *               스케줄러처럼 화면이 없는 곳은 저장된 값만 쓸 수 있다.
      */
     public List<ShelterAnimalDTO> findCandidates(Long missingId, String region) {
         Missing missing = missingRepository.findById(missingId)
                 .orElseThrow(() -> new NotFoundException("실종 신고를 찾을 수 없습니다."));
+        return findCandidates(missing, region);
+    }
+
+    public List<ShelterAnimalDTO> findCandidates(Missing missing, String region) {
+        String area = (region != null && !region.isBlank()) ? region : missing.getRegion();
 
         String kind = KIND.get(missing.getPetType());
         String missingDate = digitsOnly(missing.getPetMissingDate());
 
         return shelterService.getAllAnimals().stream()
                 .filter(a -> kind == null || kind.equals(a.getKindType()))
-                .filter(a -> inRegion(a.getOrgNm(), region))
+                .filter(a -> inRegion(a.getOrgNm(), area))
                 .filter(a -> foundAfter(a.getFoundDate(), missingDate))
                 .sorted(Comparator
-                        .comparingInt((ShelterAnimalDTO a) -> score(a, missing)).reversed()
+                        .comparingInt((ShelterAnimalDTO a) -> score(a, missing, area)).reversed()
                         // 점수가 같으면 최근에 들어온 아이를 먼저 본다
                         .thenComparing(ShelterAnimalDTO::getFoundDate,
                                 Comparator.nullsLast(Comparator.reverseOrder())))
@@ -93,7 +98,7 @@ public class ShelterMatchService {
         return foundDate.compareTo(missingDate) >= 0;
     }
 
-    private int score(ShelterAnimalDTO animal, Missing missing) {
+    int score(ShelterAnimalDTO animal, Missing missing, String area) {
         int score = breedScore(animal.getBreed(), missing.getPetBreed());
 
         Integer animalYear = birthYear(animal.getAge());
@@ -108,7 +113,26 @@ public class ShelterMatchService {
             score += 1;
         }
 
+        score += foundPlaceBonus(animal.getFoundPlace(), area);
         return score;
+    }
+
+    /**
+     * 발견장소가 실종 지역을 가리키면 한 칸 올린다.
+     *
+     * 지역을 거르는 기준은 관할 지자체(orgNm)다. 발견장소 문자열이 의미상으로는
+     * 더 정확하지만 "초계면소방서"·"보호센터 내 출산"처럼 자유롭게 적혀 있어
+     * 시군구를 알아볼 수 있는 건 30%뿐이다. 거름으로 쓰면 나머지가 다 떨어진다.
+     * 그래서 알아볼 수 있을 때만 가점으로 쓴다.
+     *
+     * 관할과 발견장소가 어긋나 보이는 16%는 대부분 "처인구 금학로"처럼
+     * 행정구만 적고 시 이름을 생략한 경우라, 시군구 이름이 들어 있는지만 본다.
+     */
+    private int foundPlaceBonus(String foundPlace, String area) {
+        if (foundPlace == null || area == null) return 0;
+        String[] parts = area.split(" ");
+        if (parts.length < 2) return 0;
+        return foundPlace.contains(parts[1]) ? 1 : 0;
     }
 
     /**

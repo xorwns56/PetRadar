@@ -17,6 +17,8 @@ public class MissingDTO {
     private String petAge;
     private String petMissingDate;
     private String petMissingPlace;
+    /** 실종 지점의 관할 지자체. 화면이 좌표에서 다시 구하지 않아도 되게 실어 보낸다 */
+    private String region;
     private PetMissingPoint petMissingPoint;
     private String petImage;
     private String title;
@@ -48,6 +50,7 @@ public class MissingDTO {
                 missing.getPetAge(),
                 missing.getPetMissingDate(),
                 missing.getPetMissingPlace(),
+                missing.getRegion(),
                 point,
                 ImageUrls.of(missing.getPetImage(), imageBaseUrl),
                 missing.getTitle(),

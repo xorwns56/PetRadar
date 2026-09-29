@@ -49,6 +49,15 @@ public class Missing{
     @Column(nullable = false)
     private String petMissingPlace;
 
+    /**
+     * 실종 지점의 관할 지자체 ("서울특별시 구로구").
+     *
+     * 좌표를 지역 이름으로 바꾸는 일은 카카오 SDK를 쓸 수 있는 화면이 한다.
+     * 서버에는 지오코더가 없는데, 보호동물과 맞춰보려면 지역이 필요하다 —
+     * 공공 API는 발견 지점의 좌표를 주지 않고 관할 지자체만 준다.
+     */
+    private String region;
+
     @Column(columnDefinition = "DECIMAL(10, 8)")
     private Double latitude;
 

@@ -43,6 +43,9 @@ public class MissingRequest {
     private Double latitude;
     private Double longitude;
 
+    /** 실종 지점의 관할 지자체. 화면이 좌표에서 구해 함께 보낸다 */
+    private String region;
+
     @NotBlank(message = "제목을 입력해주세요.")
     private String title;
 
@@ -67,6 +70,7 @@ public class MissingRequest {
         missing.setPetMissingPlace(petMissingPlace);
         missing.setLatitude(latitude);
         missing.setLongitude(longitude);
+        missing.setRegion(region);
         missing.setTitle(title);
         missing.setContent(content);
     }

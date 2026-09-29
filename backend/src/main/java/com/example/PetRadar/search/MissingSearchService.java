@@ -113,7 +113,8 @@ public class MissingSearchService {
                 doc.getPetAge(),
                 doc.getPetMissingDate(),
                 doc.getPetMissingPlace(),
-                null,   // 실종 위치 좌표는 검색 결과 카드에서 쓰지 않아 색인하지 않는다
+                null,   // 관할 지자체는 검색 카드에서 쓰지 않는다. 필요하면 상세에서 받는다
+                null,   // 실종 위치 좌표도 마찬가지로 색인하지 않는다
                 ImageUrls.of(doc.getPetImage(), imageBaseUrl),
                 doc.getTitle(),
                 doc.getContent()
