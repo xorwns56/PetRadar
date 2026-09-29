@@ -4,6 +4,7 @@ import Layout from "../components/layout/Layout";
 import PageHeading from "../components/layout/PageHeading";
 import Button from "../components/ui/Button";
 import MissingItem from "../components/missing/MissingItem";
+import Pagination from "../components/ui/Pagination";
 import { useAuth } from "../contexts/AuthContext";
 import { fetchMissingList } from "../api/missing";
 
@@ -18,29 +19,50 @@ const MissingList = () => {
   const [missingList, setMissingList] = useState([]);
   const [status, setStatus] = useState("loading"); // loading | ready | error
 
+  // 화면은 1부터, 서버(Spring Page)는 0부터 센다
+  const PAGE_SIZE = 12;
+  const [page, setPage] = useState(1);
+  const [totalItems, setTotalItems] = useState(0);
+
   const load = useCallback(async () => {
     setStatus("loading");
     try {
-      setMissingList(await fetchMissingList({ searchInput: keyword, sortType }));
+      const data = await fetchMissingList({
+        searchInput: keyword,
+        sortType,
+        page: page - 1,
+        size: PAGE_SIZE,
+      });
+      setMissingList(data.content);
+      setTotalItems(data.totalElements);
       setStatus("ready");
     } catch (error) {
       console.error("Failed to fetch missing list:", error);
       setStatus("error");
     }
-  }, [keyword, sortType]);
+  }, [keyword, sortType, page]);
 
   useEffect(() => {
     load();
   }, [load]);
 
+  /* 검색어나 정렬이 바뀌면 첫 쪽으로 돌아간다.
+     3쪽을 보다가 검색하면 결과가 1쪽뿐이라 빈 화면이 된다 */
   const onSubmit = (e) => {
     e.preventDefault();
     setKeyword(searchInput);
+    setPage(1);
   };
 
   const onReset = () => {
     setSearchInput("");
     setKeyword("");
+    setPage(1);
+  };
+
+  const onSortChange = (value) => {
+    setSortType(value);
+    setPage(1);
   };
 
   const isSearching = keyword.trim().length > 0;
@@ -69,7 +91,7 @@ const MissingList = () => {
         <select
           id="missing-sort"
           value={sortType}
-          onChange={(e) => setSortType(e.target.value)}
+          onChange={(e) => onSortChange(e.target.value)}
           disabled={isSearching}
           title={
             isSearching ? "검색 결과는 관련도 순으로 보여드려요." : undefined
@@ -109,6 +131,19 @@ const MissingList = () => {
             />
           ))}
         </div>
+      )}
+
+      {status === "ready" && (
+        <Pagination
+          totalItems={totalItems}
+          page={page}
+          itemSize={PAGE_SIZE}
+          onClick={(next) => {
+            setPage(next);
+            // 쪽을 넘기면 목록 맨 위부터 보게 한다
+            window.scrollTo({ top: 0, behavior: "smooth" });
+          }}
+        />
       )}
 
       {status === "error" && (
@@ -155,6 +190,19 @@ const MissingList = () => {
             />
           ))}
         </div>
+      )}
+
+      {status === "ready" && (
+        <Pagination
+          totalItems={totalItems}
+          page={page}
+          itemSize={PAGE_SIZE}
+          onClick={(next) => {
+            setPage(next);
+            // 쪽을 넘기면 목록 맨 위부터 보게 한다
+            window.scrollTo({ top: 0, behavior: "smooth" });
+          }}
+        />
       )}
 
     </Layout>

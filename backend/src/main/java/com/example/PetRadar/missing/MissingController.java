@@ -3,6 +3,8 @@ package com.example.PetRadar.missing;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.data.web.SortDefault;
@@ -22,15 +24,26 @@ public class MissingController {
     private final MissingService missingService;
 
     @GetMapping
-    public ResponseEntity<List<MissingDTO>> getMissingList(@RequestParam(defaultValue = "") String searchInput, @RequestParam(defaultValue = "latest") String sortType) {
-        Sort sort;
-        if ("oldest".equals(sortType)) {
-            sort = Sort.by(Sort.Direction.ASC, "createdAt");
-        } else {
-            sort = Sort.by(Sort.Direction.DESC, "createdAt");
-        }
-        List<MissingDTO> missingList = missingService.getMissingList(searchInput, sort);
-        return ResponseEntity.ok(missingList);
+    public ResponseEntity<Page<MissingDTO>> getMissingList(
+            @RequestParam(defaultValue = "") String searchInput,
+            @RequestParam(defaultValue = "latest") String sortType,
+            @PageableDefault(size = 12) Pageable pageable) {
+        Sort sort = "oldest".equals(sortType)
+                ? Sort.by(Sort.Direction.ASC, "createdAt")
+                : Sort.by(Sort.Direction.DESC, "createdAt");
+        Pageable paged = PageRequest.of(pageable.getPageNumber(), pageable.getPageSize(), sort);
+        return ResponseEntity.ok(missingService.getMissingList(searchInput, paged));
+    }
+
+    /**
+     * 지도용 전체 목록.
+     *
+     * 목록 화면은 페이지로 끊어 받지만 지도는 그럴 수 없다. 지도는 화면에
+     * 들어오는 것을 스스로 골라 그리므로, 페이지로 자르면 마커가 임의로 빠진다.
+     */
+    @GetMapping("/points")
+    public ResponseEntity<List<MissingDTO>> getMissingPoints() {
+        return ResponseEntity.ok(missingService.getMissingPoints());
     }
 
     @GetMapping("/me")

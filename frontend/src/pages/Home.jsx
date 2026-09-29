@@ -5,7 +5,7 @@ import Button from "../components/ui/Button";
 import MainMenu from "../components/home/MainMenu";
 import MissingMap from "../components/missing/MissingMap";
 import NearbyShelterAnimals from "../components/home/NearbyShelterAnimals";
-import { fetchMissingList } from "../api/missing";
+import { fetchMissingPoints } from "../api/missing";
 
 const Home = () => {
   const nav = useNavigate();
@@ -14,7 +14,7 @@ const Home = () => {
   const [visibleCount, setVisibleCount] = useState(null);
 
   useEffect(() => {
-    fetchMissingList()
+    fetchMissingPoints()
       .then(setMissingList)
       .catch((error) => console.error("Failed to fetch missing list:", error));
   }, []);

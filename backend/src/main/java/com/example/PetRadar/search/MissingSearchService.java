@@ -8,6 +8,9 @@ import com.example.PetRadar.missing.MissingRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.elasticsearch.client.elc.NativeQuery;
 import org.springframework.data.elasticsearch.core.ElasticsearchOperations;
 import org.springframework.data.elasticsearch.core.SearchHits;
@@ -48,9 +51,16 @@ public class MissingSearchService {
         }
     }
 
-    // 전문 검색: 제목, 내용, 이름, 품종, 실종장소를 한 번에 훑는다
-    public List<MissingDTO> search(String query) {
+    /**
+     * 전문 검색: 제목, 내용, 이름, 품종, 실종장소를 한 번에 훑는다.
+     *
+     * 페이지를 반드시 넘긴다. 지정하지 않으면 Spring Data Elasticsearch가
+     * 기본값(0페이지 10건)을 쓰는데, 그러면 11건째부터는 잘렸다는 표시도 없이
+     * 사라진다. "말티즈"를 검색한 사람이 10마리만 보고 없다고 판단하게 된다.
+     */
+    public Page<MissingDTO> search(String query, Pageable pageable) {
         NativeQuery searchQuery = NativeQuery.builder()
+                .withPageable(pageable)
                 .withQuery(q -> q
                         .multiMatch(mm -> mm
                                 .query(query)
@@ -70,9 +80,10 @@ public class MissingSearchService {
                 .build();
 
         SearchHits<MissingDocument> hits = elasticsearchOperations.search(searchQuery, MissingDocument.class);
-        return hits.getSearchHits().stream()
+        List<MissingDTO> content = hits.getSearchHits().stream()
                 .map(hit -> toDTO(hit.getContent()))
                 .toList();
+        return new PageImpl<>(content, pageable, hits.getTotalHits());
     }
 
     /**

@@ -6,6 +6,8 @@ import com.example.PetRadar.search.MissingSearchService;
 import com.example.PetRadar.user.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -27,8 +29,21 @@ public class MissingService {
     @Value("${app.image.base-url}")
     private String imageBaseUrl;
 
-    public List<MissingDTO> getMissingList(String searchInput, Sort sort) {
-        return missingRepository.findByTitleContainingIgnoreCase(searchInput, sort).stream()
+    public Page<MissingDTO> getMissingList(String searchInput, Pageable pageable) {
+        return missingRepository.findByTitleContainingIgnoreCase(searchInput, pageable)
+                .map(missing -> MissingDTO.from(missing, imageBaseUrl));
+    }
+
+    /**
+     * 지도가 쓸 전체 목록.
+     *
+     * 지도는 화면에 들어오는 것을 스스로 골라 그리므로 페이지로 자르면
+     * 마커가 임의로 빠진다. 대신 좌표가 있는 글만 넘겨 쓸데없는 양을 줄인다.
+     * 글이 크게 늘면 이 자리를 "보이는 범위" 질의로 바꿔야 한다.
+     */
+    public List<MissingDTO> getMissingPoints() {
+        return missingRepository.findAllWithUser().stream()
+                .filter(m -> m.getLatitude() != null && m.getLongitude() != null)
                 .map(missing -> MissingDTO.from(missing, imageBaseUrl))
                 .collect(Collectors.toList());
     }
