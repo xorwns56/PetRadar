@@ -68,6 +68,11 @@ public class ShelterService {
                 .toList();
     }
 
+    /** 보호 중인 동물 전체. 실종 신고와 맞춰 보는 쪽이 직접 거른다 */
+    public List<ShelterAnimalDTO> getAllAnimals() {
+        return snapshot().animals();
+    }
+
     /** 한 보호소가 지금 보호 중인 동물 */
     public List<ShelterAnimalDTO> getAnimalsByShelter(String careRegNo) {
         List<ShelterAnimalDTO> animals = snapshot().animals().stream()

@@ -2,6 +2,7 @@ import { useModal } from "../../contexts/ModalContext";
 import Button from "../ui/Button";
 import Dialog, { DialogField } from "../ui/Dialog";
 import { petTypeLabel, petGenderLabel } from "../../utils/pet-label";
+import ShelterMatches from "./ShelterMatches";
 
 /* 실종 동물 상세 모달 */
 const PetModalDetail = ({ missingPet, onClick, myMissing }) => {
@@ -47,6 +48,10 @@ const PetModalDetail = ({ missingPet, onClick, myMissing }) => {
 
       <DialogField label="제목" value={missingPet.title} />
       <DialogField label="내용" value={missingPet.content} />
+
+      {/* 잃어버린 아이를 찾는 사람이 제일 먼저 확인해야 할 것이
+          보호소에 이미 들어와 있는 아이들이다 */}
+      <ShelterMatches missingPet={missingPet} />
     </Dialog>
   );
 };

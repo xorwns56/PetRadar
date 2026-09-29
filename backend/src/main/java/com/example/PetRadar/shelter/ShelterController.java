@@ -23,6 +23,7 @@ import java.util.List;
 public class ShelterController {
 
     private final ShelterService shelterService;
+    private final ShelterMatchService shelterMatchService;
 
     /** 보호소 목록. lat·lng를 주면 가까운 순으로 정렬한다 */
     @GetMapping
@@ -36,6 +37,20 @@ public class ShelterController {
     @GetMapping("/{careRegNo}/animals")
     public ResponseEntity<List<ShelterAnimalDTO>> getAnimals(@PathVariable String careRegNo) {
         return ResponseEntity.ok(shelterService.getAnimalsByShelter(careRegNo));
+    }
+
+    /**
+     * 한 실종 신고와 맞아 보이는 보호동물.
+     *
+     * region은 실종 지점의 관할 지자체다. 공공 API가 발견 지점의 좌표를 주지
+     * 않아 거리로는 좁힐 수 없고, 좌표를 지역명으로 바꾸는 일은 카카오 SDK를
+     * 쓸 수 있는 화면이 맡는다.
+     */
+    @GetMapping("/matches")
+    public ResponseEntity<List<ShelterAnimalDTO>> getMatches(
+            @RequestParam Long missingId,
+            @RequestParam(required = false) String region) {
+        return ResponseEntity.ok(shelterMatchService.findCandidates(missingId, region));
     }
 
     /**
