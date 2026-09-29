@@ -5,6 +5,9 @@ import com.fasterxml.jackson.databind.JsonNode;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.time.Duration;
@@ -73,15 +76,33 @@ public class ShelterService {
         return snapshot().animals();
     }
 
-    /** 한 보호소가 지금 보호 중인 동물 */
-    public List<ShelterAnimalDTO> getAnimalsByShelter(String careRegNo) {
-        List<ShelterAnimalDTO> animals = snapshot().animals().stream()
+    /**
+     * 한 보호소가 지금 보호 중인 동물.
+     *
+     * 페이지로 끊는다. 제주 동물보호센터는 191마리, 50마리가 넘는 곳이 12곳이라
+     * 한 번에 내리면 카드와 사진이 그만큼 한꺼번에 들어간다. 게다가 이 화면은
+     * "내 아이가 있나" 훑는 곳이라 오래 머문다.
+     *
+     * 발견일 최신순이 기본이다. 정렬은 공공 데이터가 문자열 yyyyMMdd로 주므로
+     * 문자열 비교로 충분하다.
+     */
+    public Page<ShelterAnimalDTO> getAnimalsByShelter(String careRegNo, Pageable pageable, boolean oldestFirst) {
+        List<ShelterAnimalDTO> all = snapshot().animals().stream()
                 .filter(a -> careRegNo.equals(a.getCareRegNo()))
+                .sorted(Comparator.comparing(
+                        ShelterAnimalDTO::getFoundDate,
+                        oldestFirst
+                                ? Comparator.nullsLast(Comparator.naturalOrder())
+                                : Comparator.nullsLast(Comparator.reverseOrder())))
                 .toList();
-        if (animals.isEmpty() && findShelter(careRegNo).isEmpty()) {
+
+        if (all.isEmpty() && findShelter(careRegNo).isEmpty()) {
             throw new NotFoundException("보호소를 찾을 수 없습니다.");
         }
-        return animals;
+
+        int from = (int) Math.min(pageable.getOffset(), all.size());
+        int to = Math.min(from + pageable.getPageSize(), all.size());
+        return new PageImpl<>(all.subList(from, to), pageable, all.size());
     }
 
     /**

@@ -1,6 +1,9 @@
 package com.example.PetRadar.shelter;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -33,10 +36,14 @@ public class ShelterController {
         return ResponseEntity.ok(shelterService.getShelters(lat, lng));
     }
 
-    /** 한 보호소가 보호 중인 동물 */
+    /** 한 보호소가 보호 중인 동물. 191마리인 곳이 있어 페이지로 끊는다 */
     @GetMapping("/{careRegNo}/animals")
-    public ResponseEntity<List<ShelterAnimalDTO>> getAnimals(@PathVariable String careRegNo) {
-        return ResponseEntity.ok(shelterService.getAnimalsByShelter(careRegNo));
+    public ResponseEntity<Page<ShelterAnimalDTO>> getAnimals(
+            @PathVariable String careRegNo,
+            @RequestParam(defaultValue = "newest") String sortType,
+            @PageableDefault(size = 12) Pageable pageable) {
+        return ResponseEntity.ok(shelterService.getAnimalsByShelter(
+                careRegNo, pageable, "oldest".equals(sortType)));
     }
 
     /**

@@ -17,9 +17,16 @@ export const fetchShelters = ({ lat, lng } = {}) =>
     .get("/api/shelter", { params: lat != null && lng != null ? { lat, lng } : {} })
     .then((r) => r.data);
 
-/** 한 보호소가 지금 보호 중인 동물 */
-export const fetchShelterAnimals = (careRegNo) =>
-  client.get(`/api/shelter/${careRegNo}/animals`).then((r) => r.data);
+/**
+ * 한 보호소가 지금 보호 중인 동물 (페이지 단위).
+ * 191마리인 보호소가 있어 서버가 끊어서 준다.
+ * page는 0부터 센다(Spring). 정렬도 서버가 한다 — 한 쪽만 정렬하면
+ * 전체 기준이 아니라 그 쪽 안에서만 순서가 바뀐다.
+ */
+export const fetchShelterAnimals = (careRegNo, { page = 0, size = 12, sortType = "newest" } = {}) =>
+  client
+    .get(`/api/shelter/${careRegNo}/animals`, { params: { page, size, sortType } })
+    .then((r) => r.data);
 
 /**
  * 지역 기준 보호동물 (홈 화면용).

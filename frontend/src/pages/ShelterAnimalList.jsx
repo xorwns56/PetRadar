@@ -1,8 +1,9 @@
-import { useMemo, useState } from "react";
+import { useState } from "react";
 import { useParams } from "react-router-dom";
 import Layout from "../components/layout/Layout";
 import PageHeading from "../components/layout/PageHeading";
 import StateNotice from "../components/layout/StateNotice";
+import Pagination from "../components/ui/Pagination";
 import ShelterAnimalItem from "../components/shelter/ShelterAnimalItem";
 import ShelterAnimalModalDetail from "../components/shelter/ShelterAnimalModalDetail";
 import { fetchShelterAnimals } from "../api/shelter";
@@ -15,32 +16,39 @@ import { useModal } from "../contexts/ModalContext";
  * 예전에는 보호소 이름과 주소를 URL에 싣고, 받아온 100건을 화면에서
  * 이름·주소가 같은 것만 걸러 썼다. 그래서 그 100건 안에 우연히 들어온
  * 몇 마리만 보였다. 지금은 보호소 등록번호로 서버에 직접 묻는다.
+ *
+ * 정렬과 쪽 나누기 모두 서버가 한다. 한 쪽만 정렬하면 전체 기준이 아니라
+ * 그 쪽 안에서만 순서가 바뀐다.
  */
+const PAGE_SIZE = 12;
+
 const ShelterAnimalList = () => {
   const { careRegNo } = useParams();
   const { isActive, openModal, closeModal } = useModal();
   const [selected, setSelected] = useState(null);
-  const [sortOrder, setSortOrder] = useState("newest");
+  const [sortType, setSortType] = useState("newest");
+  // 화면은 1부터, 서버(Spring Page)는 0부터 센다
+  const [page, setPage] = useState(1);
 
   const {
-    data: animals,
+    data: pageData,
     error,
     loading,
-  } = useShelterQuery(() => fetchShelterAnimals(careRegNo), [careRegNo]);
-
-  // 발견일은 "20260928" 형태라 문자열 비교로 그대로 정렬된다
-  const items = useMemo(
+  } = useShelterQuery(
     () =>
-      [...animals].sort((a, b) =>
-        sortOrder === "newest"
-          ? (b.foundDate ?? "").localeCompare(a.foundDate ?? "")
-          : (a.foundDate ?? "").localeCompare(b.foundDate ?? "")
-      ),
-    [animals, sortOrder]
+      fetchShelterAnimals(careRegNo, {
+        page: page - 1,
+        size: PAGE_SIZE,
+        sortType,
+      }),
+    [careRegNo, page, sortType]
   );
 
-  const shelterName = animals[0]?.careName;
-  const shelterAddress = animals[0]?.careAddress;
+  // 공통 훅이 배열을 기본값으로 주므로 Page 모양이 오기 전에는 비어 있다
+  const items = pageData?.content ?? [];
+  const totalItems = pageData?.totalElements ?? 0;
+  const shelterName = items[0]?.careName;
+  const shelterAddress = items[0]?.careAddress;
 
   return (
     <Layout width="wide">
@@ -48,7 +56,9 @@ const ShelterAnimalList = () => {
         title="보호소 유기동물"
         /* 어느 보호소를 보고 있는지 제목만으로는 알 수 없었다 */
         description={
-          shelterName ? `${shelterName} · ${shelterAddress}` : "보호 중인 아이들이에요."
+          shelterName
+            ? `${shelterName} · ${shelterAddress} · ${totalItems}마리`
+            : "보호 중인 아이들이에요."
         }
         actions={
           <>
@@ -57,8 +67,11 @@ const ShelterAnimalList = () => {
             </label>
             <select
               id="animal-sort"
-              value={sortOrder}
-              onChange={(e) => setSortOrder(e.target.value)}
+              value={sortType}
+              onChange={(e) => {
+                setSortType(e.target.value);
+                setPage(1);
+              }}
               className="h-11 w-28 rounded-xl border border-line bg-surface px-3 text-sm text-ink transition-colors focus:border-brand focus:outline-none"
             >
               <option value="newest">최신순</option>
@@ -92,18 +105,31 @@ const ShelterAnimalList = () => {
       )}
 
       {!loading && !error && items.length > 0 && (
-        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-          {items.map((animal) => (
-            <ShelterAnimalItem
-              key={animal.desertionNo}
-              animal={animal}
-              onClick={() => {
-                setSelected(animal);
-                openModal();
-              }}
-            />
-          ))}
-        </div>
+        <>
+          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+            {items.map((animal) => (
+              <ShelterAnimalItem
+                key={animal.desertionNo}
+                animal={animal}
+                onClick={() => {
+                  setSelected(animal);
+                  openModal();
+                }}
+              />
+            ))}
+          </div>
+
+          <Pagination
+            totalItems={totalItems}
+            page={page}
+            itemSize={PAGE_SIZE}
+            onClick={(next) => {
+              setPage(next);
+              // 쪽을 넘기면 목록 맨 위부터 보게 한다
+              window.scrollTo({ top: 0, behavior: "smooth" });
+            }}
+          />
+        </>
       )}
 
       {isActive && selected && (
