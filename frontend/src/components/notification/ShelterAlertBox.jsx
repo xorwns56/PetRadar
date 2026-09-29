@@ -12,7 +12,7 @@ const ShelterAlertBox = ({ preview, onAlertClick, onAlertClose }) => (
     title="보호소에 비슷한 아이가 들어왔어요."
     description={
       preview
-        ? `${preview.breed} · ${preview.orgNm}에서 발견됐어요.`
+        ? `${preview.title} · ${preview.subtitle}에서 발견됐어요.`
         : "사진을 확인해보세요. 공고 기간이 지나면 처리가 달라질 수 있어요."
     }
     onAlertClick={onAlertClick}

@@ -1,7 +1,10 @@
 package com.example.PetRadar.notification;
 
 import com.example.PetRadar.user.User;
+import com.example.PetRadar.image.ImageUrls;
+import com.example.PetRadar.report.ReportRepository;
 import com.example.PetRadar.user.UserRepository;
+import org.springframework.beans.factory.annotation.Value;
 import lombok.RequiredArgsConstructor;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.scheduling.annotation.Async;
@@ -18,6 +21,10 @@ public class NotificationService {
     private final UserRepository userRepository;
     private final SimpMessagingTemplate simpMessagingTemplate;
     private final ShelterPreviewProvider shelterPreviewProvider;
+    private final ReportRepository reportRepository;
+
+    @Value("${app.image.base-url}")
+    private String imageBaseUrl;
 
     public void createNotificationToUser(Long senderId, Long receiverId, String postType, Long postId) {
         createNotificationToUser(senderId, receiverId, postType, postId, null);
@@ -66,11 +73,29 @@ public class NotificationService {
     }
 
     private NotificationDTO.Preview previewOf(Notification notification) {
-        if (!"shelter".equals(notification.getPostType()) || notification.getTargetRef() == null) {
+        String ref = notification.getTargetRef();
+        if (ref == null) return null;   // targetRef가 생기기 전의 알림
+
+        // 대상이 사라졌으면 요약 없이 기본 문구로 둔다
+        return switch (notification.getPostType()) {
+            case "shelter" -> shelterPreviewProvider.find(ref).orElse(null);
+            case "report" -> reportPreview(ref);
+            default -> null;
+        };
+    }
+
+    /** 제보 알림: 무엇을 봤다는 제보인지와 어느 아이에 대한 것인지 */
+    private NotificationDTO.Preview reportPreview(String ref) {
+        try {
+            return reportRepository.findById(Long.valueOf(ref))
+                    .map(report -> new NotificationDTO.Preview(
+                            report.getTitle(),
+                            report.getMissing() != null ? report.getMissing().getPetName() : null,
+                            ImageUrls.of(report.getPetImage(), imageBaseUrl)))
+                    .orElse(null);
+        } catch (NumberFormatException e) {
             return null;
         }
-        // 이미 나간 아이는 공공 목록에 없다. 그때는 요약 없이 기본 문구로 둔다
-        return shelterPreviewProvider.find(notification.getTargetRef()).orElse(null);
     }
 
     public void deleteNotification(Long receiverId, Long notificationId) {

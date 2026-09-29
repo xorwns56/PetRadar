@@ -23,7 +23,7 @@ public class ShelterPreviewLookup implements ShelterPreviewProvider {
                     .filter(a -> desertionNo.equals(a.getDesertionNo()))
                     .findFirst()
                     .map(a -> new NotificationDTO.Preview(
-                            a.getBreed(), a.getOrgNm(), a.getThumbnailUrl()));
+                            a.getBreed(), a.getOrgNm(), a.getThumbnailUrl()));   // 품종 · 관할
         } catch (Exception e) {
             // 공공 API가 잠깐 죽었다고 알림 목록까지 못 보게 할 이유는 없다
             log.warn("알림 요약을 찾지 못했다: {}", desertionNo, e);

@@ -52,6 +52,9 @@ public class ReportService {
         // 이미지는 파일로 저장하고 DB에는 키만 남긴다
         report.setPetImage(imageStorageService.store(image));
         reportRepository.save(report);
-        notificationService.createNotificationToUser(userId, missing.getUser().getId(), "report", missingId);
+        // 어느 제보인지 남겨야 알림에 사진과 제목을 띄울 수 있다
+        notificationService.createNotificationToUser(
+                userId, missing.getUser().getId(), "report", missingId,
+                String.valueOf(report.getId()));
     }
 }

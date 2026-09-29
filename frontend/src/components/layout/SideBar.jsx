@@ -114,8 +114,8 @@ const SideBar = () => {
                 return (
                   <ReportAlertBox
                     key={key}
-                    {...alert}
-                    currentUser={alert.receiverId}
+                    senderId={alert.senderId}
+                    preview={alert.preview}
                     onAlertClick={() => nav("/myPage")}
                     onAlertClose={close}
                   />
