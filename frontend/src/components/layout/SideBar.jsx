@@ -1,7 +1,6 @@
 import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import ReportAlertBox from "../notification/ReportAlertBox";
-import MissingAlertBox from "../notification/MissingAlertBox";
 import ShelterAlertBox from "../notification/ShelterAlertBox";
 import { useSidebar } from "../../contexts/SidebarContext";
 import { deleteNotification } from "../../api/notification";
@@ -90,16 +89,6 @@ const SideBar = () => {
                 const key = `${alert.postType}_${alert.id}`;
                 const close = () => onAlertClose(alert.id);
 
-                if (alert.postType === "missing") {
-                  return (
-                    <MissingAlertBox
-                      key={key}
-                      {...alert}
-                      onAlertClick={() => nav("/missingList")}
-                      onAlertClose={close}
-                    />
-                  );
-                }
                 if (alert.postType === "shelter") {
                   // postId가 내 실종 글이다. 거기 후보 목록이 붙어 있다
                   return (
@@ -111,6 +100,7 @@ const SideBar = () => {
                     />
                   );
                 }
+                if (alert.postType !== "report") return null;
                 return (
                   <ReportAlertBox
                     key={key}

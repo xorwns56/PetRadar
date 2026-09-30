@@ -7,7 +7,6 @@ import com.example.PetRadar.user.UserRepository;
 import org.springframework.beans.factory.annotation.Value;
 import lombok.RequiredArgsConstructor;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
-import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -17,6 +16,17 @@ import com.example.PetRadar.global.error.ForbiddenException;
 @Service
 @RequiredArgsConstructor
 public class NotificationService {
+
+    /**
+     * 더 이상 만들지 않는 알림 종류 (실종 신고 등록 시의 전체 발송).
+     *
+     * 홈 지도가 주변에 어떤 아이를 찾고 있는지 이미 보여주므로 없앴다.
+     * 다만 이미 쌓인 행이 남아 있어 목록에서 걸러낸다 — 그대로 내려보내면
+     * 화면에 그릴 카드가 없다. 행은 아래 한 줄로 정리할 수 있다.
+     *   delete from notification where post_type = 'missing';
+     */
+    private static final String RETIRED_BROADCAST = "missing";
+
     private final NotificationRepository notificationRepository;
     private final UserRepository userRepository;
     private final SimpMessagingTemplate simpMessagingTemplate;
@@ -25,10 +35,6 @@ public class NotificationService {
 
     @Value("${app.image.base-url}")
     private String imageBaseUrl;
-
-    public void createNotificationToUser(Long senderId, Long receiverId, String postType, Long postId) {
-        createNotificationToUser(senderId, receiverId, postType, postId, null);
-    }
 
     /**
      * @param targetRef 이 알림을 부른 대상(보호소 알림의 유기번호).
@@ -52,15 +58,6 @@ public class NotificationService {
         simpMessagingTemplate.convertAndSendToUser(String.valueOf(receiverId), "/queue/notification", NotificationDTO.from(notification));
     }
 
-    @Async
-    public void createNotificationToAllUsers(Long senderId, String postType, Long postId) {
-        List<User> allUsers = userRepository.findAll();
-        for (User user : allUsers) {
-            if(user.getId().equals(senderId)) continue;
-            createNotificationToUser(senderId, user.getId(), postType, postId);
-        }
-    }
-
     /**
      * 보호소 알림에는 어떤 아이인지 요약을 붙여 내려준다.
      * 실종자가 가장 빨리 판단하는 건 사진이라, 눌러 들어가지 않고도
@@ -68,6 +65,7 @@ public class NotificationService {
      */
     public List<NotificationDTO> findByReceiverId(Long receiverId) {
         return notificationRepository.findByReceiverIdOrderByCreatedAtDesc(receiverId).stream()
+                .filter(n -> !RETIRED_BROADCAST.equals(n.getPostType()))
                 .map(n -> NotificationDTO.from(n, previewOf(n)))
                 .collect(Collectors.toList());
     }

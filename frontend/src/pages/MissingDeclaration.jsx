@@ -51,7 +51,7 @@ const MissingDeclaration = () => {
     <Layout width="content">
       <PageHeading
         title="실종 동물 신고"
-        description="등록하면 근처 이웃들에게 바로 알림이 갑니다."
+        description="등록하면 홈 지도와 목록에 바로 올라가고, 보호소에 비슷한 아이가 들어오면 알려드려요."
       />
 
       {error && (

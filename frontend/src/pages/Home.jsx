@@ -26,7 +26,7 @@ const Home = () => {
       <section className="grid items-center gap-8 lg:grid-cols-[1.15fr_1fr]">
         <div>
           <p className="inline-flex items-center rounded-full bg-brand-soft px-3 py-1 text-xs font-semibold text-brand-ink">
-            이웃에게 실시간으로 알려드려요
+            목격 제보는 실시간으로 알려드려요
           </p>
           <h1 className="mt-4 text-3xl leading-tight font-bold tracking-tight text-ink sm:text-4xl lg:text-5xl">
             길 잃은 아이를
@@ -34,9 +34,9 @@ const Home = () => {
             바로 신고해주세요.
           </h1>
           <p className="mt-4 text-base leading-relaxed text-ink-muted sm:text-lg">
-            실종 신고 알림 기능으로,
+            등록한 아이는 아래 지도와 목록에 바로 올라가고,
             <br />
-            함께 더 빠르게 실종 아이를 찾아낼 수 있어요.
+            목격 제보가 들어오면 그 자리에서 알려드려요.
           </p>
           <Button
             size="lg"

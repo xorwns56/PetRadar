@@ -1,7 +1,6 @@
 package com.example.PetRadar.missing;
 
 import com.example.PetRadar.image.ImageStorageService;
-import com.example.PetRadar.notification.NotificationService;
 import com.example.PetRadar.search.MissingSearchService;
 import com.example.PetRadar.user.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -23,7 +22,6 @@ import com.example.PetRadar.global.error.ForbiddenException;
 public class MissingService {
     private final MissingRepository missingRepository;
     private final UserRepository userRepository;
-    private final NotificationService notificationService;
     private final ImageStorageService imageStorageService;
     private final MissingSearchService searchService;
 
@@ -76,7 +74,10 @@ public class MissingService {
             throw e;
         }
         searchService.index(missing);
-        notificationService.createNotificationToAllUsers(userId,"missing", missing.getId());
+        /* 예전에는 여기서 전 사용자에게 알림을 보냈다. 홈 지도가 주변에 어떤 아이를
+           찾고 있는지 이미 보여주므로 같은 일을 두 번 하는 셈이었고, 서버는 사용자가
+           어디 사는지 모르는 탓에 "당신 근처에서"라고 말하면서 실제로는 전국에
+           뿌리고 있었다. 내 글에 직접 닿는 알림(목격 제보, 보호소 매칭)만 남긴다 */
     }
 
     public void updateMissing(Long id, MissingRequest request, long userId, MultipartFile image) {
