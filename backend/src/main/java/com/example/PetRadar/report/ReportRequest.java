@@ -1,6 +1,7 @@
 package com.example.PetRadar.report;
 
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Size;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -17,12 +18,21 @@ import lombok.Setter;
 @NoArgsConstructor
 public class ReportRequest {
 
+    /** varchar(255) 컬럼의 상한 */
+    private static final int MAX_LINE = 255;
+
+    /** 본문은 TEXT(65,535바이트) 컬럼이다. 한글은 글자당 3바이트라 그 아래로 둔다 */
+    private static final int MAX_BODY = 20000;
+
     @NotBlank(message = "제목을 입력해주세요.")
+    @Size(max = MAX_LINE, message = "제목은 {max}자까지 입력할 수 있습니다.")
     private String title;
 
     @NotBlank(message = "내용을 입력해주세요.")
+    @Size(max = MAX_BODY, message = "내용은 {max}자까지 입력할 수 있습니다.")
     private String content;
 
+    @Size(max = MAX_LINE, message = "발견장소는 {max}자까지 입력할 수 있습니다.")
     private String petReportPlace;
     private Double latitude;
     private Double longitude;

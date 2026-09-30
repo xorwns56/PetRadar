@@ -1,4 +1,5 @@
 import { dogBreed, catBreed, etcBreed } from "../../utils/get-pet-breed";
+import { MAX_BODY, MAX_LINE } from "../../utils/field-limits";
 import LocationMap from "./LocationMap";
 import ImageField from "../ui/ImageField";
 import FormField, { controlClass, textareaClass } from "../ui/FormField";
@@ -83,6 +84,7 @@ const MissingForm = ({
             value={form.petName}
             onChange={onChange}
             placeholder="이름"
+            maxLength={MAX_LINE}
             className={controlClass}
           />
         </FormField>
@@ -181,6 +183,7 @@ const MissingForm = ({
             ref={handleRef("title")}
             value={form.title}
             onChange={onChange}
+            maxLength={MAX_LINE}
             className={controlClass}
           />
         </FormField>
@@ -193,6 +196,7 @@ const MissingForm = ({
             value={form.content}
             onChange={onChange}
             placeholder="상세한 설명을 적어주세요."
+            maxLength={MAX_BODY}
             className={textareaClass}
           />
         </FormField>

@@ -9,6 +9,7 @@ import FormField, { controlClass, textareaClass } from "../components/ui/FormFie
 import { createReport } from "../api/report";
 import { useAuth } from "../contexts/AuthContext";
 import { toMessage } from "../utils/error";
+import { MAX_BODY, MAX_LINE } from "../utils/field-limits";
 
 const MissingReport = () => {
   const nav = useNavigate();
@@ -107,6 +108,7 @@ const MissingReport = () => {
               value={form.title}
               onChange={handleChange}
               placeholder="어디서 보셨는지 한 줄로 적어주세요."
+              maxLength={MAX_LINE}
               className={controlClass}
             />
           </FormField>
@@ -118,6 +120,7 @@ const MissingReport = () => {
               value={form.content}
               onChange={handleChange}
               placeholder="상세한 설명을 적어주세요."
+              maxLength={MAX_BODY}
               className={`${textareaClass} min-h-40`}
             />
           </FormField>
