@@ -4,6 +4,7 @@ import com.example.PetRadar.auth.AuthDTO;
 import com.example.PetRadar.missing.MissingService;
 import com.example.PetRadar.report.ReportService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -25,13 +26,38 @@ public class UserService {
     private static final String HP_REGEX = "^01[0-9]{1}-\\d{3,4}-\\d{4}$";
     private static final String PW_REGEX = "^(?=.*[a-zA-Z])(?=.*\\d)(?=.*[^\\w\\s]).{8,}$";
 
+    /** 화면(RegisterForm)의 규칙과 같아야 한다. 한쪽만 고치면 통과한 값이 반대편에서 막힌다 */
+    private static final String LOGIN_ID_REGEX = "^[a-z0-9]+$";
+    private static final int LOGIN_ID_MAX_LENGTH = 20;
+
     /** 가입은 모든 값이 있어야 한다 */
     private void validateUserRegistration(AuthDTO authDTO) {
+        validateLoginId(authDTO.getId());
         validateHp(authDTO.getHp());
         if (authDTO.getPw() == null || authDTO.getPw().isEmpty()) {
             throw new InvalidRequestException("비밀번호를 입력해주세요.");
         }
         validatePassword(authDTO.getPw());
+    }
+
+    /**
+     * 아이디 검증.
+     *
+     * 예전에는 서버가 아이디를 전혀 보지 않아 화면을 거치지 않은 요청이면
+     * 빈 아이디로도 가입됐다. login_id는 unique지만 NULL은 여러 개가 허용되니
+     * DB도 막아주지 않는다. 그렇게 만들어진 계정은 로그인할 방법이 없다.
+     */
+    private void validateLoginId(String loginId) {
+        if (loginId == null || loginId.isBlank()) {
+            throw new InvalidRequestException("아이디를 입력해주세요.");
+        }
+        if (!Pattern.matches(LOGIN_ID_REGEX, loginId)) {
+            throw new InvalidRequestException("아이디는 영문 소문자와 숫자만 사용할 수 있습니다.");
+        }
+        if (loginId.length() > LOGIN_ID_MAX_LENGTH) {
+            throw new InvalidRequestException(
+                    "아이디는 " + LOGIN_ID_MAX_LENGTH + "자까지 입력할 수 있습니다.");
+        }
     }
 
     private void validateHp(String hp) {
@@ -56,11 +82,20 @@ public class UserService {
     public void registerUser(AuthDTO authDTO) {
         // 회원가입 시 유효성 검사를 수행합니다.
         validateUserRegistration(authDTO);
+        if (userRepository.findByLoginId(authDTO.getId()).isPresent()) {
+            throw new InvalidRequestException("이미 사용 중인 아이디입니다.");
+        }
         User user = new User();
         user.setLoginId(authDTO.getId());
         user.setHp(authDTO.getHp());
         user.setPwHash(passwordEncoder.encode(authDTO.getPw()));
-        userRepository.save(user);
+        try {
+            userRepository.save(user);
+        } catch (DataIntegrityViolationException e) {
+            // 위 확인과 INSERT 사이에 같은 아이디가 들어온 경우(동시 가입).
+            // 받아주지 않으면 unique 제약 위반이 그대로 올라가 500이 나간다
+            throw new InvalidRequestException("이미 사용 중인 아이디입니다.");
+        }
     }
 
     @Transactional(readOnly = true)

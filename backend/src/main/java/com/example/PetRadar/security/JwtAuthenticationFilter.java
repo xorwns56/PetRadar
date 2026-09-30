@@ -34,6 +34,9 @@ import java.util.Optional;
 @Component
 @RequiredArgsConstructor
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
+    /** STOMP 엔드포인트. SockJS는 전송 방식마다 이 아래에 경로를 덧붙인다 */
+    private static final String WEBSOCKET_PATH = "/api/ws";
+
     private final JwtTokenProvider jwtTokenProvider;
     private final UserService userService;
     private final AuthService authService;
@@ -42,8 +45,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
             throws ServletException, IOException {
-        String bearerToken = request.getHeader("Authorization");
-        if(bearerToken == null) bearerToken = request.getParameter("token");
+        String bearerToken = extractBearerToken(request);
         if (bearerToken != null && bearerToken.startsWith("Bearer ")) {
             String accessToken = bearerToken.substring(7);
             try {
@@ -70,6 +72,24 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             }
         }
         filterChain.doFilter(request, response);
+    }
+
+    /**
+     * 요청에서 토큰을 꺼낸다. 기본은 Authorization 헤더다.
+     *
+     * 소켓 연결만 쿼리 파라미터도 받는다 — 브라우저의 WebSocket API는 핸드셰이크에
+     * 헤더를 붙일 수 없어서 다른 방법이 없다. 대신 그 경로에서만 본다.
+     * 모든 요청에서 받아주면 액세스 토큰이 URL에 실려 nginx 액세스 로그·브라우저
+     * 히스토리·Referer 헤더에 그대로 남는다.
+     */
+    private String extractBearerToken(HttpServletRequest request) {
+        String header = request.getHeader("Authorization");
+        if (header != null) {
+            return header;
+        }
+        return request.getRequestURI().startsWith(WEBSOCKET_PATH)
+                ? request.getParameter("token")
+                : null;
     }
 
     /**

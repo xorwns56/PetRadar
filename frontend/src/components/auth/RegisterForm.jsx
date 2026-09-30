@@ -1,6 +1,7 @@
 import { useState } from "react";
 import Button from "../ui/Button";
 import FloatingField, { FieldIconButton } from "../ui/FloatingField";
+import { MAX_LOGIN_ID } from "../../utils/field-limits";
 
 const ID_REGEX = /^[a-z0-9]*$/;
 const PW_REGEX = /^(?=.*[a-zA-Z])(?=.*\d)(?=.*[^\w\s]).{8,}$/;
@@ -86,6 +87,7 @@ const RegisterForm = ({ isExist, onRegister }) => {
         error={errMsg.id}
         onChange={onChangeInput}
         onBlur={onBlur}
+        maxLength={MAX_LOGIN_ID}
       />
 
       <FloatingField
