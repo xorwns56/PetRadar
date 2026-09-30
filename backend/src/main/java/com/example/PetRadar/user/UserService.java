@@ -1,6 +1,8 @@
 package com.example.PetRadar.user;
 
 import com.example.PetRadar.auth.AuthDTO;
+import com.example.PetRadar.missing.MissingService;
+import com.example.PetRadar.report.ReportService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -16,6 +18,9 @@ import com.example.PetRadar.global.error.InvalidRequestException;
 public class UserService {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
+    // 탈퇴할 때 각 도메인이 남긴 것(제보 행, 검색 색인, 업로드 파일)을 치우게 한다
+    private final MissingService missingService;
+    private final ReportService reportService;
 
     private static final String HP_REGEX = "^01[0-9]{1}-\\d{3,4}-\\d{4}$";
     private static final String PW_REGEX = "^(?=.*[a-zA-Z])(?=.*\\d)(?=.*[^\\w\\s]).{8,}$";
@@ -100,10 +105,24 @@ public class UserService {
         userRepository.save(user);
     }
 
+    /**
+     * 회원 탈퇴.
+     *
+     * User의 cascade만으로는 두 가지가 정리되지 않았다.
+     *   - 남의 글에 남긴 제보: User에도 Missing에도 매달려 있지 않아 행이 남고,
+     *     report.user_id가 사라진 사용자를 가리켜 FK 제약에 걸렸다.
+     *     제보를 한 번이라도 한 사람은 탈퇴가 500으로 막혀 있었다
+     *   - 내가 쓴 실종 글의 검색 색인과 이미지 파일: cascade는 DB 행만 지운다.
+     *     지워진 글이 검색 결과에는 계속 떠서 눌러 들어가면 404가 났다
+     *
+     * 그래서 각 도메인에 "그쪽이 남긴 것"을 먼저 치우게 하고 마지막에 계정을 지운다.
+     */
     @Transactional
     public void deleteUser(Long userId) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new NotFoundException("사용자를 찾을 수 없습니다."));
+        reportService.deleteAllByUser(userId);
+        missingService.deleteAllByUser(userId);
         userRepository.delete(user);
     }
 
