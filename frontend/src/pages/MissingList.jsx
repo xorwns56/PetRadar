@@ -133,19 +133,6 @@ const MissingList = () => {
         </div>
       )}
 
-      {status === "ready" && (
-        <Pagination
-          totalItems={totalItems}
-          page={page}
-          itemSize={PAGE_SIZE}
-          onClick={(next) => {
-            setPage(next);
-            // 쪽을 넘기면 목록 맨 위부터 보게 한다
-            window.scrollTo({ top: 0, behavior: "smooth" });
-          }}
-        />
-      )}
-
       {status === "error" && (
         <div className="rounded-2xl border border-line bg-surface py-16 text-center shadow-card">
           <p className="text-sm text-ink-muted">목록을 불러오지 못했어요.</p>
