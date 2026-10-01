@@ -31,24 +31,6 @@ services:
       timeout: 5s
       retries: 10
 
-  elasticsearch:
-    image: elasticsearch:8.15.0
-    container_name: petradar-elasticsearch-local
-    ports:
-      # 색인 상태를 브라우저나 curl로 들여다볼 때 쓴다
-      - "127.0.0.1:9200:9200"
-    environment:
-      - discovery.type=single-node
-      - xpack.security.enabled=false
-      - ES_JAVA_OPTS=-Xms512m -Xmx512m
-    volumes:
-      - elasticsearch-local-data:/usr/share/elasticsearch/data
-    healthcheck:
-      test: ["CMD-SHELL", "curl -f http://localhost:9200/_cluster/health || exit 1"]
-      interval: 10s
-      timeout: 5s
-      retries: 15
-
   backend:
     build:
       context: ./backend
@@ -63,7 +45,6 @@ services:
       SPRING_DATASOURCE_URL: jdbc:mysql://mysql:3306/petradar_db?serverTimezone=Asia/Seoul&characterEncoding=UTF-8
       SPRING_DATASOURCE_USERNAME: root
       SPRING_DATASOURCE_PASSWORD: ${MYSQL_ROOT_PASSWORD:-localdev}
-      SPRING_ELASTICSEARCH_URIS: http://elasticsearch:9200
       APP_IMAGE_UPLOAD_DIR: /app/uploads
       # 로컬 기본값을 둔다. .env가 있으면 그 값을 쓴다
       JWT_ACCESS_SECRET: ${JWT_ACCESS_SECRET:-local-dev-access-secret-key-please-change-me}
@@ -81,8 +62,6 @@ services:
       - gradle-cache:/root/.gradle
     depends_on:
       mysql:
-        condition: service_healthy
-      elasticsearch:
         condition: service_healthy
 
   frontend:
@@ -119,6 +98,5 @@ services:
 
 volumes:
   mysql-local-data:
-  elasticsearch-local-data:
   uploads-local:
   gradle-cache:

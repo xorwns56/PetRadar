@@ -91,7 +91,7 @@
 | **Frontend** | React, React Router, Vite, Tailwind CSS |
 | **Backend** | Spring Boot 3.5, Spring Security, Spring Data JPA |
 | **Database** | MySQL 8 |
-| **Search** | Elasticsearch 8.15 |
+| **Search** | MySQL FULLTEXT (ngram) |
 | **Auth** | JWT (jjwt) |
 | **Realtime** | WebSocket (STOMP) + SockJS |
 | **API** | Kakao 지도 API, 경기데이터드림 유기동물 API |
@@ -116,7 +116,7 @@ com.example.PetRadar
   missing/       실종 신고 글 (CRUD)
   report/        목격 제보 글 (실종 글에 종속)
   notification/  알림 저장 + STOMP 발송
-  search/        Elasticsearch 색인·검색·재색인
+  search/        전문검색 (질의 전처리·오타 교정·인덱스 생성)
   image/         업로드 파일 저장, URL 조립
   security/      SecurityConfig, JWT 필터·프로바이더
   websocket/     STOMP 엔드포인트 설정
@@ -212,8 +212,7 @@ docker compose up -d
 |------|------|
 | frontend | nginx — 정적 파일 서빙 및 `/api` 프록시 |
 | backend | Spring Boot |
-| mysql | 회원·실종신고·제보 데이터 |
-| elasticsearch | 검색 인덱스 (기동 시 DB에서 자동 색인) |
+| mysql | 회원·실종신고·제보 데이터 + 전문검색 인덱스 |
 
 </br>
 

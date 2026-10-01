@@ -20,22 +20,6 @@ services:
       timeout: 5s
       retries: 10
 
-  elasticsearch:
-    image: elasticsearch:8.15.0
-    container_name: petradar-elasticsearch
-    restart: unless-stopped
-    environment:
-      - discovery.type=single-node       # 단일 노드로 실행
-      - xpack.security.enabled=false     # 내부 네트워크에서만 접근하므로 비활성화
-      - ES_JAVA_OPTS=-Xms512m -Xmx512m   # EC2 한 대에 함께 뜨므로 메모리를 제한한다
-    volumes:
-      - elasticsearch-data:/usr/share/elasticsearch/data
-    healthcheck:
-      test: ["CMD-SHELL", "curl -f http://localhost:9200/_cluster/health || exit 1"]
-      interval: 10s
-      timeout: 5s
-      retries: 15
-
   backend:
     # image와 build를 함께 둔다.
     # 로컬: docker compose build 로 직접 빌드하며 이 이름으로 태그된다
@@ -51,7 +35,6 @@ services:
       SPRING_DATASOURCE_URL: jdbc:mysql://mysql:3306/petradar_db?serverTimezone=Asia/Seoul&characterEncoding=UTF-8
       SPRING_DATASOURCE_USERNAME: root
       SPRING_DATASOURCE_PASSWORD: ${MYSQL_ROOT_PASSWORD:?MYSQL_ROOT_PASSWORD를 .env에 설정해주세요}
-      SPRING_ELASTICSEARCH_URIS: http://elasticsearch:9200
       APP_IMAGE_UPLOAD_DIR: /app/uploads
       # 기동 시마다 키가 바뀌면 재배포할 때 전체 사용자가 로그아웃되므로 고정값을 주입한다
       JWT_ACCESS_SECRET: ${JWT_ACCESS_SECRET:?JWT_ACCESS_SECRET을 .env에 설정해주세요}
@@ -66,8 +49,6 @@ services:
       - uploads:/app/uploads
     depends_on:
       mysql:
-        condition: service_healthy
-      elasticsearch:
         condition: service_healthy
 
   frontend:
@@ -85,5 +66,4 @@ services:
 
 volumes:
   mysql-data:
-  elasticsearch-data:
   uploads:

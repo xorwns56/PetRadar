@@ -2,7 +2,7 @@ import { client } from "./client";
 
 /**
  * 실종 글 목록 (페이지 단위).
- * 검색어가 있으면 Elasticsearch 전문 검색(/api/search)으로 관련도 순 결과를,
+ * 검색어가 있으면 전문 검색(/api/search)으로 관련도 순 결과를,
  * 없으면 목록 API로 정렬(최신순/오래된순) 결과를 받는다.
  * 두 경로 모두 같은 Page 모양으로 온다: { content, totalElements, totalPages, ... }
  *

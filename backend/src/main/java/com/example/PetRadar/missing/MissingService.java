@@ -1,7 +1,6 @@
 package com.example.PetRadar.missing;
 
 import com.example.PetRadar.image.ImageStorageService;
-import com.example.PetRadar.search.MissingSearchService;
 import com.example.PetRadar.user.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
@@ -23,7 +22,6 @@ public class MissingService {
     private final MissingRepository missingRepository;
     private final UserRepository userRepository;
     private final ImageStorageService imageStorageService;
-    private final MissingSearchService searchService;
 
     @Value("${app.image.base-url}")
     private String imageBaseUrl;
@@ -73,7 +71,6 @@ public class MissingService {
             imageStorageService.delete(imageKey);
             throw e;
         }
-        searchService.index(missing);
         /* 예전에는 여기서 전 사용자에게 알림을 보냈다. 홈 지도가 주변에 어떤 아이를
            찾고 있는지 이미 보여주므로 같은 일을 두 번 하는 셈이었고, 서버는 사용자가
            어디 사는지 모르는 탓에 "당신 근처에서"라고 말하면서 실제로는 전국에
@@ -109,7 +106,6 @@ public class MissingService {
         if (newKey != null) {
             imageStorageService.delete(previousKey);
         }
-        searchService.index(existingMissing);
     }
 
     @Transactional
@@ -125,8 +121,7 @@ public class MissingService {
     /**
      * 한 사용자의 실종 글을 전부 지운다 (회원 탈퇴).
      *
-     * User의 cascade에 맡기면 이 경로를 타지 않아 색인과 이미지 파일이 남았다 —
-     * 탈퇴로 사라진 글이 검색 결과에는 계속 뜨고, 눌러 들어가면 404가 났다.
+     * User의 cascade에 맡기면 이 경로를 타지 않아 업로드된 이미지 파일이 남는다.
      * 소유자 검증은 부르는 쪽이 이미 본인 계정임을 알고 있으므로 하지 않는다.
      */
     @Transactional
@@ -137,14 +132,15 @@ public class MissingService {
     /**
      * 글 한 건을 지울 때 함께 정리해야 할 것들.
      *
-     * 행만 지우면 남는 것이 둘이다 — 검색 색인과 업로드된 파일. 지우는 자리가
-     * 둘(본인 삭제, 회원 탈퇴)이라 한쪽만 고치면 다시 어긋나므로 여기 모아 둔다.
+     * 행을 지워도 업로드된 파일은 남는다. 지우는 자리가 둘(본인 삭제, 회원 탈퇴)이라
+     * 한쪽만 고치면 다시 어긋나므로 여기 모아 둔다.
+     *
+     * 검색 색인은 따로 지우지 않는다 — 전문 검색이 MySQL로 옮겨 와 행이 곧 색인이다.
      */
     private void purge(Missing missing) {
         // 달린 제보는 Missing의 cascade가 행을 지우지만, 파일까지 지워주지는 않는다
         missing.getReports().forEach(report -> imageStorageService.delete(report.getPetImage()));
         imageStorageService.delete(missing.getPetImage());
         missingRepository.delete(missing);
-        searchService.delete(missing.getId());
     }
 }
