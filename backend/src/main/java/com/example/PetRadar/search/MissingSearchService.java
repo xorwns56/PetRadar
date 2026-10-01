@@ -1,7 +1,5 @@
 package com.example.PetRadar.search;
 
-import co.elastic.clients.elasticsearch._types.query_dsl.TextQueryType;
-import com.example.PetRadar.image.ImageUrls;
 import com.example.PetRadar.missing.Missing;
 import com.example.PetRadar.missing.MissingDTO;
 import com.example.PetRadar.missing.MissingRepository;
@@ -9,11 +7,8 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.elasticsearch.client.elc.NativeQuery;
-import org.springframework.data.elasticsearch.core.ElasticsearchOperations;
-import org.springframework.data.elasticsearch.core.SearchHits;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -25,7 +20,6 @@ public class MissingSearchService {
 
     private final MissingSearchRepository searchRepository;
     private final MissingRepository missingRepository;
-    private final ElasticsearchOperations elasticsearchOperations;
 
     @Value("${app.image.base-url}")
     private String imageBaseUrl;
@@ -34,6 +28,8 @@ public class MissingSearchService {
      * 색인/삭제는 글 등록·수정·삭제에서 호출된다.
      * Elasticsearch는 DB 트랜잭션에 참여하지 않으므로 실패해도 예외를 퍼뜨리지 않는다.
      * 검색에서 잠깐 빠지더라도 글 자체는 등록되는 편이 낫고, 누락분은 재색인으로 복구한다.
+     *
+     * 검색은 MySQL로 옮겼지만 색인은 아직 남겨 둔다 — 되돌릴 수 있게 하기 위해서다.
      */
     public void index(Missing missing) {
         try {
@@ -54,36 +50,36 @@ public class MissingSearchService {
     /**
      * 전문 검색: 제목, 내용, 이름, 품종, 실종장소를 한 번에 훑는다.
      *
-     * 페이지를 반드시 넘긴다. 지정하지 않으면 Spring Data Elasticsearch가
-     * 기본값(0페이지 10건)을 쓰는데, 그러면 11건째부터는 잘렸다는 표시도 없이
-     * 사라진다. "말티즈"를 검색한 사람이 10마리만 보고 없다고 판단하게 된다.
+     * MySQL FULLTEXT(ngram)로 옮겼다. 예전에는 Elasticsearch를 썼는데 인덱스에
+     * 분석기 설정이 없어 기본 standard 분석기가 쓰였고, 한국어에서는 공백으로만
+     * 자르는 탓에 조사가 붙은 채 한 덩어리가 됐다 — "구로"로 검색해도
+     * "서울 구로구"가 걸리지 않았다.
+     *
+     * 세 단계다.
+     *   1. 검색어를 교정한다 (별칭 사전 → 편집거리). 오타는 여기서 잡는다
+     *   2. 교정된 말로 구문 일치 검색
+     *   3. 그래도 0건이면 바이그램으로 넓힌다. 조각 하나만 겹쳐도 들어오므로
+     *      노이즈가 섞인다 — 정확히 맞는 것이 있을 때는 쓰지 않는다
      */
     public Page<MissingDTO> search(String query, Pageable pageable) {
-        NativeQuery searchQuery = NativeQuery.builder()
-                .withPageable(pageable)
-                .withQuery(q -> q
-                        .multiMatch(mm -> mm
-                                .query(query)
-                                .fields(
-                                        "title^2",           // 제목 가중치 2배
-                                        "content",
-                                        "petName",           // 목격자는 이름을 모르므로 기본 가중치
-                                        "petBreed^3",        // 품종 3배 (목격자의 주요 검색어)
-                                        "petMissingPlace^2"  // 실종장소 2배 (목격 위치)
-                                )
-                                // most_fields: 여러 필드에 걸친 조합("말티즈 강남")도 점수를 합산해 위로 올린다
-                                .type(TextQueryType.MostFields)
-                                // 표기 흔들림 보정 (말티즈 ↔ 몰티즈)
-                                .fuzziness("AUTO")
-                        )
-                )
-                .build();
+        // 네이티브 쿼리에 ORDER BY가 이미 있다. Pageable의 정렬을 함께 넘기면
+        // Spring Data가 ORDER BY를 하나 더 붙여 SQL이 깨진다
+        Pageable paged = PageRequest.of(pageable.getPageNumber(), pageable.getPageSize());
 
-        SearchHits<MissingDocument> hits = elasticsearchOperations.search(searchQuery, MissingDocument.class);
-        List<MissingDTO> content = hits.getSearchHits().stream()
-                .map(hit -> toDTO(hit.getContent()))
-                .toList();
-        return new PageImpl<>(content, pageable, hits.getTotalHits());
+        String phrase = SearchTerms.phrase(query);
+        if (phrase.isBlank()) {
+            return Page.empty(paged);   // 한 글자 검색어 등
+        }
+
+        Page<Missing> hits = missingRepository.searchFullText(phrase, paged);
+        if (hits.isEmpty()) {
+            // 교정이 닿지 못한 오타를 받아내는 그물. 원문으로 넓힌다
+            String bigrams = SearchTerms.bigrams(query);
+            if (!bigrams.isBlank()) {
+                hits = missingRepository.searchFullText(bigrams, paged);
+            }
+        }
+        return hits.map(missing -> MissingDTO.from(missing, imageBaseUrl));
     }
 
     /**
@@ -99,25 +95,5 @@ public class MissingSearchService {
 
     public long indexedCount() {
         return searchRepository.count();
-    }
-
-    // 검색 결과를 목록 API와 같은 형태로 돌려주어 프론트가 그대로 쓸 수 있게 한다
-    private MissingDTO toDTO(MissingDocument doc) {
-        return new MissingDTO(
-                doc.getId(),
-                doc.getUserId(),
-                doc.getPetName(),
-                doc.getPetType(),
-                doc.getPetGender(),
-                doc.getPetBreed(),
-                doc.getPetAge(),
-                doc.getPetMissingDate(),
-                doc.getPetMissingPlace(),
-                null,   // 관할 지자체는 검색 카드에서 쓰지 않는다. 필요하면 상세에서 받는다
-                null,   // 실종 위치 좌표도 마찬가지로 색인하지 않는다
-                ImageUrls.of(doc.getPetImage(), imageBaseUrl),
-                doc.getTitle(),
-                doc.getContent()
-        );
     }
 }
