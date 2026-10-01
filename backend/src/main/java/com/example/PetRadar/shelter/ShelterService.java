@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
 import java.time.Duration;
@@ -171,7 +172,36 @@ public class ShelterService {
         return Math.round(r * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a)) * 10) / 10.0;
     }
 
+    /**
+     * 만료되기 전에 미리 갱신해 둔다.
+     *
+     * 적재에 17초가 걸리는데, 예전에는 그 비용을 **만료 직후 들어온 사용자**가
+     * 뒤집어썼다. 캐시는 수동적으로 늙기만 하고, 누군가 요청해야 그제서야
+     * "지났네" 하고 받아오기 때문이다.
+     *
+     * 주기는 TTL보다 짧아야 한다. 그래야 갱신하는 17초 동안에도 기존 캐시가
+     * 아직 유효해서, 들어온 요청이 snapshot()의 빠른 길(락 없음)로 즉시 빠져나간다.
+     * 주기가 TTL보다 길면 그 사이에 만료 구간이 생겨 고치려던 문제가 그대로 남는다.
+     *
+     * 실패해도 다음 주기에 다시 시도한다. 그때까지는 기존 캐시가 쓰이고,
+     * 그것마저 만료되면 snapshot()의 지연 적재가 받아낸다 — 이 메서드는
+     * 최적화이지 유일한 경로가 아니다.
+     */
+    @Scheduled(fixedDelayString = "${app.shelter.refresh-interval-ms:3000000}",
+            initialDelayString = "${app.shelter.refresh-initial-delay-ms:10000}")
+    public void refreshCache() {
+        synchronized (this) {
+            try {
+                cache.set(load());
+            } catch (Exception e) {
+                log.warn("보호소 미리 적재 실패, 다음 주기에 다시 시도한다", e);
+            }
+        }
+    }
+
     private Snapshot snapshot() {
+        // 만료 전이면 락을 거치지 않는다. 미리 적재가 자물쇠를 쥐고 있어도
+        // 여기로 빠져나가므로 사용자는 기다리지 않는다
         Snapshot current = cache.get();
         if (current != null && !isExpired(current)) return current;
 
