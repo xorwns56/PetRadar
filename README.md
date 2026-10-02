@@ -9,7 +9,7 @@
 ## 🐾 프로젝트 개요
 
 - **프로젝트명:** 반려동물 위치 기반 실종 신고 플랫폼  
-- **개발기간:** 2025.06.16 ~ 2025.06.26  
+- **개발기간:** 2025.06.17 ~ 2025.06.26 (초기 구현) · 이후 배포·검색·보호소 연동 개편  
 
 </br>
 
@@ -37,7 +37,7 @@
 | 행동 특성 | 실시간 알림 필요, 간편한 제보 기능 선호 |
 | 사용 동기 | 실종 직후 빠른 신고와 주변 네트워크 활용 |
 | 사용 환경 | PC, 모바일 웹 |
-| 협력 기관 | 지역 동물 보호소, 지자체 |
+| 데이터 출처 | 공공데이터포털 — 국가동물보호정보시스템 (전국 보호소·구조동물) |
 
 </br>
 
@@ -47,7 +47,7 @@
 |--------|------------|
 | 전단지·SNS 중심 → 전달 범위 한정 | 지도에 모아 보여주는 위치 기반 목록 |
 | 실시간 제보 부재 | 목격 제보가 달리면 작성자에게 즉각 알림 |
-| 보호소와 연계 부족 | 공공데이터 API 연동 통한 협력 체계 마련 |
+| 보호소 정보가 흩어져 있음 | 전국 구조동물 공공데이터를 같은 화면에 함께, 비슷한 아이가 들어오면 알림 |
 
 </br>
 
@@ -61,7 +61,7 @@
 ### - 검색
 - MySQL FULLTEXT 전문 검색 (제목, 내용, 이름, 품종, 실종장소)  
 - ngram 파서로 한국어 부분 일치 — 조사가 붙어 있어도 찾습니다 (`구로` → `서울 구로구`)  
-- 품종·실종장소에 가중치를 두어 목격자의 검색 패턴을 반영  
+- 칼럼별 가중치 — 품종(×3) > 제목·실종장소(×2) > 전체(×1). 목격자는 품종과 장소로 찾습니다  
 - 오타·약칭 보정 (`몰티즈` → `말티즈`, `포메` → `포메라니안`)  
 - 표기가 둘 다 쓰이는 품종은 함께 검색 (`진도견` ↔ `진돗개`, `한국 고양이` ↔ `코리안숏헤어`)  
 
@@ -69,9 +69,11 @@
 > `ddl-auto=update`가 파서를 지정한 인덱스를 만들어 주지 못하기 때문입니다.
 > 손으로 다시 만들어야 할 때는 `backend/src/main/resources/db/fulltext-index.sql`을 쓰세요.
 
-### - 정보 공유
-- 공공데이터 API를 통한 보호소 정보 제공  
-- 실종 동물 현황 DB 저장 및 관리  
+### - 보호소 연계
+- 공공데이터포털(국가동물보호정보시스템)로 **전국** 보호소·보호동물 조회  
+- 인증키는 서버에만 두고 백엔드가 대신 호출합니다 — 보호가 끝난 개체(입양·반환·폐사)도 서버에서 걸러집니다  
+- 전국 7천여 건을 받는 데 17초가 걸려, 스케줄러가 캐시를 미리 데워 둡니다 (TTL 60분)  
+- 실종 신고와 품종·지역이 맞아 보이는 보호동물이 새로 들어오면 작성자에게 알림  
 
 ### - 사용자 관리
 - 회원가입 및 로그인  
@@ -88,14 +90,14 @@
 
 | 구분 | 기술 |
 |------|------|
-| **Frontend** | React, React Router, Vite, Tailwind CSS |
+| **Frontend** | React 19, React Router 7, Vite 6, Tailwind CSS 4 |
 | **Backend** | Spring Boot 3.5, Spring Security, Spring Data JPA |
 | **Database** | MySQL 8 |
 | **Search** | MySQL FULLTEXT (ngram) |
 | **Auth** | JWT (jjwt) |
 | **Realtime** | WebSocket (STOMP) + SockJS |
-| **API** | Kakao 지도 API, 경기데이터드림 유기동물 API |
-| **Infra** | Docker Compose, nginx |
+| **API** | Kakao 지도 SDK, 공공데이터포털 국가동물보호정보시스템 |
+| **Infra** | Docker Compose, nginx, Let's Encrypt(certbot) |
 | **CI/CD** | GitHub Actions → GHCR |
 | **Deployment** | AWS EC2 |
 
@@ -115,11 +117,13 @@ com.example.PetRadar
   user/          회원 정보 (User가 refreshToken도 보관), OAuthAccount
   missing/       실종 신고 글 (CRUD)
   report/        목격 제보 글 (실종 글에 종속)
+  shelter/       공공데이터 API 클라이언트·캐시, 보호동물 매칭 감시
   notification/  알림 저장 + STOMP 발송
   search/        전문검색 (질의 전처리·오타 교정·인덱스 생성)
   image/         업로드 파일 저장, URL 조립
   security/      SecurityConfig, JWT 필터·프로바이더
   websocket/     STOMP 엔드포인트 설정
+  global/        전역 예외 처리
 ```
 
 도메인 폴더 안의 역할 분담 (`missing/` 기준)
@@ -197,6 +201,10 @@ API를 직접 찔러보려면 `localhost:8080`, nginx 없이 프론트만 보려
 카카오 지도를 로컬에서 쓰려면 카카오 개발자 콘솔의 Web 사이트 도메인에
 `http://localhost` 를 등록해야 합니다.
 
+보호소·유기동물 화면은 `.env` 의 `DATA_GO_KR_SERVICE_KEY` 로 동작합니다. 비워 두면
+그 화면만 비어 보이고 실종·제보·알림은 그대로 됩니다 (발급 방법은 `.env.example` 에
+적어 뒀습니다).
+
 ### 배포 구성 확인
 
 실제 배포와 같은 이미지로 띄워 확인할 때 씁니다.
@@ -224,14 +232,18 @@ main 브랜치에 push하면 GitHub Actions가 이미지를 빌드해 GHCR에 �
 ### 서버 최초 설정 (1회)
 
 `init.sh` 가 Docker 설치부터 인증서 발급·갱신 cron 등록까지 한 번에 합니다.
-먼저 아래 세 가지를 준비합니다.
+서버 안에서 할 수 있는 일만 하므로, 콘솔에서 사람이 해야 하는 준비가 먼저입니다
+(전체 목록은 아래 ["서버에서 손으로 해야 하는 일"](#-서버에서-손으로-해야-하는-일)).
 
 | 준비 | 이유 |
 |------|------|
-| 도메인 A 레코드가 서버 IP를 가리킴 | Let's Encrypt가 80 포트로 접속해 도메인 소유를 확인합니다 |
+| x86(amd64) 인스턴스 | 이미지를 `linux/amd64` 하나로만 빌드합니다. ARM 인스턴스에서는 뜨지 않습니다 |
+| 도메인 A 레코드가 서버 IP를 가리킴 (`@`·`www` 둘 다) | Let's Encrypt가 80 포트로 접속해 도메인 소유를 확인합니다 |
 | 보안 그룹 80·443 인바운드 개방 | 80이 막혀 있으면 인증서를 받을 수 없습니다 |
 | 공공데이터포털 인증키 | 보호소·유기동물 화면이 이 키로 동작합니다 (일반 인증키 **Decoding** 쪽) |
+| 카카오 개발자 콘솔에 도메인 등록 | 등록하지 않으면 사이트는 떠도 지도만 안 나옵니다 |
 | (선택) IAM 역할 | 로그를 CloudWatch로 보낼 때만. 아래 "로그" 참고 |
+| (GHCR 패키지가 비공개일 때) `docker login ghcr.io` | 이미지를 받지 못해 6단계에서 멈춥니다 |
 
 ```bash
 curl -sSL https://raw.githubusercontent.com/xorwns56/PetRadar/main/init.sh -o init.sh
@@ -239,9 +251,12 @@ sudo bash init.sh
 ```
 
 물어보는 값은 도메인·이메일·Swap 크기·공공데이터 인증키, 그리고 로그를 CloudWatch로
-보낼지뿐입니다. DB 비밀번호와
-JWT 서명 키는 `openssl` 로 만들어 `.env` 에 넣으므로 따로 정할 필요가 없습니다.
-HTTPS 없이 IP로만 띄워볼 때는 도메인에 `none` 을 입력합니다.
+보낼지(보낸다면 AWS 리전)뿐입니다. DB 비밀번호와 JWT 서명 키는 `openssl` 로 만들어
+`.env` 에 넣으므로 따로 정할 필요가 없습니다.
+HTTPS 없이 IP로만 띄워볼 때는 도메인에 `none` 을 입력합니다 — 나중에 다시 실행하면
+그때 인증서까지 처리합니다.
+`.env` 가 이미 있으면 그대로 두고 덮어쓸지 한 번 더 묻습니다. 데이터가 있는 서버에서는
+반드시 `N` 입니다 — DB 비밀번호를 새로 만들면 이미 초기화된 mysql 볼륨에 붙지 못합니다.
 
 스크립트가 하는 일
 
@@ -284,12 +299,19 @@ API가 200을 주는지 확인까지 합니다. `latest` 태그는 이름이 그
 `init.sh` 가 등록한 cron이 매일 03:00에 실행합니다.
 
 ```
-0 3 * * * cd ~/PetRadar && docker compose run --rm certbot renew --webroot -w /var/www/certbot --quiet && docker compose restart frontend
+0 3 * * * { cd ~/PetRadar && docker compose run --rm certbot renew --webroot -w /var/www/certbot --quiet && docker compose restart frontend; } >> /var/log/petradar-certbot-renew.log 2>&1
 ```
 
 `certbot renew` 는 만료가 임박하지 않으면 아무 것도 하지 않으므로 매일 실행해도
 됩니다. nginx는 기동 시 읽은 인증서를 계속 쓰므로, 갱신에 성공했을 때만(`&&`)
 frontend를 재시작해 새 인증서를 읽게 합니다.
+
+출력은 `/var/log/petradar-certbot-renew.log` 에 모읍니다. certbot 컨테이너는 `--rm` 이고
+자기 로그(`/var/log/letsencrypt`)가 볼륨에 없어서, 갱신이 **왜** 실패했는지 볼 수 있는
+유일한 창구입니다. Let's Encrypt가 보내는 만료 임박 메일은 "임박했다"만 말합니다.
+`--quiet` 라 문제가 없으면 아무것도 쓰지 않으므로 **빈 파일이 정상**입니다.
+체인 전체를 `{ }` 로 묶는 이유는, 묶지 않으면 리다이렉션이 마지막 명령에만 붙어
+정작 보고 싶은 certbot 출력이 빠지기 때문입니다.
 
 ### 로그
 
@@ -352,18 +374,95 @@ ISO8601로 시작하게 맞춰 두었습니다.** Spring과 MySQL은 원래 그�
 ```
 
 응답 시간이 함께 남으므로 "어떤 요청이 느렸나"를 로그로 되짚을 수 있습니다.
-포맷 정의는 `nginx.conf`(http 컨텍스트)에 한 번, 사용은 `nginx-routes.conf`와
-`nginx-https.conf` 의 리다이렉트 블록에서 합니다 — `access_log` 는 아래 레벨에서
-다시 쓰면 교체되므로 server 안에서 지정해야 요청이 두 번 기록되지 않습니다.
+포맷 정의는 `nginx.conf`(http 컨텍스트)에 한 번, 사용은 `nginx-routes.conf` 에서
+합니다 — 이 파일을 80·443 양쪽 server 블록이 include 하므로 한 번 써 두면 둘 다
+적용됩니다. `access_log` 는 아래 레벨에서 다시 쓰면 교체되므로 server 안에서 지정해야
+요청이 두 번 기록되지 않습니다.
+
+`nginx-https.conf` 의 HTTP→HTTPS 리다이렉트 블록만 `access_log off` 입니다. 이 파일은
+호스트에서 마운트되는데 포맷 정의는 이미지 안에 있어서, `git pull` 로 이 파일만 새것이
+되고 이미지가 아직 구버전이면 nginx가 "unknown log format" 으로 기동에 실패합니다 —
+사이트가 내려가는 쪽이 더 비쌉니다. 리다이렉트된 요청은 HTTPS로 다시 들어와 그쪽에
+기록되므로 잃는 정보도 없습니다.
 개발용 `nginx-dev.conf` 는 이 파일들을 쓰지 않아 영향받지 않습니다.
 
 용량의 대부분은 nginx 액세스 로그입니다(요청 하나가 한 줄). 데모 트래픽이면 월
-수십 MB로 무료 한도(월 5GB) 안이지만, 줄이려면 `nginx-api-routes.conf` 에서
-정적 파일 경로의 `access_log off` 를 쓰면 됩니다. 액세스 로그에는 방문자 IP가
-남으므로 보존기간을 짧게 두는 편이 좋습니다.
+수십 MB로 무료 한도(월 5GB) 안이지만, 줄이려면 업로드 이미지 경로(`location /images/`
+— `nginx-api-routes.conf`)와 SPA 정적 파일 경로(`location /` — `nginx-routes.conf`)에
+`access_log off` 를 걸면 됩니다. 액세스 로그에는 방문자 IP가 남으므로 보존기간을
+짧게 두는 편이 좋습니다.
 
 > `down -v` 는 볼륨까지 지웁니다. DB, 업로드 이미지, 인증서가 모두 삭제되므로
 > 서버에서는 사용하지 마세요.
+
+</br>
+
+## 🐾 서버에서 손으로 해야 하는 일
+
+`init.sh` 와 `deploy.sh` 는 **서버 안에서 할 수 있는 일만** 합니다. AWS·DNS·외부 서비스
+콘솔에서 사람이 해야 하는 작업은 아래가 전부입니다.
+
+### 최초 1회 — `init.sh` 보다 먼저
+
+| 할 일 | 안 하면 |
+|------|------|
+| EC2 인스턴스 생성 (Ubuntu, **x86/amd64**) | 이미지를 `linux/amd64` 하나로만 빌드하므로 ARM 인스턴스에서는 컨테이너가 뜨지 않습니다 |
+| 보안 그룹 인바운드 22·80·443 개방 | 80이 막히면 Let's Encrypt가 도메인 소유를 확인하지 못해 인증서 발급이 실패합니다 |
+| 도메인 A 레코드를 서버 공인 IP로 — `@` 와 `www` 둘 다 | 같은 이유로 발급이 실패합니다. `init.sh` 가 미리 확인하고 멈춰 줍니다 |
+| 공공데이터포털에서 인증키 발급 — 아래 두 API에 활용신청(자동승인) 후 **일반 인증키(Decoding)** 복사 | 보호소·유기동물 화면만 비어 보입니다. 나머지 기능은 그대로 동작합니다 |
+| 카카오 개발자 콘솔 > 앱 설정 > 플랫폼 > Web 사이트 도메인에 `https://<도메인>` 등록 | 사이트는 떠도 **지도만** 안 나옵니다. 원인을 찾기 어려운 증상입니다 |
+| (CloudWatch로 로그를 보낼 때만) IAM 역할을 인스턴스에 연결 | 드라이버가 컨테이너 생성 시점에 로그 스트림부터 만들기 때문에, 권한이 없으면 컨테이너가 **기동조차** 못 합니다 |
+| (GHCR 패키지를 비공개로 뒀을 때만) `sudo docker login ghcr.io -u <사용자>` 로 PAT 로그인 | `docker compose pull` 이 실패해 `init.sh` 가 6단계에서 멈춥니다 |
+
+공공데이터포털에서 활용신청할 두 API — 계정당 인증키는 하나이고, 둘 다 신청하면 같은
+키로 함께 씁니다. `Encoding` 키를 넣으면 이중 인코딩이 되어
+`SERVICE_KEY_IS_NOT_REGISTERED_ERROR` 가 납니다.
+
+- [전국동물보호센터정보표준데이터](https://www.data.go.kr/data/15025454/standard.do) — 보호소 좌표
+- [국가동물보호정보시스템 구조동물 조회](https://www.data.go.kr/data/15098931/openapi.do) — 보호 중인 동물
+
+> 카카오 AppKey는 `frontend/src/lib/kakaoMap.js` 에 들어 있습니다(브라우저에 노출되는
+> 클라이언트 키라 도메인 제한으로 보호합니다). 이 저장소를 다른 도메인에 올리는 경우엔
+> 자기 앱의 AppKey로 바꾸고, 그 도메인을 콘솔에 등록해야 합니다.
+
+### `init.sh` 직후
+
+| 할 일 | 안 하면 |
+|------|------|
+| 한 번 로그아웃하고 다시 접속 | `usermod -aG docker` 는 재로그인 뒤에 적용되므로 `deploy.sh` 가 docker에 붙지 못합니다 (`sudo ./deploy.sh` 로도 됩니다) |
+| (CloudWatch를 켠 경우) 로그 그룹 `/petradar` 의 보존기간 확인 | 기본값이 무기한 보관이라 계속 쌓이고 계속 과금됩니다. `init.sh` 가 aws CLI로 14일을 시도하고 실패하면 알려 주는데, EC2에 aws CLI가 없으면 그 경로로 실패합니다 |
+
+### 배포할 때마다
+
+| 할 일 | 안 하면 |
+|------|------|
+| 저장소 Actions 탭에서 빌드 초록불 확인 후 `./deploy.sh` | 아직 올라가지 않은 이미지를 받아 이전 버전이 그대로 뜹니다. `latest` 태그라 이름만으로는 구분되지 않습니다 |
+
+기본 도메인(`petradar.site`)이 아닌 도메인으로 세팅했다면 `init.sh` 가 `sed` 로
+`frontend/nginx-https.conf` 를 고쳐 둡니다. 이 파일이 수정 상태라 이후 `git pull` 이
+막히는데, `deploy.sh` 는 pull만 건너뛰고 이미지 갱신은 계속합니다. compose·nginx 설정이
+바뀐 배포에서는 직접 해결해야 합니다.
+
+```bash
+git stash && git pull --ff-only && git stash pop   # 충돌하면 도메인만 다시 바꿔 넣는다
+```
+
+### 백업 — 자동화되어 있지 않음
+
+DB와 업로드 이미지는 도커 볼륨에만 있습니다. 필요하면 손으로 받아 둡니다.
+
+```bash
+# DB
+docker compose exec -T mysql sh -c 'mysqldump -uroot -p"$MYSQL_ROOT_PASSWORD" petradar_db' \
+  > ~/petradar-$(date +%F).sql
+
+# 업로드 이미지 (볼륨 이름은 docker volume ls 로 확인)
+docker run --rm -v petradar_uploads:/data -v ~:/backup alpine \
+  tar czf /backup/petradar-uploads-$(date +%F).tgz -C /data .
+```
+
+`.env` 에는 DB 비밀번호와 JWT 서명 키가 들어 있고 저장소에 없습니다. 서버를 새로
+만들면 로그인 세션이 전부 풀리므로, 유지해야 한다면 이 파일도 함께 보관합니다.
 
 </br>
 
