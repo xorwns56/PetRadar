@@ -4,6 +4,7 @@ import {
   DEFAULT_CENTER,
   OVERVIEW_LEVEL,
   loadKakaoMap,
+  showHereDot,
 } from "../../lib/kakaoMap";
 import { useGeolocation } from "../../hooks/useGeolocation";
 import MapLocationNotice from "./MapLocationNotice";
@@ -158,6 +159,13 @@ const MissingMap = ({ missingList, onVisibleCountChange }) => {
     mapRef.current.setCenter(
       new window.kakao.maps.LatLng(position.lat, position.lng)
     );
+  }, [mapLoaded, position]);
+
+  /* 중심을 옮기기만 하면 어디가 내 위치인지 알 수 없다. 이 화면은 "지금 있는
+     곳을 중심으로 보여드려요"라고 말하는 자리라 기준점을 함께 찍는다 */
+  useEffect(() => {
+    const overlay = showHereDot(mapRef.current, position);
+    return () => overlay?.setMap(null);
   }, [mapLoaded, position]);
 
   // 배율·중심이 바뀌면 묶음이 달라지므로 다시 그린다

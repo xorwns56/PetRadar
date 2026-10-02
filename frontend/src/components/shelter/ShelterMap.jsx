@@ -4,6 +4,7 @@ import {
   NATIONWIDE_CENTER,
   NATIONWIDE_LEVEL,
   loadKakaoMap,
+  showHereDot,
 } from "../../lib/kakaoMap";
 import { clusterByPixel } from "../../lib/mapCluster";
 
@@ -42,7 +43,6 @@ const ShelterMap = ({
   const markersRef = useRef(new Map());
   /** 묶인 보호소 → 그 묶음의 DOM. 묶여 있어도 짚은 티가 나게 한다 */
   const clusterOfRef = useRef(new Map());
-  const hereRef = useRef(null);
 
   // 최신 값을 이벤트 핸들러가 보게 한다. 지도는 한 번만 만들고 계속 쓰므로
   // 핸들러가 첫 렌더의 값을 붙들면 갱신이 반영되지 않는다
@@ -243,31 +243,12 @@ const ShelterMap = ({
     map.panTo(target.coords);
   }, [selectedId, mapReady]);
 
-  /* 현재 위치 점.
-     보호소 마커가 주황이라 색을 달리하고, 퍼지는 고리를 둬서 "내가 여기"임을
-     한눈에 알 수 있게 한다. 지도가 문서에 직접 꽂는 DOM이라 JSX가 아니지만
-     클래스 문자열이 소스에 그대로 있으므로 Tailwind가 찾아낸다 */
+  /* 현재 위치 점. 모양과 이유는 lib/kakaoMap.js의 showHereDot에 있다.
+     정리는 cleanup이 맡으므로 ref로 들고 있지 않아도 된다 —
+     의존성이 바뀌면 이전 오버레이가 먼저 지워진다 */
   useEffect(() => {
-    const map = mapRef.current;
-    if (!map || !center) return;
-
-    hereRef.current?.setMap(null);
-    const dot = document.createElement("div");
-    dot.className =
-      "pointer-events-none relative flex size-4 items-center justify-center select-none";
-    dot.innerHTML =
-      '<span class="absolute inline-flex size-full animate-ping rounded-full bg-here opacity-60"></span>' +
-      '<span class="relative inline-flex size-3 rounded-full border-2 border-white bg-here shadow"></span>';
-
-    const overlay = new window.kakao.maps.CustomOverlay({
-      position: new window.kakao.maps.LatLng(center.lat, center.lng),
-      content: dot,
-      zIndex: 5,
-    });
-    overlay.setMap(map);
-    hereRef.current = overlay;
-
-    return () => overlay.setMap(null);
+    const overlay = showHereDot(mapRef.current, center);
+    return () => overlay?.setMap(null);
   }, [center, mapReady]);
 
   // 높이는 쓰는 쪽이 정한다

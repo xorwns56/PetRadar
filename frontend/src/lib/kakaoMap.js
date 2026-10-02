@@ -128,6 +128,38 @@ export function loadKakaoMap() {
 }
 
 /**
+ * 지도에 "내가 여기" 점을 꽂는다.
+ *
+ * 중심을 내 위치로 옮기는 것만으로는 어디가 내 위치인지 알 수 없다 —
+ * 마커들 사이에서 중심이 어디인지는 보이지 않는다. 홈과 보호소가 같은
+ * 모양을 쓰도록 여기에 둔다. 예전에는 보호소 지도에만 있었다.
+ *
+ * 퍼지는 고리를 둬서 실종·보호소 마커와 구분한다. 지도가 문서에 직접 꽂는
+ * DOM이라 JSX가 아니지만, 클래스 문자열이 소스에 그대로 있으므로
+ * Tailwind가 찾아낸다.
+ *
+ * @returns {object|null} 지울 수 있도록 오버레이를 돌려준다 — overlay.setMap(null)
+ */
+export function showHereDot(map, position) {
+  if (!map || !position) return null;
+
+  const dot = document.createElement("div");
+  dot.className =
+    "pointer-events-none relative flex size-4 items-center justify-center select-none";
+  dot.innerHTML =
+    '<span class="absolute inline-flex size-full animate-ping rounded-full bg-here opacity-60"></span>' +
+    '<span class="relative inline-flex size-3 rounded-full border-2 border-white bg-here shadow"></span>';
+
+  const overlay = new window.kakao.maps.CustomOverlay({
+    position: new window.kakao.maps.LatLng(position.lat, position.lng),
+    content: dot,
+    zIndex: 5,
+  });
+  overlay.setMap(map);
+  return overlay;
+}
+
+/**
  * 좌표를 관할 지자체 이름으로 바꾼다 ("경기도 화성시").
  *
  * 보호동물의 발견 지점은 공공 API에 좌표가 없고 관할 지자체(orgNm)만 있다.
