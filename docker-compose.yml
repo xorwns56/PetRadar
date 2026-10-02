@@ -42,8 +42,8 @@ services:
       # HTTPS를 붙이면 .env에서 COOKIE_SECURE=true로 바꾼다
       COOKIE_SECURE: ${COOKIE_SECURE:-false}
       # 공공데이터포털 인증키 (보호소·유기동물 조회).
-      # 아직 읽는 코드가 없어 기동을 막지 않는다. 보호소 프록시를 붙일 때
-      # 다른 시크릿처럼 :? 로 바꿔 빠뜨리면 기동이 멈추게 할 것
+      # 다른 시크릿과 달리 :? 로 기동을 막지 않는다 — 키가 없으면 보호소 화면만
+      # 비어 보이고 실종·제보·알림은 그대로 동작하므로, 전체를 못 띄우는 쪽이 더 손해다
       DATA_GO_KR_SERVICE_KEY: ${DATA_GO_KR_SERVICE_KEY:-}
     volumes:
       - uploads:/app/uploads
@@ -61,9 +61,16 @@ services:
     volumes:
       # 백엔드가 저장한 이미지를 nginx가 직접 서빙한다 (읽기 전용)
       - uploads:/usr/share/nginx/images:ro
+      # ACME 챌린지 경로. 인증서를 발급받기 전(HTTP만 띄운 상태)에도 nginx가
+      # certbot이 놓은 파일을 서빙해야 하므로 https 오버라이드가 아니라 여기에 둔다.
+      # 이 마운트가 없으면 nginx는 컨테이너 안의 빈 디렉터리를 보게 되고,
+      # Let's Encrypt가 챌린지를 404로 받아 최초 발급이 실패한다
+      - certbot-www:/var/www/certbot:ro
     depends_on:
       - backend
 
 volumes:
   mysql-data:
   uploads:
+  # 발급·갱신 때 certbot(https 오버라이드)이 쓰고 nginx가 읽는다
+  certbot-www:
