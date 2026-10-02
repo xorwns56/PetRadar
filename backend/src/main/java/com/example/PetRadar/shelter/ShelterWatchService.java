@@ -67,7 +67,10 @@ public class ShelterWatchService {
 
     /**
      * 공공 API가 하루 내내 갱신되므로 한 시간마다 본다.
-     * 캐시 주기와 맞춰 두어 불필요한 외부 호출이 겹치지 않게 한다.
+     *
+     * 캐시를 읽기만 하므로 이 주기는 외부 호출을 늘리지 않는다. 캐시 적재와는
+     * 서로 모르는 별개의 타이머다 — 캐시가 새 개체를 받아와도 이쪽이 돌 때까지
+     * 알림은 가지 않으므로, 알림 지연은 두 주기가 더해진 값이다.
      */
     @Scheduled(fixedDelayString = "${app.shelter.watch-interval-ms:3600000}",
             initialDelayString = "${app.shelter.watch-initial-delay-ms:120000}")
