@@ -340,6 +340,22 @@ aws logs tail /petradar --since 1h --filter ERROR
 | `mode: non-blocking` | 전송이 막혔을 때 애플리케이션의 stdout 쓰기까지 멈추지 않게 합니다. 버퍼가 차면 로그를 버립니다 — 로그를 잃는 쪽이 사이트가 서는 것보다 낫습니다 |
 | `awslogs-create-group` | 그룹이 없으면 컨테이너가 기동에 실패하므로 직접 만들게 합니다 |
 | 보존기간 14일 | 기본값이 무기한 보관이라 그대로 두면 계속 쌓이고 계속 과금됩니다. `init.sh` 가 aws CLI로 설정을 시도하고, 실패하면 알려줍니다 |
+| `awslogs-datetime-format` | 날짜로 시작하는 줄만 새 이벤트로 봅니다. 없으면 자바 스택트레이스가 줄마다 쪼개져, `ERROR` 로 걸러도 첫 줄만 보입니다 |
+
+위 마지막 옵션을 호스트 전체에 걸 수 있도록 **세 컨테이너의 로그가 모두
+ISO8601로 시작하게 맞춰 두었습니다.** Spring과 MySQL은 원래 그렇고, nginx만
+기본 포맷이 IP로 시작해서 `nginx.conf` 에 포맷을 따로 정의했습니다.
+
+```
+2026-10-02T10:14:55+00:00 1.2.3.4 200 0.012 "GET /api/missing HTTP/1.1" 896 "-"
+                                      ↑ $request_time — 기본 포맷에는 없습니다
+```
+
+응답 시간이 함께 남으므로 "어떤 요청이 느렸나"를 로그로 되짚을 수 있습니다.
+포맷 정의는 `nginx.conf`(http 컨텍스트)에 한 번, 사용은 `nginx-routes.conf`와
+`nginx-https.conf` 의 리다이렉트 블록에서 합니다 — `access_log` 는 아래 레벨에서
+다시 쓰면 교체되므로 server 안에서 지정해야 요청이 두 번 기록되지 않습니다.
+개발용 `nginx-dev.conf` 는 이 파일들을 쓰지 않아 영향받지 않습니다.
 
 용량의 대부분은 nginx 액세스 로그입니다(요청 하나가 한 줄). 데모 트래픽이면 월
 수십 MB로 무료 한도(월 5GB) 안이지만, 줄이려면 `nginx-api-routes.conf` 에서

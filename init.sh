@@ -167,6 +167,11 @@ if [ "$USE_CLOUDWATCH" = "y" ] || [ "$USE_CLOUDWATCH" = "Y" ]; then
   docker pull hello-world >/dev/null 2>&1 && TEST_IMAGE_OK=y
 
   # tag로 컨테이너 이름이 로그 스트림이 된다 — petradar-backend / -frontend / -mysql.
+  #
+  # awslogs-datetime-format: 날짜로 시작하는 줄만 새 이벤트로 본다. 없으면 자바
+  #   스택트레이스가 줄마다 쪼개져 ERROR로 걸러도 첫 줄만 나온다. 세 컨테이너가
+  #   모두 ISO8601로 시작하므로(nginx는 log_format cloudwatch) 호스트 전체에 걸어도 된다.
+  #
   # non-blocking: 전송이 막혔을 때 애플리케이션의 stdout 쓰기까지 멈추지 않게 한다.
   #               버퍼가 차면 로그를 버린다 — 로그를 잃는 쪽이 사이트가 서는 것보다 낫다
   cat > /etc/docker/daemon.json <<EOF
@@ -177,6 +182,7 @@ if [ "$USE_CLOUDWATCH" = "y" ] || [ "$USE_CLOUDWATCH" = "Y" ]; then
     "awslogs-group": "/petradar",
     "awslogs-create-group": "true",
     "tag": "{{.Name}}",
+    "awslogs-datetime-format": "%Y-%m-%dT%H:%M:%S",
     "mode": "non-blocking",
     "max-buffer-size": "4m"
   }
