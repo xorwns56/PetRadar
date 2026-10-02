@@ -221,73 +221,72 @@ docker compose up -d
 main 브랜치에 push하면 GitHub Actions가 이미지를 빌드해 GHCR에 올립니다.
 서버에서는 소스를 빌드하지 않고 이미지를 받아 띄웁니다.
 
-> HTTPS 설정은 `docker-compose.https.yml`에 분리되어 있습니다.
-> **인증서를 발급한 뒤부터는 모든 명령에 `-f` 로 두 파일을 함께 지정해야 합니다.**
-> 빠뜨리면 frontend가 443 포트와 인증서 설정 없이 다시 만들어져 HTTPS가 끊깁니다.
-
 ### 서버 최초 설정 (1회)
 
-도메인의 A 레코드가 서버를 가리키고 80 포트가 열려 있어야 합니다.
+`init.sh` 가 Docker 설치부터 인증서 발급·갱신 cron 등록까지 한 번에 합니다.
+먼저 아래 세 가지를 준비합니다.
+
+| 준비 | 이유 |
+|------|------|
+| 도메인 A 레코드가 서버 IP를 가리킴 | Let's Encrypt가 80 포트로 접속해 도메인 소유를 확인합니다 |
+| 보안 그룹 80·443 인바운드 개방 | 80이 막혀 있으면 인증서를 받을 수 없습니다 |
+| 공공데이터포털 인증키 | 보호소·유기동물 화면이 이 키로 동작합니다 (일반 인증키 **Decoding** 쪽) |
 
 ```bash
-# 1. Docker 설치 (Ubuntu 기준, 설치 후 재로그인)
-curl -fsSL https://get.docker.com | sudo sh
-sudo usermod -aG docker $USER
-
-# 2. 저장소 clone
-git clone https://github.com/xorwns56/petradar.git ~/PetRadar
-cd ~/PetRadar
-
-# 3. 시크릿 생성 (JWT 키는 openssl rand -base64 48 로 생성)
-cp .env.example .env
-vi .env
-
-# 4. HTTP로 먼저 기동
-#    인증서가 없으면 nginx가 기동하지 못하므로 https 오버라이드 없이 띄운다
-docker compose up -d
-
-# 5. 인증서 발급
-docker compose -f docker-compose.yml -f docker-compose.https.yml run --rm certbot \
-  certonly --webroot -w /var/www/certbot \
-  -d petradar.site -d www.petradar.site \
-  --email <이메일> --agree-tos --no-eff-email
-
-# 6. .env 의 COOKIE_SECURE 를 true 로 바꾼 뒤 HTTPS 적용
-docker compose -f docker-compose.yml -f docker-compose.https.yml up -d
+curl -sSL https://raw.githubusercontent.com/xorwns56/PetRadar/main/init.sh -o init.sh
+sudo bash init.sh
 ```
 
-### 인증서 갱신 (cron 등록, 1회)
+물어보는 값은 도메인·이메일·Swap 크기·공공데이터 인증키뿐입니다. DB 비밀번호와
+JWT 서명 키는 `openssl` 로 만들어 `.env` 에 넣으므로 따로 정할 필요가 없습니다.
+HTTPS 없이 IP로만 띄워볼 때는 도메인에 `none` 을 입력합니다.
 
-Let's Encrypt 인증서는 90일마다 만료됩니다. `certbot renew`는 만료가 임박하지
-않으면 아무 것도 하지 않으므로 매일 실행해도 됩니다.
+스크립트가 하는 일
 
-nginx는 기동 시 읽은 인증서를 계속 사용하므로, 갱신에 성공하면(`&&`) 재시작해야
-새 인증서가 반영됩니다.
+1. 패키지 업데이트, Docker 설치, `docker` 그룹에 사용자 추가
+2. Swap 생성 — 1GB 메모리에서 MySQL과 JVM을 함께 돌리면 OOM으로 죽습니다
+3. 저장소 clone — https 오버라이드가 `frontend/nginx-https.conf` 를 호스트 경로로 마운트하므로 파일이 서버에 있어야 합니다
+4. `.env` 생성 (권한 600). 이미 있으면 그대로 둡니다 — DB 비밀번호를 새로 만들면 이미 초기화된 mysql 볼륨에 붙지 못합니다
+5. HTTP 로 기동 — 인증서가 없으면 nginx가 443 설정을 읽다 실패하므로 순서가 중요합니다
+6. A 레코드 확인 → 챌린지 경로를 외부에서 직접 가져와 선검증 → 인증서 발급(webroot, nginx를 멈추지 않음) → `COOKIE_SECURE=true` → HTTPS 로 재기동
+7. 갱신 cron 등록 (매일 03:00)
 
-```bash
-crontab -e
-```
-```
-0 3 * * * cd ~/PetRadar && docker compose -f docker-compose.yml -f docker-compose.https.yml run --rm certbot renew --webroot -w /var/www/certbot && docker compose -f docker-compose.yml -f docker-compose.https.yml restart frontend
-```
+> **`-f` 를 빠뜨려 HTTPS가 끊기는 사고를 막기 위해**, 스크립트가 `.env` 에
+> `COMPOSE_FILE=docker-compose.yml:docker-compose.https.yml` 을 적어 둡니다.
+> 서버에서는 그냥 `docker compose up -d` 라고 써도 HTTPS 설정이 함께 적용됩니다.
+> 반대로 HTTPS 없이 띄우려면 `-f docker-compose.yml` 을 명시해야 합니다.
 
 ### 이후 배포
 
+저장소 Actions 탭에서 빌드가 끝난 것을 확인하고 서버에서 실행합니다.
+
 ```bash
-cd ~/PetRadar
-git pull              # 설정 파일(docker-compose.yml 등) 변경 반영
-docker compose -f docker-compose.yml -f docker-compose.https.yml pull   # 새 이미지
-docker compose -f docker-compose.yml -f docker-compose.https.yml up -d
+cd ~/PetRadar && ./deploy.sh
 ```
 
-`latest` 태그는 이름이 그대로라 `pull` 없이 `up -d`만 하면 기존 이미지를 재사용합니다.
-`.env`는 저장소에 포함되지 않으므로 한 번 만들어두면 이후 배포에도 유지됩니다.
+`git pull`(compose·nginx 설정) → `docker compose pull`(새 이미지) → `up -d` →
+API가 200을 주는지 확인까지 합니다. `latest` 태그는 이름이 그대로라 `pull` 없이
+`up -d` 만 하면 기존 이미지를 재사용합니다.
 
-서버를 재부팅하면 `restart: unless-stopped` 설정으로 컨테이너가 자동으로 다시 뜹니다.
-단, 직접 `stop` 한 경우에는 켜지지 않습니다.
+`up -d` 는 컨테이너를 만든 것까지만 보장하므로, 백엔드가 기동에 실패해 재시작을
+반복해도 성공처럼 보입니다. 그래서 `/api/missing/points` (인증 없이 nginx→백엔드→DB를
+모두 거치는 경로)가 200을 줄 때까지 최대 90초 기다린 뒤 결과를 알려줍니다.
 
-> `down -v` 는 볼륨까지 지웁니다. DB, 업로드 이미지, 인증서가 모두 삭제되므로
-> 서버에서는 사용하지 마세요.
+`.env` 는 저장소에 포함되지 않으므로 한 번 만들어두면 이후 배포에도 유지됩니다.
+서버를 재부팅하면 `restart: unless-stopped` 로 컨테이너가 자동으로 다시 뜹니다
+(직접 `stop` 한 경우는 켜지지 않습니다).
+
+### 인증서 갱신
+
+`init.sh` 가 등록한 cron이 매일 03:00에 실행합니다.
+
+```
+0 3 * * * cd ~/PetRadar && docker compose run --rm certbot renew --webroot -w /var/www/certbot --quiet && docker compose restart frontend
+```
+
+`certbot renew` 는 만료가 임박하지 않으면 아무 것도 하지 않으므로 매일 실행해도
+됩니다. nginx는 기동 시 읽은 인증서를 계속 쓰므로, 갱신에 성공했을 때만(`&&`)
+frontend를 재시작해 새 인증서를 읽게 합니다.
 
 > `down -v` 는 볼륨까지 지웁니다. DB, 업로드 이미지, 인증서가 모두 삭제되므로
 > 서버에서는 사용하지 마세요.
