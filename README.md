@@ -55,8 +55,16 @@
 
 ### - 위치 기반 신고 및 알림
 - 목격 제보가 달리거나 보호소에 비슷한 아이가 들어오면 글 작성자에게 알림  
-- WebSocket(STOMP) 기반 실시간 전달  
+- SSE(Server-Sent Events) 기반 실시간 전달  
 - Kakao 지도 API 기반 위치 시각화 및 현재 위치 표시  
+
+> 알림은 **SSE**로 보냅니다. WebSocket(STOMP)을 쓰다가 바꿨습니다 — 받는 핸들러가
+> 하나도 없어(`@MessageMapping` 0개) 트래픽이 서버→클라이언트 한 방향뿐인데,
+> 브로커의 destination·구독 모델과 SockJS 폴백이 하는 일이 없었습니다.
+> 바꾸면서 얻은 것은 **자동 재연결**(`EventSource` 내장)과 **토큰이 URL에서 사라진 것**
+> 입니다. 치른 비용은 하트비트를 직접 보내는 것과 nginx에 버퍼링·타임아웃을
+> 알려주는 것입니다 — SSE는 끝나지 않는 평범한 HTTP 응답이라 "오래 갈 연결"이라고
+> 선언할 수단이 없습니다.
 
 ### - 검색
 - MySQL FULLTEXT 전문 검색 (제목, 내용, 이름, 품종, 실종장소)  
@@ -95,7 +103,7 @@
 | **Database** | MySQL 8 |
 | **Search** | MySQL FULLTEXT (ngram) |
 | **Auth** | JWT (jjwt) |
-| **Realtime** | WebSocket (STOMP) + SockJS |
+| **Realtime** | SSE (Server-Sent Events) |
 | **API** | Kakao 지도 SDK, 공공데이터포털 국가동물보호정보시스템 |
 | **Infra** | Docker Compose, nginx, Let's Encrypt(certbot) |
 | **CI/CD** | GitHub Actions → GHCR |

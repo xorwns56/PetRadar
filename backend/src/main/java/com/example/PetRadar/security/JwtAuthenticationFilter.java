@@ -34,8 +34,8 @@ import java.util.Optional;
 @Component
 @RequiredArgsConstructor
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
-    /** STOMP 엔드포인트. SockJS는 전송 방식마다 이 아래에 경로를 덧붙인다 */
-    private static final String WEBSOCKET_PATH = "/api/ws";
+    /** 알림 스트림(SSE). 이 경로만 쿠키로 인증한다 — 아래 authenticateFromCookie 참고 */
+    private static final String STREAM_PATH = "/api/notification/stream";
 
     private final JwtTokenProvider jwtTokenProvider;
     private final UserService userService;
@@ -45,8 +45,12 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
             throws ServletException, IOException {
-        String bearerToken = extractBearerToken(request);
-        if (bearerToken != null && bearerToken.startsWith("Bearer ")) {
+        String bearerToken = request.getHeader("Authorization");
+        if (bearerToken == null && STREAM_PATH.equals(request.getRequestURI())) {
+            // 실패하면 인증 없이 통과시킨다. 이 경로는 SecurityConfig에서
+            // authenticated()라 EntryPoint가 다른 경로와 같은 모양의 401을 돌려준다
+            authenticateFromCookie(request);
+        } else if (bearerToken != null && bearerToken.startsWith("Bearer ")) {
             String accessToken = bearerToken.substring(7);
             try {
                 if (jwtTokenProvider.validateAccessToken(accessToken)) {
@@ -75,21 +79,31 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     }
 
     /**
-     * 요청에서 토큰을 꺼낸다. 기본은 Authorization 헤더다.
+     * 알림 스트림을 HttpOnly 쿠키만으로 인증한다.
      *
-     * 소켓 연결만 쿼리 파라미터도 받는다 — 브라우저의 WebSocket API는 핸드셰이크에
-     * 헤더를 붙일 수 없어서 다른 방법이 없다. 대신 그 경로에서만 본다.
-     * 모든 요청에서 받아주면 액세스 토큰이 URL에 실려 nginx 액세스 로그·브라우저
-     * 히스토리·Referer 헤더에 그대로 남는다.
+     * 브라우저의 EventSource는 요청에 헤더를 붙일 수 없다. 예전 소켓은 같은 제약을
+     * 쿼리 파라미터(`?token=`)로 피했는데, 그러면 액세스 토큰이 URL에 실려 nginx
+     * 액세스 로그와 브라우저 히스토리에 남는다. 쿠키는 그 경로로 새지 않는다.
+     *
+     * 리프레시 토큰을 쓰는 것은 서버가 **마지막에 발급한 것인지 DB와 맞춰볼 수**
+     * 있어서다(로그아웃하면 즉시 끊긴다). 받아들이는 곳은 이 경로 하나이고,
+     * 하는 일은 읽기뿐이다.
      */
-    private String extractBearerToken(HttpServletRequest request) {
-        String header = request.getHeader("Authorization");
-        if (header != null) {
-            return header;
+    private void authenticateFromCookie(HttpServletRequest request) {
+        String refreshToken = extractRefreshTokenFromCookie(request);
+        if (refreshToken == null) {
+            return;
         }
-        return request.getRequestURI().startsWith(WEBSOCKET_PATH)
-                ? request.getParameter("token")
-                : null;
+        try {
+            if (jwtTokenProvider.validateRefreshToken(refreshToken)
+                    && authService.isIssuedRefreshToken(refreshToken)) {
+                String userId = jwtTokenProvider.getUserIdFromRefreshToken(refreshToken);
+                authenticate(jwtTokenProvider.createAccessToken(userId), request);
+            }
+        } catch (Exception e) {
+            // 인증 없이 통과한다. 끝나지 않는 응답을 여기서 직접 쓰기 시작하면
+            // 클라이언트가 스트림으로 오해하므로 응답에 손대지 않는다
+        }
     }
 
     /**

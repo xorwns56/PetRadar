@@ -6,7 +6,6 @@ import com.example.PetRadar.report.ReportRepository;
 import com.example.PetRadar.user.UserRepository;
 import org.springframework.beans.factory.annotation.Value;
 import lombok.RequiredArgsConstructor;
-import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -29,7 +28,7 @@ public class NotificationService {
 
     private final NotificationRepository notificationRepository;
     private final UserRepository userRepository;
-    private final SimpMessagingTemplate simpMessagingTemplate;
+    private final NotificationStream notificationStream;
     private final ShelterPreviewProvider shelterPreviewProvider;
     private final ReportRepository reportRepository;
 
@@ -55,7 +54,9 @@ public class NotificationService {
         notification.setPostId(postId);
         notification.setTargetRef(targetRef);
         notificationRepository.save(notification);
-        simpMessagingTemplate.convertAndSendToUser(String.valueOf(receiverId), "/queue/notification", NotificationDTO.from(notification));
+        // 목록 조회와 같은 모양으로 내려보낸다. 요약 없이 보내면 방금 받은 알림만
+        // 사진·제목이 빈 카드로 그려지고, 새로고침해야 채워졌다
+        notificationStream.send(receiverId, NotificationDTO.from(notification, previewOf(notification)));
     }
 
     /**
