@@ -231,13 +231,15 @@ main 브랜치에 push하면 GitHub Actions가 이미지를 빌드해 GHCR에 �
 | 도메인 A 레코드가 서버 IP를 가리킴 | Let's Encrypt가 80 포트로 접속해 도메인 소유를 확인합니다 |
 | 보안 그룹 80·443 인바운드 개방 | 80이 막혀 있으면 인증서를 받을 수 없습니다 |
 | 공공데이터포털 인증키 | 보호소·유기동물 화면이 이 키로 동작합니다 (일반 인증키 **Decoding** 쪽) |
+| (선택) IAM 역할 | 로그를 CloudWatch로 보낼 때만. 아래 "로그" 참고 |
 
 ```bash
 curl -sSL https://raw.githubusercontent.com/xorwns56/PetRadar/main/init.sh -o init.sh
 sudo bash init.sh
 ```
 
-물어보는 값은 도메인·이메일·Swap 크기·공공데이터 인증키뿐입니다. DB 비밀번호와
+물어보는 값은 도메인·이메일·Swap 크기·공공데이터 인증키, 그리고 로그를 CloudWatch로
+보낼지뿐입니다. DB 비밀번호와
 JWT 서명 키는 `openssl` 로 만들어 `.env` 에 넣으므로 따로 정할 필요가 없습니다.
 HTTPS 없이 IP로만 띄워볼 때는 도메인에 `none` 을 입력합니다.
 
@@ -245,11 +247,12 @@ HTTPS 없이 IP로만 띄워볼 때는 도메인에 `none` 을 입력합니다.
 
 1. 패키지 업데이트, Docker 설치, `docker` 그룹에 사용자 추가
 2. Swap 생성 — 1GB 메모리에서 MySQL과 JVM을 함께 돌리면 OOM으로 죽습니다
-3. 저장소 clone — https 오버라이드가 `frontend/nginx-https.conf` 를 호스트 경로로 마운트하므로 파일이 서버에 있어야 합니다
-4. `.env` 생성 (권한 600). 이미 있으면 그대로 둡니다 — DB 비밀번호를 새로 만들면 이미 초기화된 mysql 볼륨에 붙지 못합니다
-5. HTTP 로 기동 — 인증서가 없으면 nginx가 443 설정을 읽다 실패하므로 순서가 중요합니다
-6. A 레코드 확인 → 챌린지 경로를 외부에서 직접 가져와 선검증 → 인증서 발급(webroot, nginx를 멈추지 않음) → `COOKIE_SECURE=true` → HTTPS 로 재기동
-7. 갱신 cron 등록 (매일 03:00)
+3. (선택) 로그 전송 설정 — 컨테이너가 뜨기 전에 끝냅니다
+4. 저장소 clone — https 오버라이드가 `frontend/nginx-https.conf` 를 호스트 경로로 마운트하므로 파일이 서버에 있어야 합니다
+5. `.env` 생성 (권한 600). 이미 있으면 그대로 둡니다 — DB 비밀번호를 새로 만들면 이미 초기화된 mysql 볼륨에 붙지 못합니다
+6. HTTP 로 기동 — 인증서가 없으면 nginx가 443 설정을 읽다 실패하므로 순서가 중요합니다
+7. A 레코드 확인 → 챌린지 경로를 외부에서 직접 가져와 선검증 → 인증서 발급(webroot, nginx를 멈추지 않음) → `COOKIE_SECURE=true` → HTTPS 로 재기동
+8. 갱신 cron 등록 (매일 03:00)
 
 > **`-f` 를 빠뜨려 HTTPS가 끊기는 사고를 막기 위해**, 스크립트가 `.env` 에
 > `COMPOSE_FILE=docker-compose.yml:docker-compose.https.yml` 을 적어 둡니다.
@@ -287,6 +290,61 @@ API가 200을 주는지 확인까지 합니다. `latest` 태그는 이름이 그
 `certbot renew` 는 만료가 임박하지 않으면 아무 것도 하지 않으므로 매일 실행해도
 됩니다. nginx는 기동 시 읽은 인증서를 계속 쓰므로, 갱신에 성공했을 때만(`&&`)
 frontend를 재시작해 새 인증서를 읽게 합니다.
+
+### 로그
+
+기본은 도커의 `json-file` 입니다. 애플리케이션이 로그 파일을 쓰지 않으므로
+(Spring·nginx·MySQL 모두 stdout/stderr로 내보냅니다) 로그는 전부 도커를 거칩니다.
+
+```bash
+docker compose logs -f backend
+```
+
+이 방식은 **배포할 때마다 초기화됩니다.** `up -d` 가 컨테이너를 교체하면 옛
+컨테이너의 로그 파일도 함께 지워집니다. 지난주에 무슨 일이 있었는지 보려면
+밖으로 내보내야 합니다.
+
+`init.sh` 에서 "CloudWatch로 보낼까요?"에 `y` 라고 답하면 `/etc/docker/daemon.json`
+을 만들어 호스트 전체의 로그 드라이버를 `awslogs` 로 바꿉니다. compose가 아니라
+호스트 설정에 두는 이유는, 로그를 어디로 보내는지가 애플리케이션의 성질이 아니라
+서버의 사정이기 때문입니다 — 그래서 로컬 개발은 AWS 자격증명 없이 그대로 돕니다.
+
+**IAM 역할을 먼저 붙여야 합니다.** 드라이버는 컨테이너를 만들 때 로그 스트림부터
+생성하므로, 권한이 없으면 컨테이너가 아예 뜨지 않습니다. `init.sh` 가 작은
+컨테이너로 먼저 시험해보고 실패하면 설정을 되돌립니다.
+
+```json
+{
+  "Version": "2012-10-17",
+  "Statement": [{
+    "Effect": "Allow",
+    "Action": [
+      "logs:CreateLogGroup", "logs:CreateLogStream",
+      "logs:PutLogEvents", "logs:DescribeLogStreams"
+    ],
+    "Resource": "arn:aws:logs:ap-northeast-2:*:log-group:/petradar*"
+  }]
+}
+```
+
+로그 그룹은 `/petradar` 하나이고, 컨테이너 이름이 스트림이 됩니다
+(`petradar-backend`, `petradar-frontend`, `petradar-mysql`).
+
+```bash
+aws logs tail /petradar --follow
+aws logs tail /petradar --since 1h --filter ERROR
+```
+
+| 옵션 | 왜 |
+|------|------|
+| `mode: non-blocking` | 전송이 막혔을 때 애플리케이션의 stdout 쓰기까지 멈추지 않게 합니다. 버퍼가 차면 로그를 버립니다 — 로그를 잃는 쪽이 사이트가 서는 것보다 낫습니다 |
+| `awslogs-create-group` | 그룹이 없으면 컨테이너가 기동에 실패하므로 직접 만들게 합니다 |
+| 보존기간 14일 | 기본값이 무기한 보관이라 그대로 두면 계속 쌓이고 계속 과금됩니다. `init.sh` 가 aws CLI로 설정을 시도하고, 실패하면 알려줍니다 |
+
+용량의 대부분은 nginx 액세스 로그입니다(요청 하나가 한 줄). 데모 트래픽이면 월
+수십 MB로 무료 한도(월 5GB) 안이지만, 줄이려면 `nginx-api-routes.conf` 에서
+정적 파일 경로의 `access_log off` 를 쓰면 됩니다. 액세스 로그에는 방문자 IP가
+남으므로 보존기간을 짧게 두는 편이 좋습니다.
 
 > `down -v` 는 볼륨까지 지웁니다. DB, 업로드 이미지, 인증서가 모두 삭제되므로
 > 서버에서는 사용하지 마세요.

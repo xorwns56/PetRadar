@@ -20,6 +20,13 @@
 #    - 보호소·유기동물 탭이 이 키로 동작한다. 없으면 그 화면만 비어 보인다.
 #    - 반드시 "일반 인증키(Decoding)" 쪽을 넣는다 (.env.example 참고).
 #
+# 4. (로그를 CloudWatch로 보낼 때만) IAM 역할
+#    - EC2 → 작업 → 보안 → IAM 역할 수정에서 아래 권한을 가진 역할을 붙인다.
+#      logs:CreateLogGroup, logs:CreateLogStream, logs:PutLogEvents,
+#      logs:DescribeLogStreams  (Resource: arn:aws:logs:<리전>:*:log-group:/petradar*)
+#    - 권한이 없으면 컨테이너가 기동조차 못 하므로, 이 스크립트가 확인하고
+#      안 되면 로그 설정을 되돌린다.
+#
 # 서버에서 실행:
 #   curl -sSL https://raw.githubusercontent.com/xorwns56/PetRadar/main/init.sh -o init.sh
 #   sudo bash init.sh
@@ -89,11 +96,18 @@ fi
 read -s -p "공공데이터포털 인증키 (일반 인증키 Decoding, 없으면 엔터): " DATA_GO_KR_SERVICE_KEY
 echo
 
+# 권한이 없으면 컨테이너가 기동조차 못 하므로 기본값은 "안 보냄"이다
+read -p "컨테이너 로그를 CloudWatch로 보낼까요? (IAM 역할이 먼저 붙어 있어야 합니다) [y/N]: " USE_CLOUDWATCH
+if [ "$USE_CLOUDWATCH" = "y" ] || [ "$USE_CLOUDWATCH" = "Y" ]; then
+  read -p "  AWS 리전 (엔터=ap-northeast-2): " AWS_LOG_REGION
+  AWS_LOG_REGION=${AWS_LOG_REGION:-ap-northeast-2}
+fi
+
 # ------------------------------------------
 # 1. 패키지 업데이트
 # ------------------------------------------
 echo ""
-echo "[1/7] 패키지 업데이트..."
+echo "[1/8] 패키지 업데이트..."
 apt-get update -y
 apt-get upgrade -y
 apt-get install -y curl git openssl
@@ -101,7 +115,7 @@ apt-get install -y curl git openssl
 # ------------------------------------------
 # 2. Docker 설치
 # ------------------------------------------
-echo "[2/7] Docker 설치..."
+echo "[2/8] Docker 설치..."
 if command -v docker >/dev/null 2>&1; then
   echo "  이미 설치돼 있어 건너뜁니다."
 else
@@ -116,7 +130,7 @@ usermod -aG docker "$APP_USER"
 # ------------------------------------------
 # 3. Swap 설정
 # ------------------------------------------
-echo "[3/7] Swap 설정 (${SWAP_SIZE})..."
+echo "[3/8] Swap 설정 (${SWAP_SIZE})..."
 # 프리티어 1GB 메모리로 MySQL과 JVM을 함께 돌리면 OOM으로 컨테이너가 죽는다
 if [ -f /swapfile ]; then
   echo "  이미 있어 건너뜁니다."
@@ -135,9 +149,78 @@ sysctl -w vm.swappiness=10 >/dev/null
 grep -q "^vm.swappiness" /etc/sysctl.conf || echo "vm.swappiness=10" >> /etc/sysctl.conf
 
 # ------------------------------------------
-# 4. 저장소 clone
+# 4. 로그 전송 설정 (선택)
 # ------------------------------------------
-echo "[4/7] 저장소 준비 (${APP_DIR})..."
+echo "[4/8] 로그 전송 설정..."
+# compose가 아니라 호스트 설정(daemon.json)에 둔다. compose에 넣으면 로컬
+# 개발에도 AWS 자격증명이 필요해지는데, 로그를 어디로 보내는지는 애플리케이션의
+# 성질이 아니라 "이 서버가 어디에 보내는가"의 문제다.
+#
+# 컨테이너가 기동하기 전에 끝내 둔다. 나중에 바꾸면 도커를 재시작해야 하고
+# 그때 컨테이너가 전부 함께 내려간다.
+if [ "$USE_CLOUDWATCH" = "y" ] || [ "$USE_CLOUDWATCH" = "Y" ]; then
+  [ -f /etc/docker/daemon.json ] && cp /etc/docker/daemon.json /etc/docker/daemon.json.bak
+
+  # 시험용 이미지를 설정 "전에" 받아 둔다. 설정 뒤에 받으면 받기 실패와
+  # 드라이버 실패를 구분할 수 없어, 멀쩡한 설정을 되돌릴 수 있다
+  TEST_IMAGE_OK=n
+  docker pull hello-world >/dev/null 2>&1 && TEST_IMAGE_OK=y
+
+  # tag로 컨테이너 이름이 로그 스트림이 된다 — petradar-backend / -frontend / -mysql.
+  # non-blocking: 전송이 막혔을 때 애플리케이션의 stdout 쓰기까지 멈추지 않게 한다.
+  #               버퍼가 차면 로그를 버린다 — 로그를 잃는 쪽이 사이트가 서는 것보다 낫다
+  cat > /etc/docker/daemon.json <<EOF
+{
+  "log-driver": "awslogs",
+  "log-opts": {
+    "awslogs-region": "${AWS_LOG_REGION}",
+    "awslogs-group": "/petradar",
+    "awslogs-create-group": "true",
+    "tag": "{{.Name}}",
+    "mode": "non-blocking",
+    "max-buffer-size": "4m"
+  }
+}
+EOF
+  systemctl restart docker
+  sleep 5
+
+  # 드라이버는 컨테이너를 만들 때 로그 스트림부터 생성한다. 권한이 모자라면
+  # 그 시점에 실패해 컨테이너가 아예 뜨지 않는다 — 로그 설정 때문에 사이트가
+  # 내려가는 상황이므로, 작은 컨테이너로 먼저 시험하고 안 되면 되돌린다
+  if [ "$TEST_IMAGE_OK" = "n" ]; then
+    echo "  시험용 이미지를 받지 못해 드라이버 확인을 건너뜁니다."
+    echo "  컨테이너가 뜨지 않으면 /etc/docker/daemon.json 을 지우고"
+    echo "  sudo systemctl restart docker 로 되돌리세요."
+  elif docker run --rm --name petradar-logtest hello-world >/dev/null 2>&1; then
+    echo "  CloudWatch로 보냅니다 (로그 그룹 /petradar)."
+
+    # 보존기간을 걸지 않으면 무기한 보관되어 계속 과금된다
+    if command -v aws >/dev/null 2>&1 && \
+       aws logs put-retention-policy --log-group-name /petradar \
+         --retention-in-days 14 --region "$AWS_LOG_REGION" 2>/dev/null; then
+      echo "  보존기간 14일 적용."
+    else
+      echo "  보존기간을 걸지 못했습니다 — 콘솔에서 /petradar 그룹에 직접 설정하세요."
+      echo "  (기본값이 무기한 보관이라 그대로 두면 계속 쌓입니다)"
+    fi
+  else
+    echo "  컨테이너가 로그 드라이버 때문에 기동하지 못했습니다. IAM 역할을 확인하세요."
+    echo "  로그 설정을 되돌리고 계속 진행합니다 — 사이트는 정상적으로 뜹니다."
+    rm -f /etc/docker/daemon.json
+    [ -f /etc/docker/daemon.json.bak ] && mv /etc/docker/daemon.json.bak /etc/docker/daemon.json
+    systemctl restart docker
+    sleep 5
+    USE_CLOUDWATCH=n
+  fi
+else
+  echo "  건너뜁니다 — 로그는 docker compose logs 로 봅니다."
+fi
+
+# ------------------------------------------
+# 5. 저장소 clone
+# ------------------------------------------
+echo "[5/8] 저장소 준비 (${APP_DIR})..."
 # 소스를 빌드하려는 게 아니라 compose 파일과 frontend/nginx-https.conf가 필요해서다.
 # https 오버라이드가 그 설정을 호스트 경로로 마운트하므로 파일이 서버에 있어야 한다.
 # root로 clone하면 이후 git pull에 sudo가 필요해지니 로그인 사용자로 받는다
@@ -151,9 +234,9 @@ fi
 cd "$APP_DIR"
 
 # ------------------------------------------
-# 5. .env 생성
+# 6. .env 생성
 # ------------------------------------------
-echo "[5/7] .env 생성..."
+echo "[6/8] .env 생성..."
 if [ -f "$ENV_FILE" ]; then
   # MYSQL_ROOT_PASSWORD를 새로 만들면 이미 초기화된 mysql 볼륨의 비밀번호와
   # 어긋나 백엔드가 DB에 붙지 못한다. 그래서 기본은 '유지'다
@@ -184,9 +267,9 @@ chown "${APP_USER}:${APP_USER}" "$ENV_FILE"
 chmod 600 "$ENV_FILE"
 
 # ------------------------------------------
-# 6. HTTP로 기동
+# 7. HTTP로 기동
 # ------------------------------------------
-echo "[6/7] 컨테이너 기동 (HTTP)..."
+echo "[7/8] 컨테이너 기동 (HTTP)..."
 # 인증서가 없으면 nginx가 443 설정을 읽다가 기동에 실패하므로, 먼저 HTTP로만 띄운다.
 # 스키마와 FULLTEXT 인덱스는 백엔드가 처음 뜰 때 알아서 만든다
 docker compose pull || {
@@ -209,9 +292,9 @@ if [ "$DOMAIN" = "none" ]; then
 fi
 
 # ------------------------------------------
-# 7. 인증서 발급 + HTTPS 전환
+# 8. 인증서 발급 + HTTPS 전환
 # ------------------------------------------
-echo "[7/7] 인증서 발급 및 HTTPS 전환..."
+echo "[8/8] 인증서 발급 및 HTTPS 전환..."
 
 # 발급 실패의 대부분은 A 레코드가 아직 이 서버를 가리키지 않아서다.
 # 실패를 5분 기다린 뒤 알게 되는 것보다 지금 확인하는 쪽이 싸다
@@ -305,6 +388,9 @@ echo "  https://${DOMAIN} 으로 접속하세요."
 echo ""
 echo " DB 비밀번호·JWT 키는 ${ENV_FILE} 에 있습니다 (권한 600)."
 echo " 인증서 갱신 로그: ${CRON_LOG}"
+if [ "$USE_CLOUDWATCH" = "y" ] || [ "$USE_CLOUDWATCH" = "Y" ]; then
+  echo " 컨테이너 로그: aws logs tail /petradar --follow"
+fi
 echo ""
 echo " 이후 배포는 이 한 줄입니다:"
 echo "   cd ${APP_DIR} && ./deploy.sh"
