@@ -375,14 +375,22 @@ docker compose up -d
 # 갱신 cron (매일 새벽 3시). certbot renew는 만료가 임박하지 않으면 아무 것도
 # 하지 않으므로 매일 돌려도 된다. nginx는 기동 때 읽은 인증서를 계속 쓰므로
 # 갱신에 성공했을 때만(&&) frontend를 재시작해 새 인증서를 읽게 한다
-# 로그를 남기지 않으면 갱신이 실패해도 아무도 모르고 90일 뒤 조용히 만료된다.
+# 갱신이 실패한 "이유"를 볼 수 있는 유일한 창구다. certbot 컨테이너는 --rm이고
+# 자기 로그 경로(/var/log/letsencrypt)는 볼륨에 없어서 컨테이너와 함께 사라진다.
+# 만료 임박 자체는 Let's Encrypt가 20·7·1일 전에 메일로 알려주지만(--email),
+# 메일은 "임박했다"만 말하고 원인은 알려주지 않는다.
+#
 # 저장소 안이 아니라 /var/log에 둔다 — 소스 체크아웃에 로그 파일이 섞이면
 # 서버에서 git status가 더러워지고, 그걸 가리려고 .gitignore에 항목을 더하게 된다.
 # cron은 APP_USER로 돌아 /var/log에 파일을 만들 수 없으므로 root인 지금 만들어 둔다
 CRON_LOG="/var/log/petradar-certbot-renew.log"
-CRON_CMD="cd ${APP_DIR} && docker compose run --rm certbot renew --webroot -w /var/www/certbot --quiet && docker compose restart frontend"
+
+# 체인 전체를 { }로 묶어야 한다. `a && b >> LOG`는 리다이렉션이 b에만 붙어서
+# 정작 보고 싶은 certbot 출력이 빠지고, 성공했을 때의 restart 출력만 남는다.
+# --quiet라 문제가 없으면 아무것도 쓰지 않는다 — 빈 파일이 정상이라는 뜻이다
+CRON_CMD="{ cd ${APP_DIR} && docker compose run --rm certbot renew --webroot -w /var/www/certbot --quiet && docker compose restart frontend; } >> ${CRON_LOG} 2>&1"
 ( crontab -u "$APP_USER" -l 2>/dev/null | grep -v "certbot renew"; \
-  echo "0 3 * * * $CRON_CMD >> ${CRON_LOG} 2>&1" ) | crontab -u "$APP_USER" -
+  echo "0 3 * * * $CRON_CMD" ) | crontab -u "$APP_USER" -
 touch "$CRON_LOG" && chown "${APP_USER}:${APP_USER}" "$CRON_LOG"
 
 # 백엔드는 DB 준비를 기다린 뒤 뜨므로, 바로 찔러보면 502가 나올 수 있다
