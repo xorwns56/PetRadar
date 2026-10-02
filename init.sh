@@ -375,8 +375,11 @@ docker compose up -d
 # 갱신 cron (매일 새벽 3시). certbot renew는 만료가 임박하지 않으면 아무 것도
 # 하지 않으므로 매일 돌려도 된다. nginx는 기동 때 읽은 인증서를 계속 쓰므로
 # 갱신에 성공했을 때만(&&) frontend를 재시작해 새 인증서를 읽게 한다
-# 로그를 남기지 않으면 갱신이 실패해도 아무도 모르고 90일 뒤 조용히 만료된다
-CRON_LOG="${APP_DIR}/certbot-renew.log"
+# 로그를 남기지 않으면 갱신이 실패해도 아무도 모르고 90일 뒤 조용히 만료된다.
+# 저장소 안이 아니라 /var/log에 둔다 — 소스 체크아웃에 로그 파일이 섞이면
+# 서버에서 git status가 더러워지고, 그걸 가리려고 .gitignore에 항목을 더하게 된다.
+# cron은 APP_USER로 돌아 /var/log에 파일을 만들 수 없으므로 root인 지금 만들어 둔다
+CRON_LOG="/var/log/petradar-certbot-renew.log"
 CRON_CMD="cd ${APP_DIR} && docker compose run --rm certbot renew --webroot -w /var/www/certbot --quiet && docker compose restart frontend"
 ( crontab -u "$APP_USER" -l 2>/dev/null | grep -v "certbot renew"; \
   echo "0 3 * * * $CRON_CMD >> ${CRON_LOG} 2>&1" ) | crontab -u "$APP_USER" -

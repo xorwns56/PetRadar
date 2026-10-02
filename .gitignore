@@ -1,6 +1,3 @@
 .idea
 .gradle
 .env
-
-# init.sh가 등록한 갱신 cron이 남기는 로그
-certbot-renew.log
