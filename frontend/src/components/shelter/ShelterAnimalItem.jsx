@@ -10,7 +10,10 @@ const ShelterAnimalItem = ({ animal, onClick }) => (
   >
     <span className="block overflow-hidden bg-brand-soft">
       <img
-        src={animal.imageUrl || "/image-default.png"}
+        /* 공공 API는 원본(popfile1)과 썸네일(popfile2)을 함께 준다.
+           카드 크기에 원본을 쓰면 장당 수 MB를 받느라 늦게 뜬다.
+           썸네일이 없는 개체가 있어 원본으로 떨어뜨린다 */
+        src={animal.thumbnailUrl || animal.imageUrl || "/image-default.png"}
         alt=""
         loading="lazy"
         onError={(e) => {
